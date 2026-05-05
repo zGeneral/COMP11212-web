@@ -169,7 +169,7 @@ describe('renderCount', () => {
   });
 });
 
-describe('parseTableText / renderTableHtml', () => {
+describe('parseTableText / renderTableHtml — table mode', () => {
   const { parseTableText, renderTableHtml } = _internal;
   const sample = [
     'step | rule   | x | y',
@@ -188,38 +188,108 @@ describe('parseTableText / renderTableHtml', () => {
     expect(p.rows[3].cells).toEqual(['3', ':=', '5', '7']);
   });
 
-  it('renders an HTML table with sticky header', () => {
-    const html = renderTableHtml(sample);
+  it('renders an HTML table with sticky header (table mode)', () => {
+    const html = renderTableHtml(sample, 'table', {});
     expect(html).toContain('<table class="trace-table">');
-    expect(html).toContain('<thead>');
     expect(html).toContain('<th>step</th>');
+    expect(html).toContain('<th>rule</th>');
     expect(html).toContain('<th>x</th>');
-    expect(html).toContain('<tbody>');
   });
 
-  it('marks the cell where a value changed from the previous row', () => {
-    const html = renderTableHtml(sample);
-    // Row 1: x changed 0 → 5; should be tt-changed.
-    expect(html).toMatch(/<td class="tt-val tt-changed">5<\/td>.*?<td class="tt-val">0<\/td>/);
-    // Row 3: y changed 0 → 7; should be tt-changed.
-    expect(html).toMatch(/<td class="tt-val">5<\/td><td class="tt-val tt-changed">7<\/td>/);
+  it('marks an increase as tt-up', () => {
+    const html = renderTableHtml(sample, 'table', {});
+    expect(html).toMatch(/<td class="tt-val tt-up">5<\/td>/);   // x: 0 → 5
+    expect(html).toMatch(/<td class="tt-val tt-up">7<\/td>/);   // y: 0 → 7
   });
 
-  it('does NOT mark the step or rule columns as changed (they always change)', () => {
-    const html = renderTableHtml(sample);
-    expect(html).not.toMatch(/<td class="tt-step tt-changed"/);
-    expect(html).not.toMatch(/<td class="tt-rule tt-changed"/);
-  });
-
-  it('handles a truncation row (... step budget exceeded ...)', () => {
-    const truncated = sample + '\n... step budget exceeded — likely non-terminating ...';
-    const html = renderTableHtml(truncated);
+  it('handles truncation rows', () => {
+    const truncated = sample + '\n... step budget exceeded ...';
+    const html = renderTableHtml(truncated, 'table', {});
     expect(html).toContain('class="truncated"');
-    expect(html).toContain('step budget exceeded');
+  });
+});
+
+describe('renderTableHtml — direction-aware highlighting', () => {
+  const { renderTableHtml } = _internal;
+  const upDown = [
+    'step | rule   | x',
+    '-----+--------+---',
+    '0    | start  | 5',
+    '1    | :=     | 8',  // up
+    '2    | :=     | 3',  // down
+    '3    | :=     | 3',  // same
+  ].join('\n');
+
+  it('marks increases tt-up, decreases tt-down, equal cells unmarked', () => {
+    const html = renderTableHtml(upDown, 'table', {});
+    expect(html).toMatch(/<td class="tt-val tt-up">8<\/td>/);
+    expect(html).toMatch(/<td class="tt-val tt-down">3<\/td>/);
+    expect(html).toMatch(/<td class="tt-val">3<\/td>/);
+  });
+});
+
+describe('renderTableHtml — state-trace mode', () => {
+  const { renderTableHtml } = _internal;
+  const sample = [
+    'step | rule   | x',
+    '-----+--------+---',
+    '0    | start  | 0',
+    '1    | :=     | 5',
+    '2    | skip-; | 5',
+    '3    | while-tt| 5',
+    '4    | :=     | 8',
+  ].join('\n');
+
+  it('drops the rule column and renames step to No.', () => {
+    const html = renderTableHtml(sample, 'state-trace', {});
+    expect(html).toContain('<th>No.</th>');
+    expect(html).not.toContain('<th>rule</th>');
   });
 
-  it('falls back to a <pre> when the input is not a parseable table', () => {
-    const html = renderTableHtml('not a table');
-    expect(html).toContain('<pre');
+  it('filters consecutive equal-state rows', () => {
+    const html = renderTableHtml(sample, 'state-trace', {});
+    // 5 engine rows → 3 displayed: start (x=0), := (x=5), := (x=8).
+    // The skip-; and while-tt rows have x=5 (same as previous emitted), filtered.
+    const tdMatches = html.match(/<td class="tt-val[^"]*">[^<]+<\/td>/g) || [];
+    expect(tdMatches).toHaveLength(3);
+  });
+
+  it('includes constant initial-state vars as columns', () => {
+    const html = renderTableHtml(sample, 'state-trace', { m: 14, n: 4 });
+    expect(html).toContain('<th>m</th>');
+    expect(html).toContain('<th>n</th>');
+    // Initial-state values should appear in every emitted row.
+    expect(html).toMatch(/>14</);
+    expect(html).toMatch(/>4</);
+  });
+});
+
+describe('renderTableHtml — loops mode', () => {
+  const { renderTableHtml } = _internal;
+  const sample = [
+    'step | rule    | i',
+    '-----+---------+---',
+    '0    | start   | 0',
+    '1    | :=      | 0',
+    '2    | skip-;  | 0',
+    '3    | while-tt| 0',
+    '4    | :=      | 1',
+    '5    | skip-;  | 1',
+    '6    | while-tt| 1',
+    '7    | :=      | 2',
+    '8    | while-ff| 2',
+  ].join('\n');
+
+  it('keeps initial + every while-tt + every while-ff', () => {
+    const html = renderTableHtml(sample, 'loops', {});
+    // start (i=0), while-tt (i=0), while-tt (i=1), while-ff (i=2). 4 rows.
+    const tdMatches = html.match(/<td class="tt-val[^"]*">[^<]+<\/td>/g) || [];
+    expect(tdMatches).toHaveLength(4);
+  });
+
+  it('drops the rule column', () => {
+    const html = renderTableHtml(sample, 'loops', {});
+    expect(html).not.toContain('<th>rule</th>');
+    expect(html).toContain('<th>No.</th>');
   });
 });

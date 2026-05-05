@@ -192,7 +192,14 @@ function getPane() {
 export function showLoading(tool) {
   const pane = getPane();
   if (!pane) return;
-  const labels = { trace: 'Tracing', table: 'Building table', count: 'Counting steps', hoare: 'Verifying' };
+  const labels = {
+    trace: 'Tracing',
+    table: 'Building table',
+    'state-trace': 'Tracing state changes',
+    loops: 'Building loop snapshots',
+    count: 'Counting steps',
+    hoare: 'Verifying',
+  };
   pane.classList.remove('error');
   pane.innerHTML = `<div class="status">${labels[tool] || 'Running'}…</div>`;
 }
@@ -206,21 +213,24 @@ export function showEngineLoading() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Table view — parse the engine's text output into a real HTML <table> and
-// highlight cells where the value changed from the previous row.
+// Table-style views — three modes, all share a parser + a renderer:
 //
-// Engine output shape (one trailing newline ignored):
-//   step | rule    | x  | y
-//   -----+---------+----+----
-//   0    | start   | 0  | 0
-//   1    | :=      | 5  | 0
-//   ...
+//   mode='table'        Every small-step transition (step + rule + vars).
+//                       The "show me everything" view.
+//   mode='state-trace'  One row per meaningful state change (drop rule col,
+//                       rename step → No.). The "hand-trace" view.
+//   mode='loops'        One row per while-tt + initial + final (drop rule
+//                       col, rename step → No.). The "loop iterations" view.
+//
+// All three include all initial-state variables as columns, even if the
+// variable never changes. All three highlight cells direction-aware:
+// increases on light-blue with dark-blue text, decreases on light-red with
+// dark-red text.
 // ─────────────────────────────────────────────────────────────────────────────
 
 function parseTableText(text) {
   const lines = String(text).split('\n').filter((l) => l.length > 0);
   if (lines.length < 3) return null;
-  // First line is header; second line is separator; rest are data rows.
   const splitRow = (line) => line.split('|').map((c) => c.trim());
   const header = splitRow(lines[0]);
   const rows = [];
@@ -230,53 +240,158 @@ function parseTableText(text) {
       rows.push({ truncated: line });
       continue;
     }
-    if (line.includes('---')) continue;   // skip extra separators if any
+    if (line.includes('---')) continue;
     const cells = splitRow(line);
     if (cells.length === header.length) rows.push({ cells });
   }
   return { header, rows };
 }
 
-function renderTableHtml(text) {
+// Build the column ordering: initial-state vars in declaration order first
+// (they're "givens" the student is reasoning over), then any other vars
+// that appear in the engine cols, alphabetically.
+function buildColumns(engineHeader, initialState) {
+  const initialKeys = Object.keys(initialState || {});
+  const engineVars = engineHeader.filter((h) => h !== 'step' && h !== 'rule');
+  const extra = engineVars.filter((v) => !initialKeys.includes(v)).sort();
+  return [...initialKeys, ...extra];
+}
+
+// For a given row + var, find the value to display.
+// If the var is in the engine's row, use it. Otherwise (var was constant
+// throughout, dropped from the engine output), use the initial-state value.
+function valueForCol(engineHeader, row, varName, initialState) {
+  if (!row || !row.cells) return '';
+  const idx = engineHeader.indexOf(varName);
+  if (idx >= 0) return row.cells[idx];
+  const init = initialState[varName];
+  return init === undefined ? '0' : String(init);
+}
+
+// Determine the direction of change between two numeric strings.
+// Returns 'up', 'down', 'same', or 'na' (non-numeric or first appearance).
+function changeDirection(prev, curr) {
+  if (prev === undefined || prev === null) return 'na';
+  const p = Number(prev), c = Number(curr);
+  if (Number.isNaN(p) || Number.isNaN(c)) return prev !== curr ? 'na' : 'same';
+  if (c > p) return 'up';
+  if (c < p) return 'down';
+  return 'same';
+}
+
+// For the State-trace mode: keep only rows where at least one variable
+// value actually differs from the last kept row. Always keep row 0 (start).
+function filterStateChanges(parsed, columns, initialState) {
+  if (!parsed.rows.length) return [];
+  const out = [parsed.rows[0]];
+  let last = parsed.rows[0];
+  for (let i = 1; i < parsed.rows.length; i++) {
+    const row = parsed.rows[i];
+    if (row.truncated) { out.push(row); continue; }
+    const changed = columns.some((col) =>
+      valueForCol(parsed.header, row, col, initialState) !==
+      valueForCol(parsed.header, last, col, initialState)
+    );
+    if (changed) { out.push(row); last = row; }
+  }
+  return out;
+}
+
+// For the Loops mode: keep initial row, every while-tt, every while-ff,
+// and the last row (de-duplicated).
+function filterLoopSnapshots(parsed) {
+  if (!parsed.rows.length) return [];
+  const ruleIdx = parsed.header.indexOf('rule');
+  const out = [parsed.rows[0]];
+  for (let i = 1; i < parsed.rows.length; i++) {
+    const row = parsed.rows[i];
+    if (row.truncated) { out.push(row); continue; }
+    const rule = ruleIdx >= 0 ? row.cells[ruleIdx] : '';
+    if (rule === 'while-tt' || rule === 'while-ff') out.push(row);
+  }
+  // Always include the last data row if not already present.
+  const lastEngine = parsed.rows[parsed.rows.length - 1];
+  if (lastEngine && !lastEngine.truncated && !out.includes(lastEngine)) {
+    out.push(lastEngine);
+  }
+  return out;
+}
+
+// Mode-aware render: returns the inner HTML for the result pane.
+function renderTableHtml(text, mode = 'table', initialState = {}) {
   const parsed = parseTableText(text);
-  if (!parsed) {
-    return `<pre class="trace">${escapeHtml(text)}</pre>`;
+  if (!parsed) return `<pre class="trace">${escapeHtml(text)}</pre>`;
+
+  const columns = buildColumns(parsed.header, initialState);
+  let filtered;
+  if (mode === 'state-trace') {
+    filtered = filterStateChanges(parsed, columns, initialState);
+  } else if (mode === 'loops') {
+    filtered = filterLoopSnapshots(parsed);
+  } else {
+    filtered = parsed.rows;
   }
-  const { header, rows } = parsed;
+
+  // Decide which header columns to emit for THIS mode.
+  // mode='table': step + rule + columns (existing behaviour).
+  // mode='state-trace' / 'loops': No. + columns (drop rule).
+  const showRule = mode === 'table';
+  const stepLabel = mode === 'table' ? 'step' : 'No.';
+
   let html = '<table class="trace-table"><thead><tr>';
-  for (const h of header) {
-    html += `<th>${escapeHtml(h)}</th>`;
-  }
+  html += `<th>${escapeHtml(stepLabel)}</th>`;
+  if (showRule) html += '<th>rule</th>';
+  for (const col of columns) html += `<th>${escapeHtml(col)}</th>`;
   html += '</tr></thead><tbody>';
-  let prev = null;
-  for (const row of rows) {
+
+  let prevValues = null;
+  let displayIdx = 0;
+  for (const row of filtered) {
     if (row.truncated) {
-      html += `<tr class="truncated"><td colspan="${header.length}">${escapeHtml(row.truncated)}</td></tr>`;
+      const span = 1 + (showRule ? 1 : 0) + columns.length;
+      html += `<tr class="truncated"><td colspan="${span}">${escapeHtml(row.truncated)}</td></tr>`;
       continue;
     }
-    const cells = row.cells;
+    const stepNum = mode === 'table'
+      ? row.cells[parsed.header.indexOf('step')]
+      : String(displayIdx);
+    const rule = parsed.header.indexOf('rule') >= 0
+      ? row.cells[parsed.header.indexOf('rule')]
+      : '';
+
+    const valueRow = columns.map((col) => valueForCol(parsed.header, row, col, initialState));
+
     html += '<tr>';
-    for (let i = 0; i < cells.length; i++) {
-      const value = cells[i];
-      const colName = header[i];
-      // step + rule columns are metadata; never highlight as a value-change.
-      const isMeta = colName === 'step' || colName === 'rule';
-      const changed = !isMeta && prev && prev[i] !== undefined && prev[i] !== value;
-      const cls = isMeta
-        ? `tt-${escapeHtml(colName)}`
-        : 'tt-val' + (changed ? ' tt-changed' : '');
+    html += `<td class="tt-step">${escapeHtml(stepNum)}</td>`;
+    if (showRule) html += `<td class="tt-rule">${escapeHtml(rule)}</td>`;
+    for (let i = 0; i < columns.length; i++) {
+      const value = valueRow[i];
+      const prev = prevValues ? prevValues[i] : undefined;
+      const dir = changeDirection(prev, value);
+      let cls = 'tt-val';
+      if (dir === 'up')   cls += ' tt-up';
+      if (dir === 'down') cls += ' tt-down';
+      if (dir === 'na' && prev !== undefined && prev !== value) cls += ' tt-changed';
       html += `<td class="${cls}">${escapeHtml(value)}</td>`;
     }
     html += '</tr>';
-    prev = cells;
+
+    prevValues = valueRow;
+    displayIdx += 1;
   }
   html += '</tbody></table>';
   return html;
 }
 
-function renderTrace(text) {
-  // Used by the table tool — wraps the table HTML in a scroll container.
-  return `<div class="trace-table-wrap">${renderTableHtml(text)}</div>`;
+// Used by trace_pane.renderResult when tool produces a {tableText, initialState, mode} envelope.
+function renderTrace(envelopeValue) {
+  // Backward compat: if the engine returned a bare string (older Table path),
+  // treat it as mode=table with empty initial state.
+  if (typeof envelopeValue === 'string') {
+    return `<div class="trace-table-wrap">${renderTableHtml(envelopeValue, 'table', {})}</div>`;
+  }
+  const { tableText, mode, initialState } = envelopeValue;
+  return `<div class="trace-table-wrap">${renderTableHtml(tableText, mode || 'table', initialState || {})}</div>`;
 }
 
 function renderTraceText(text) {
@@ -385,7 +500,7 @@ export function renderResult(tool, envelope) {
   pane.classList.remove('error');
   if (tool === 'trace') {
     pane.innerHTML = renderTraceText(envelope.value);
-  } else if (tool === 'table') {
+  } else if (tool === 'table' || tool === 'state-trace' || tool === 'loops') {
     pane.innerHTML = renderTrace(envelope.value);
   } else if (tool === 'count') {
     pane.innerHTML = renderCount(envelope.value);
@@ -397,4 +512,10 @@ export function renderResult(tool, envelope) {
 }
 
 // Exposed for unit testing
-export const _internal = { renderTraceText, renderCount, renderHoare, renderError, escapeHtml, paintTrace, paintTokens, paintLine, parseTableText, renderTableHtml };
+export const _internal = {
+  renderTraceText, renderCount, renderHoare, renderError, escapeHtml,
+  paintTrace, paintTokens, paintLine,
+  parseTableText, renderTableHtml, renderTrace,
+  buildColumns, valueForCol, changeDirection,
+  filterStateChanges, filterLoopSnapshots,
+};

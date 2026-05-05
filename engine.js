@@ -116,7 +116,12 @@ export async function runTool({ tool, code, state, samples, pre, post }) {
 
     if (tool === 'table') {
       const result = py.runPython(`trace(_code, dict(_state.to_py()), view='table')`);
-      return { ok: true, value: result };
+      return { ok: true, value: { tableText: result, initialState: state || {}, mode: 'table' } };
+    }
+
+    if (tool === 'state-trace' || tool === 'loops') {
+      const result = py.runPython(`trace(_code, dict(_state.to_py()), view='table')`);
+      return { ok: true, value: { tableText: result, initialState: state || {}, mode: tool } };
     }
 
     if (tool === 'count') {

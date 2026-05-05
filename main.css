@@ -501,13 +501,25 @@ table.trace-table tbody td {
 table.trace-table .tt-step { color: var(--fg-faint); text-align: right; }
 table.trace-table .tt-rule { color: var(--fg-muted); font-style: italic; }
 table.trace-table .tt-val  { font-variant-numeric: tabular-nums; }
-table.trace-table .tt-changed {
-  background: rgba(46, 125, 50, 0.10);
+
+/* Direction-aware change highlighting:
+   - tt-up    : value increased     (dark blue text on light blue bg)
+   - tt-down  : value decreased     (dark red text on light red bg)
+   - tt-changed: value changed but not numerically comparable (fallback) */
+table.trace-table .tt-up {
+  color: #0d47a1;
+  background: #e3f2fd;
   font-weight: 600;
-  color: var(--fg);
 }
-body.theme-ide table.trace-table .tt-changed { background: rgba(211, 47, 47, 0.10); color: #d32f2f; }
-body.theme-two table.trace-table .tt-changed { background: rgba(21, 101, 192, 0.10); color: #1565c0; }
+table.trace-table .tt-down {
+  color: #b71c1c;
+  background: #ffebee;
+  font-weight: 600;
+}
+table.trace-table .tt-changed {
+  background: rgba(0, 0, 0, 0.05);
+  font-weight: 600;
+}
 table.trace-table tr.truncated td {
   text-align: center;
   font-style: italic;
