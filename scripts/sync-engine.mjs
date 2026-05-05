@@ -4,8 +4,9 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const HERE = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
+const HERE = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SRC = path.join(HERE, '..', 'COMP11212', 'notebooks', 'while_lang.py');
 const DST = path.join(HERE, 'static', 'while_lang.py');
 

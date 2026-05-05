@@ -10,9 +10,10 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { execSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 
 const VERSION = '0.27.0';
-const HERE = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
+const HERE = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const TARGET = path.join(HERE, 'static', 'pyodide');
 
 if (fs.existsSync(path.join(TARGET, 'pyodide.js'))) {
