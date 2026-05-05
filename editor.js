@@ -59,12 +59,32 @@ export function onChange(handler) {
   if (typeof handler === 'function') _changeHandlers.push(handler);
 }
 
+// Auto-size a <textarea> so it grows to fit its content.
+function autoSize(el) {
+  if (!el) return;
+  el.style.height = 'auto';
+  el.style.height = (el.scrollHeight + 2) + 'px';
+}
+
+// Wire the JSON textareas (#state-input + #hoare-samples) to auto-size on
+// every input event, and size them once at startup. Call from bootstrap.
+export function wireAutoSize() {
+  if (typeof document === 'undefined') return;
+  for (const id of ['state-input', 'hoare-samples', 'hoare-pre', 'hoare-post']) {
+    const el = document.getElementById(id);
+    if (!el || el.tagName !== 'TEXTAREA') continue;
+    el.addEventListener('input', () => autoSize(el));
+    autoSize(el);
+  }
+}
+
 // State input pane (plain <textarea id="state-input">).
 export function setState(stateObj) {
   if (typeof document === 'undefined') return;
   const node = document.getElementById('state-input');
   if (!node) return;
   node.value = JSON.stringify(stateObj || {}, null, 2);
+  autoSize(node);
 }
 
 export function getState() {

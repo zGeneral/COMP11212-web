@@ -149,6 +149,10 @@ async function applyExample(value) {
         ? JSON.stringify(entry.samples, null, 2)
         : '';
   }
+  // Trigger the auto-size listener on each programmatically-set textarea.
+  [preEl, postEl, sampEl].forEach((el) => {
+    if (el && el.tagName === 'TEXTAREA') el.dispatchEvent(new Event('input'));
+  });
 
   showTheory(entry.theory || entry.blurb || '');
 

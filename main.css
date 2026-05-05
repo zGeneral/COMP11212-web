@@ -355,13 +355,15 @@ body.cheatsheets-page { background: var(--bg); }
 
 #state-input {
   width: 100%;
-  min-height: 56px;
+  min-height: 28px;
   padding: 8px 10px;
   font-family: var(--code-font);
   font-size: 13px;
   border: 1px solid var(--border);
   border-radius: 4px;
   background: var(--bg);
+  resize: none;
+  overflow: hidden;
 }
 
 .hoare-pane label {
@@ -382,7 +384,11 @@ body.cheatsheets-page { background: var(--bg); }
   border-radius: 4px;
   background: var(--bg);
 }
-.hoare-pane textarea { min-height: 48px; resize: vertical; }
+.hoare-pane textarea {
+  min-height: 28px;
+  resize: none;
+  overflow: hidden;
+}
 .hoare-pane .hint {
   margin: 8px 0 0;
   font-size: 12px;

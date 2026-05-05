@@ -10,6 +10,7 @@ import {
   getState,
   getHoareInputs,
   setEditorTheme,
+  wireAutoSize,
 } from './editor.js';
 import { renderResult, showLoading, showEngineLoading } from './trace_pane.js';
 import { setupToolbar } from './toolbar.js';
@@ -209,6 +210,9 @@ export function bootstrap() {
     themeSel.value = savedTheme;
     themeSel.addEventListener('change', (ev) => applyTheme(ev.target.value));
   }
+
+  // Wire JSON textareas to auto-grow with their content.
+  wireAutoSize();
 
   const initial = parseUrl(typeof location !== 'undefined' ? location : { search: '', hash: '' });
 
