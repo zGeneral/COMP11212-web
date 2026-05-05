@@ -70,7 +70,12 @@
         <label>Sample-state schema (JSON)
           <textarea id="hoare-samples" spellcheck="false" autocomplete="off" placeholder='{"n": [0, 30]}'></textarea>
         </label>
-        <p class="hint">ASCII operators: <code>&amp;</code> = and · <code>|</code> = or · <code>!</code> = not · <code>&lt;=</code>, <code>&gt;=</code>.</p>
+        <p class="hint">
+          Assertions are <strong>Python expressions</strong> (not While syntax).
+          Use <code>and</code>, <code>or</code>, <code>not</code> for booleans;
+          <code>==</code> for equality; <code>//</code> for integer divide;
+          <code>%</code> for modulo. Sample schema is JSON: <code>{"n": [0, 30]}</code> means n random in [0, 30].
+        </p>
       </details>
     </section>
 
