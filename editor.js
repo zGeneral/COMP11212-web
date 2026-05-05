@@ -13,7 +13,7 @@
 // Hoare inputs stay as plain <textarea>/<input> elements.
 
 let _view = null;
-let _currentTheme = 'ide';
+let _currentTheme = 'two-tone';
 const _changeHandlers = [];
 
 function getMount() {

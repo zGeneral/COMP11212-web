@@ -162,7 +162,7 @@ const editorTheme = EditorView.theme({
 // ─────────────────────────────────────────────────────────────────────────────
 
 function pickTheme(name) {
-  return THEMES[name] || THEMES.ide;
+  return THEMES[name] || THEMES['two-tone'];
 }
 
 function create(parent, initialDoc, onChange, themeName) {

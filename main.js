@@ -18,13 +18,13 @@ const THEME_KEY = 'while-playground:theme';
 const THEME_VALUES = new Set(['plain', 'two-tone', 'ide']);
 
 function readTheme() {
-  if (typeof localStorage === 'undefined') return 'ide';
+  if (typeof localStorage === 'undefined') return 'two-tone';
   const v = localStorage.getItem(THEME_KEY);
-  return THEME_VALUES.has(v) ? v : 'ide';
+  return THEME_VALUES.has(v) ? v : 'two-tone';
 }
 
 function applyTheme(name) {
-  const safe = THEME_VALUES.has(name) ? name : 'ide';
+  const safe = THEME_VALUES.has(name) ? name : 'two-tone';
   if (typeof document !== 'undefined') {
     document.body.classList.remove('theme-plain', 'theme-two', 'theme-ide');
     document.body.classList.add(safe === 'two-tone' ? 'theme-two' : `theme-${safe}`);
