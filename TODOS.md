@@ -1,5 +1,17 @@
 # TODOs — v1.5 and beyond
 
+## v1 follow-ups (do these soon)
+
+### Add the CI workflow back
+
+The `.github/workflows/ci.yml` file is sitting in the repo on disk but was excluded from the initial git push because the GitHub PAT used to push lacked the `workflow` scope.
+
+**How to fix:** Run `gh auth refresh -h github.com -s workflow` to add the scope, then `git add .github/workflows/ci.yml && git commit -m "ci: add Vitest + Playwright + Docker build workflow" && git push`.
+
+CI provides three jobs: Vitest unit tests, Playwright E2E tests (with browser install), and a Docker build smoke test. None of them gate the deploy yet, but having them green in PRs is useful.
+
+
+
 Items deferred from v1 with explicit reasoning. Sourced from the design doc's "NOT in scope" table. Each is a complete-enough capture that future-you can pick it up cold.
 
 ---
