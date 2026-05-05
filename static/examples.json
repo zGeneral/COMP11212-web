@@ -39,7 +39,7 @@
         {
           "ref": "Example 5",
           "title": "Multiplication by repeated addition",
-          "code": "z := 0;\n    while (z + 1) * (z + 1) <= x do (\n        z := z + 1\n    );\n    r := x - z * z",
+          "code": "result := 0;\ni := 1;\nwhile i <= n do (\n  result := result + m;\n  i := i + 1\n)",
           "state": {
             "m": 4,
             "n": 7
@@ -51,7 +51,7 @@
         {
           "ref": "Example 6",
           "title": "Power — m^n",
-          "code": "y := 1;\n    z := 0;\n    while 1 <= x do (\n        t := z;\n        z := y;\n        y := t + y;\n        x := x - 1\n    )",
+          "code": "result := 1;\ni := 1;\nwhile i <= n do (\n  result := result * m;\n  i := i + 1\n)",
           "state": {
             "m": 3,
             "n": 4
@@ -69,7 +69,7 @@
         {
           "ref": "Example 7",
           "title": "Integer square via repeated addition",
-          "code": "x := 0;\n    while x <= 2 do (\n        x := x + 1\n    )",
+          "code": "result := 0;\ni := 1;\nwhile i <= n do (\n  result := result + n;\n  i := i + 1\n)",
           "state": {
             "n": 5
           },
@@ -92,7 +92,7 @@
         {
           "ref": "Example 9",
           "title": "Counting bounded loop",
-          "code": "x := 0;\n    while 0 <= x do (\n        x := x + 1\n    )",
+          "code": "x := 0;\nwhile x <= n do (\n  x := x + 1\n)",
           "state": {
             "n": 4
           },
@@ -103,7 +103,7 @@
         {
           "ref": "Example 10",
           "title": "Nested loop — pair counter",
-          "code": "x := 0; y := 0;\n    while !(y = 1) do (\n        if a * x * x + b * x + c = 0 then\n            y := 1\n        else (\n            if a * x * x - b * x + c = 0 then\n                y := 1\n            else (\n                skip\n            )\n        );\n        x := x + 1\n    )",
+          "code": "count := 0;\ni := 0;\nwhile i <= m do (\n  j := 0;\n  while j <= n do (\n    count := count + 1;\n    j := j + 1\n  );\n  i := i + 1\n)",
           "state": {
             "m": 3,
             "n": 3
@@ -127,7 +127,7 @@
         {
           "ref": "Exercise 4",
           "title": "Even-odd flag",
-          "code": "done := 0;\n    while x = 0 & done = 0 do (\n        y := 100;\n        done := 1\n    );\n    while !(done = 1) & !(x = 0) do (\n        y := 200;\n        done := 1\n    )",
+          "code": "done := 0;\nwhile done = 0 do (\n  if n <= 1 then\n    done := 1\n  else (\n    n := n - 2\n  )\n)",
           "state": {
             "n": 7
           },
@@ -149,7 +149,7 @@
         {
           "ref": "Exercise 6",
           "title": "Counter with conditional",
-          "code": "count := 0;\n    i := 0;\n    while i * i * i <= n do (\n        if m <= i * i * i then\n            count := count + 1\n        else (\n            skip\n        );\n        i := i + 1\n    )",
+          "code": "count := 0;\ni := 0;\nwhile i <= n do (\n  if i + i <= n then\n    count := count + 1\n  else (\n    skip\n  );\n  i := i + 1\n)",
           "state": {
             "n": 8
           },
@@ -160,7 +160,7 @@
         {
           "ref": "Exercise 7",
           "title": "Multiplication — alternative form",
-          "code": "x := 0; y := 0;\n    while !(m * x + n * y = k) do (\n        x := x + 1;\n        y := 0;\n        while !(m * x + n * y = k) & y <= x & !(y = x) do (\n            if m * y + n * x = k then (\n                z := x;\n                x := y;\n                y := z\n            ) else (\n                y := y + 1\n            )\n        )\n    )",
+          "code": "result := 0;\nwhile !(n = 0) do (\n  result := result + m;\n  n := n - 1\n)",
           "state": {
             "m": 5,
             "n": 4
@@ -184,7 +184,7 @@
         {
           "ref": "Exercise 15",
           "title": "Conditional with done flag",
-          "code": "done := 0;\n    while x = 0 & done = 0 do (\n        y := 1;\n        done := 1\n    );\n    while !(done = 1) & !(x = 0) do (\n        y := 2;\n        done := 1\n    )",
+          "code": "done := 0;\ni := 0;\nwhile done = 0 do (\n  if i = n then\n    done := 1\n  else (\n    i := i + 1\n  )\n)",
           "state": {
             "n": 6
           },
@@ -212,7 +212,7 @@
         {
           "ref": "Exercise 17",
           "title": "Step count of a small program",
-          "code": "x := 1;\n    if x = 0 then\n        y := 1\n    else (\n        y := 2\n    );\n    while y <= 2 do (\n        x := x + 1;\n        y := y + 1\n    )",
+          "code": "x := 0;\ny := 0;\nwhile y <= n do (\n  x := x + y;\n  y := y + 1\n)",
           "state": {
             "n": 8
           },
@@ -223,7 +223,7 @@
         {
           "ref": "Exercise 18",
           "title": "Step count — alternative form",
-          "code": "x := 1;\n    if x = 0 then\n        y := 1\n    else (\n        y := 2\n    );\n    while y <= 2 do (\n        x := x + 1;\n        y := y + 1\n    )",
+          "code": "x := 0;\nwhile x <= n do (\n  x := x + 1\n);\ny := x",
           "state": {
             "n": 8
           },
@@ -245,7 +245,7 @@
         {
           "ref": "Exercise 23",
           "title": "Constant program — Θ(1)",
-          "code": "x := 0;\n    i := 1;\n    while i <= n do (\n        j := 1;\n        while j <= i do (\n            x := x + j;\n            j := j + 1\n        );\n        i := i + 1\n    )",
+          "code": "x := n;\ny := x + 1;\nz := x + y",
           "state": {
             "n": 100
           },
@@ -303,7 +303,7 @@
         {
           "ref": "Exercise 34",
           "title": "Power — Hoare verification",
-          "code": "x := 1; y := n;\n    while 1 <= y do (\n        x := x * m;\n        y := y - 1\n    )",
+          "code": "x := 1;\ni := 0;\nwhile i <= n - 1 do (\n  x := x * 2;\n  i := i + 1\n)",
           "state": {
             "n": 4
           },
@@ -360,7 +360,7 @@
         {
           "ref": "Exercise 37",
           "title": "Divisibility check",
-          "code": "d := n;\n    while 10 <= d do (d := d - 10);\n    r := d;\n    while 3 <= r do (r := r - 3);\n    if r = 0 then\n        z := 1\n    else (\n        z := 0\n    )",
+          "code": "d := 0;\nr := n;\nwhile k <= r do (\n  r := r - k\n);\nif r = 0 then\n  d := 1\nelse (\n  skip\n)",
           "state": {
             "n": 12,
             "k": 3
@@ -384,7 +384,7 @@
         {
           "ref": "Exercise 61",
           "title": "Power — total correctness",
-          "code": "x := 1; y := n;\n    while 1 <= y do (\n        x := x * m;\n        y := y - 1\n    )",
+          "code": "x := 1;\ni := 0;\nwhile i <= n - 1 do (\n  x := x * 2;\n  i := i + 1\n)",
           "state": {
             "n": 5
           },
@@ -420,7 +420,7 @@
         {
           "ref": "Example 15",
           "title": "Multiplication via repeated addition",
-          "code": "z := 1; y := 1;\n    while z <= n - 1 do (y := y + 1; z := z + y);\n    if z = n then x := 1 else (x := 0)",
+          "code": "result := 0;\ni := 1;\nwhile i <= n do (\n  result := result + m;\n  i := i + 1\n)",
           "state": {
             "m": 4,
             "n": 7
@@ -432,7 +432,7 @@
         {
           "ref": "Example 16",
           "title": "Power — variant",
-          "code": "z := 1; y := 1;\n    while z <= n - 1 do (y := y + 1; z := z + y);\n    if z = n then x := 1 else (x := 0)",
+          "code": "result := 1;\ni := 1;\nwhile i <= n do (\n  result := result * m;\n  i := i + 1\n)",
           "state": {
             "m": 2,
             "n": 5
@@ -455,7 +455,7 @@
         {
           "ref": "Exercise 51",
           "title": "Halting — bounded vs unbounded",
-          "code": "if 100 <= n & !(100 = n) then\n        x := n\n    else (\n        x := y\n    )",
+          "code": "if 100 <= n then\n  while tt do (\n    skip\n  )\nelse (\n  skip\n)",
           "state": {
             "n": 50
           },
@@ -472,8 +472,11 @@
         {
           "ref": "Exercise 58",
           "title": "Loop-free program — terminates",
-          "code": "x := 0; y := 0;\n    while !(m * x + n * y = k) do (\n        x := x + 1;\n        y := 0;\n        while !(m * x + n * y = k) & y <= x & !(y = x) do (\n            if m * y + n * x = k then (\n                z := x;\n                x := y;\n                y := z\n            ) else (\n                y := y + 1\n            )\n        )\n    )",
-          "state": {},
+          "code": "x := m + n;\ny := m * n;\nif x <= y then\n  z := x\nelse (\n  z := y\n)",
+          "state": {
+            "m": 3,
+            "n": 4
+          },
           "tool": "trace",
           "blurb": "Loop-free programs trivially terminate; trace and confirm.",
           "theory": "**Loop-free program — terminates trivially.**\n\nA program with only `:=`, `;`, `if`, `skip` (no `while`). Big-step semantics gives this an obvious termination proof: structural induction over the program.\n\nDemonstrates the chapter's \"loop-free implies terminating\" lemma."
@@ -481,8 +484,11 @@
         {
           "ref": "Exercise 59",
           "title": "Equivalence under big-step",
-          "code": "x := 0; y := 0;\n    while !(m * x + n * y = k) do (\n        x := x + 1;\n        y := 0;\n        while !(m * x + n * y = k) & y <= x & !(y = x) do (\n            if m * y + n * x = k then (\n                z := x;\n                x := y;\n                y := z\n            ) else (\n                y := y + 1\n            )\n        )\n    )",
-          "state": {},
+          "code": "x := m;\ny := n;\nif x <= y then\n  z := y - x\nelse (\n  z := x - y\n)",
+          "state": {
+            "m": 3,
+            "n": 4
+          },
           "tool": "trace",
           "blurb": "A program for the big-step equivalence proof; trace its small-step run.",
           "theory": "**Big-step equivalence proof.**\n\nA program used in the chapter's proof that big-step and small-step semantics agree on terminating runs. Trace its small-step execution here, then compare to the big-step result (same final state)."
@@ -490,7 +496,7 @@
         {
           "ref": "Exercise 62",
           "title": "Determinism showcase",
-          "code": "done := 0;\n    while x = 0 & done = 0 do (\n        y := 1;\n        done := 1\n    );\n    while !(done = 1) & !(x = 0) do (\n        y := 2;\n        done := 1\n    )",
+          "code": "done := 0;\ni := 0;\nresult := 0;\nwhile done = 0 do (\n  if i = n then\n    done := 1\n  else (\n    result := result + i;\n    i := i + 1\n  )\n)",
           "state": {
             "n": 5
           },
@@ -525,7 +531,7 @@
         {
           "ref": "Exercise 67",
           "title": "Big-step ↔ small-step agreement",
-          "code": "x := 0; y := 0;\n    while !(m * x + n * y = k) do (\n        x := x + 1;\n        y := 0;\n        while !(m * x + n * y = k) & y <= x & !(y = x) do (\n            if m * y + n * x = k then (\n                z := x;\n                x := y;\n                y := z\n            ) else (\n                y := y + 1\n            )\n        )\n    )",
+          "code": "x := 0;\ny := 0;\nwhile y <= n do (\n  x := x + y;\n  y := y + 1\n)",
           "state": {
             "n": 4
           },
@@ -577,11 +583,11 @@
           "title": "Collatz step counter",
           "code": "steps := 0;\nwhile !(x = 1) do (\n  steps := steps + 1;\n  half := x;\n  count := 0;\n  while 2 <= half do (\n    half := half - 2;\n    count := count + 1\n  );\n  if half = 0 then\n    x := count\n  else (\n    x := 3 * x + 1\n  )\n)",
           "state": {
-            "x": 27
+            "x": 7
           },
           "tool": "trace",
           "blurb": "Collatz: halve if even, 3x+1 if odd. Famously decidable in practice but unproven in general. (Halving expanded since While has no /.)",
-          "theory": "**Collatz conjecture — counts steps to 1.**\n\nRepeatedly: if `x` is even, halve it; if `x` is odd, set `x := 3x + 1`. The Collatz conjecture says this always reaches 1 — *unproven for all `x` to this day*, but verified up to enormous numbers.\n\nTry `x = 27` (takes 111 iterations to reach 1). The While language has no `mod` or `/`, so this implementation expands \"halving\" into an inner subtraction loop."
+          "theory": "**Collatz conjecture — counts steps to 1.**\n\nRepeatedly: if `x` is even, halve it; if `x` is odd, set `x := 3x + 1`. The Collatz conjecture says this always reaches 1 — *unproven for all `x` to this day*, but verified up to enormous numbers.\n\nThis implementation expands \"halving\" into an inner subtraction loop because While has no `mod` or `/`. Default `x = 7` is small (chain length 16, peak value 52) so the trace fits in the step budget. Larger inputs like `x = 27` are correct in principle but blow past 10 000 small-steps in this expanded form."
         },
         {
           "ref": "Extra",
@@ -596,15 +602,16 @@
         },
         {
           "ref": "Extra",
-          "title": "Diophantine search — find x, y with ax + by = 1",
-          "code": "found := 0;\nx := 0;\ny := 0;\nwhile found = 0 do (\n  if a * x + b * y = 1 then\n    found := 1\n  else (\n    if x <= y then\n      x := x + 1\n    else (\n      y := y + 1\n    )\n  )\n)",
+          "title": "Diophantine search — find x, y with ax + by = c",
+          "code": "found := 0;\nx := 0;\ny := 0;\nwhile found = 0 do (\n  if a * x + b * y = c then\n    found := 1\n  else (\n    if x <= y then\n      x := x + 1\n    else (\n      y := y + 1\n    )\n  )\n)",
           "state": {
-            "a": 3,
-            "b": 5
+            "a": 2,
+            "b": 3,
+            "c": 7
           },
           "tool": "trace",
-          "blurb": "Search for nonneg x, y solving ax + by = 1. Halts iff gcd(a,b) = 1.",
-          "theory": "**Search for a Diophantine solution.**\n\nFor coprime `(a, b)`, finds non-negative `(x, y)` with `ax + by = 1` (or 0; depending on the precise equation). Halts iff `gcd(a, b) = 1`.\n\nDemonstrates a *semidecidable* predicate: the search will halt when a solution exists, but for `(a, b) = (2, 4)` it loops forever. Try `(a, b) = (3, 5)` (halts) vs `(a, b) = (2, 4)` (won't)."
+          "blurb": "Find non-negative x, y with ax + by = c. Halts iff such a solution exists.",
+          "theory": "**Search for a non-negative Diophantine solution.**\n\nFinds non-negative integers `(x, y)` with `ax + by = c`. Default state `{a: 2, b: 3, c: 7}` has the solution `(x, y) = (2, 1)` because `2·2 + 3·1 = 7` — the search converges in a few iterations.\n\nDemonstrates a *semidecidable* predicate: the search halts iff a solution exists. Try `{a: 2, b: 4, c: 5}`: gcd(2, 4) = 2 doesn't divide 5, no solution exists, and the search loops forever (you'll see the step-budget guardrail kick in)."
         },
         {
           "ref": "Extra",
