@@ -1,35 +1,74 @@
-// toolbar.js — wires the tool selector, share button, and "Try this" examples.
+// toolbar.js — wires the tool selector, share button, and examples dropdown.
+//
+// Examples are loaded from /static/examples.json at page boot (one fetch).
+// Selecting an example loads its program + state + suggested tool + (for
+// Hoare) precondition/postcondition/sample-state schema, then runs.
 
-const EXAMPLES = {
-  sum: `result := 0;
-i := 1;
-while i <= n do (
-  result := result + i;
-  i := i + 1
-)`,
-  gcd: `while !(b = 0) do (
-  if a <= b then
-    skip
-  else (
-    t := a;
-    a := b;
-    b := t
-  );
-  b := b - a
-)`,
-  factorial: `result := 1;
-i := 1;
-while i <= n do (
-  result := result * i;
-  i := i + 1
-)`,
-};
+let _catalogue = null;
 
-const EXAMPLE_STATES = {
-  sum: { n: 10 },
-  gcd: { a: 84, b: 30 },
-  factorial: { n: 6 },
-};
+async function loadCatalogue() {
+  if (_catalogue) return _catalogue;
+  try {
+    const response = await fetch('/static/examples.json');
+    if (!response.ok) throw new Error('HTTP ' + response.status);
+    _catalogue = await response.json();
+  } catch (e) {
+    console.warn('toolbar: could not load examples.json:', e);
+    _catalogue = { chapters: [] };
+  }
+  return _catalogue;
+}
+
+function populateExamplesSelect(catalogue) {
+  const select = document.getElementById('examples-select');
+  if (!select) return;
+  // Reset (keep the placeholder option)
+  while (select.options.length > 1) select.remove(1);
+
+  catalogue.chapters.forEach((chapter) => {
+    const group = document.createElement('optgroup');
+    group.label = chapter.label;
+    chapter.entries.forEach((entry, idx) => {
+      const option = document.createElement('option');
+      const refLabel = entry.ref && entry.ref !== 'Extra' ? `${entry.ref} — ` : '';
+      option.value = `${chapter.label}::${idx}`;
+      option.textContent = `${refLabel}${entry.title}`;
+      option.title = entry.blurb || '';
+      group.appendChild(option);
+    });
+    select.appendChild(group);
+  });
+}
+
+async function applyExample(value) {
+  const catalogue = await loadCatalogue();
+  const [chapterLabel, idxStr] = value.split('::');
+  const chapter = catalogue.chapters.find((c) => c.label === chapterLabel);
+  if (!chapter) return null;
+  const entry = chapter.entries[Number(idxStr)];
+  if (!entry) return null;
+
+  const editor = await import('./editor.js');
+  editor.setEditor(entry.code);
+  editor.setState(entry.state || {});
+
+  // Hoare prefill if applicable.
+  if (entry.tool === 'hoare') {
+    const preEl = document.getElementById('hoare-pre');
+    const postEl = document.getElementById('hoare-post');
+    const sampEl = document.getElementById('hoare-samples');
+    if (preEl) preEl.value = entry.pre || '';
+    if (postEl) postEl.value = entry.post || '';
+    if (sampEl) {
+      sampEl.value =
+        entry.samples && Object.keys(entry.samples).length
+          ? JSON.stringify(entry.samples, null, 2)
+          : '';
+    }
+  }
+
+  return entry;
+}
 
 function showToast(msg, kind = 'info') {
   if (typeof document === 'undefined') return;
@@ -45,7 +84,7 @@ function showToast(msg, kind = 'info') {
   setTimeout(() => toast.classList.remove('show'), 2200);
 }
 
-export function setupToolbar({ onTool, onShare, initialTool = 'trace' }) {
+export async function setupToolbar({ onTool, onShare, initialTool = 'trace' }) {
   if (typeof document === 'undefined') return;
 
   // Tool buttons
@@ -54,7 +93,6 @@ export function setupToolbar({ onTool, onShare, initialTool = 'trace' }) {
       document.querySelectorAll('[data-tool]').forEach((b) => b.classList.remove('active'));
       btn.classList.add('active');
       const tool = btn.getAttribute('data-tool');
-      // Toggle Hoare-input visibility.
       document.body.classList.toggle('tool-hoare', tool === 'hoare');
       document.body.classList.toggle('tool-count', tool === 'count');
       document.body.classList.toggle('tool-trace', tool === 'trace');
@@ -64,7 +102,7 @@ export function setupToolbar({ onTool, onShare, initialTool = 'trace' }) {
   const initialBtn = document.querySelector(`[data-tool="${initialTool}"]`);
   if (initialBtn) initialBtn.click();
 
-  // Run button — same as re-clicking the active tool.
+  // Run button
   const runBtn = document.getElementById('run-btn');
   if (runBtn) {
     runBtn.addEventListener('click', () => {
@@ -87,22 +125,26 @@ export function setupToolbar({ onTool, onShare, initialTool = 'trace' }) {
     });
   }
 
-  // Try-this example buttons
-  document.querySelectorAll('[data-example]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const name = btn.getAttribute('data-example');
-      const code = EXAMPLES[name];
-      const state = EXAMPLE_STATES[name];
-      if (!code) return;
-      // Editor + state input; run.
-      import('./editor.js').then(({ setEditor, setState }) => {
-        setEditor(code);
-        setState(state);
+  // Examples dropdown — fetch catalogue and populate.
+  const select = document.getElementById('examples-select');
+  if (select) {
+    const catalogue = await loadCatalogue();
+    populateExamplesSelect(catalogue);
+    select.addEventListener('change', async (ev) => {
+      const value = ev.target.value;
+      if (!value) return;
+      const entry = await applyExample(value);
+      if (entry && entry.tool) {
+        const btn = document.querySelector(`[data-tool="${entry.tool}"]`);
+        if (btn) btn.click();
+      } else {
         const active = document.querySelector('[data-tool].active');
         if (active) onTool(active.getAttribute('data-tool'));
-      });
+      }
+      // Reset dropdown back to the placeholder so re-selection re-runs.
+      ev.target.value = '';
     });
-  });
+  }
 }
 
-export const _internal = { EXAMPLES, EXAMPLE_STATES };
+export const _internal = { loadCatalogue, populateExamplesSelect, applyExample };

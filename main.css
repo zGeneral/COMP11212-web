@@ -88,18 +88,22 @@ a:hover { color: var(--accent-hover); }
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
-.examples { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
-.examples-label { font-size: 12px; color: var(--fg-faint); margin-right: 4px; }
-.example-btn {
+.examples { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.examples-label { font-size: 12px; color: var(--fg-faint); margin-right: 2px; }
+#examples-select {
   font-size: 12px;
-  padding: 2px 8px;
+  padding: 3px 8px;
   border: 1px solid var(--border);
   background: var(--bg-card);
   border-radius: 4px;
   cursor: pointer;
-  font-family: var(--code-font);
+  font-family: -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  min-width: 240px;
+  max-width: 360px;
+  color: var(--fg);
 }
-.example-btn:hover { border-color: var(--border-strong); background: var(--bg-soft); }
+#examples-select:hover { border-color: var(--border-strong); }
+#examples-select:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
 
 #editor {
   flex: 1 1 240px;

@@ -26,10 +26,10 @@
       <div class="editor-header">
         <label for="editor">While program</label>
         <div class="examples">
-          <span class="examples-label">Try:</span>
-          <button type="button" class="example-btn" data-example="sum">sum 1..n</button>
-          <button type="button" class="example-btn" data-example="gcd">gcd</button>
-          <button type="button" class="example-btn" data-example="factorial">factorial</button>
+          <label for="examples-select" class="examples-label">Examples</label>
+          <select id="examples-select" aria-label="Load an example">
+            <option value="">Load an example…</option>
+          </select>
         </div>
       </div>
       <textarea id="editor" spellcheck="false" autocomplete="off" autocapitalize="off"></textarea>

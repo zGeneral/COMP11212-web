@@ -1,0 +1,567 @@
+{
+  "chapters": [
+    {
+      "label": "Chapter 1 — Syntax",
+      "caption": "Programs whose syntax we read or parse.",
+      "entries": [
+        {
+          "ref": "Example 1",
+          "title": "Integer division — m / n",
+          "code": "r := m;\n    d := 0;\n    while n <= r do (\n        d := d + 1;\n        r := r - n\n    )",
+          "state": {
+            "m": 23,
+            "n": 5
+          },
+          "tool": "trace",
+          "blurb": "Repeated subtraction. d ends with the quotient, r with the remainder."
+        },
+        {
+          "ref": "Example 3",
+          "title": "gcd via subtraction (Euclid)",
+          "code": "x := m; y := n;\n    while !(x = y) do (\n        if !(x <= y) then\n            x := x - y\n        else (\n            y := y - x\n        )\n    )",
+          "state": {
+            "m": 84,
+            "n": 30
+          },
+          "tool": "trace",
+          "blurb": "Repeatedly subtract the smaller from the larger; gcd lands in x when y = 0."
+        },
+        {
+          "ref": "Example 5",
+          "title": "Multiplication by repeated addition",
+          "code": "z := 0;\n    while (z + 1) * (z + 1) <= x do (\n        z := z + 1\n    );\n    r := x - z * z",
+          "state": {
+            "m": 4,
+            "n": 7
+          },
+          "tool": "trace",
+          "blurb": "Multiply two numbers using only +, -, := (no * needed in the program)."
+        },
+        {
+          "ref": "Example 6",
+          "title": "Power — m^n",
+          "code": "y := 1;\n    z := 0;\n    while 1 <= x do (\n        t := z;\n        z := y;\n        y := t + y;\n        x := x - 1\n    )",
+          "state": {
+            "m": 3,
+            "n": 4
+          },
+          "tool": "trace",
+          "blurb": "Exponentiation by repeated multiplication."
+        }
+      ]
+    },
+    {
+      "label": "Chapter 2 — Small-step semantics",
+      "caption": "Programs whose ⟨S, σ⟩ ⇒ ⟨S', σ'⟩ trace illustrates the rules.",
+      "entries": [
+        {
+          "ref": "Example 7",
+          "title": "Integer square via repeated addition",
+          "code": "x := 0;\n    while x <= 2 do (\n        x := x + 1\n    )",
+          "state": {
+            "n": 5
+          },
+          "tool": "trace",
+          "blurb": "Compute n² using only +, := and a single while-loop."
+        },
+        {
+          "ref": "Example 8",
+          "title": "gcd by subtraction — long trace",
+          "code": "x := m; y := n;\n    while !(x = y) do (\n        if !(x <= y) then\n            x := x - y\n        else (\n            y := y - x\n        )\n    )",
+          "state": {
+            "m": 12,
+            "n": 18
+          },
+          "tool": "trace",
+          "blurb": "Same algorithm as Example 3, traced to demonstrate the chapter's table view."
+        },
+        {
+          "ref": "Example 9",
+          "title": "Counting bounded loop",
+          "code": "x := 0;\n    while 0 <= x do (\n        x := x + 1\n    )",
+          "state": {
+            "n": 4
+          },
+          "tool": "trace",
+          "blurb": "A short bounded loop chosen so the trace fits on one screen."
+        },
+        {
+          "ref": "Example 10",
+          "title": "Nested loop — pair counter",
+          "code": "x := 0; y := 0;\n    while !(y = 1) do (\n        if a * x * x + b * x + c = 0 then\n            y := 1\n        else (\n            if a * x * x - b * x + c = 0 then\n                y := 1\n            else (\n                skip\n            )\n        );\n        x := x + 1\n    )",
+          "state": {
+            "m": 3,
+            "n": 3
+          },
+          "tool": "trace",
+          "blurb": "Two nested while-loops; demonstrates trace structure on quadratic flow."
+        },
+        {
+          "ref": "Exercise 1",
+          "title": "Division — predict the trace",
+          "code": "r := m;\n    d := 0;\n    while n <= r do (\n        d := d + 1;\n        r := r - n\n    )",
+          "state": {
+            "m": 14,
+            "n": 4
+          },
+          "tool": "trace",
+          "blurb": "Trace this division program by hand; check your answer here."
+        },
+        {
+          "ref": "Exercise 4",
+          "title": "Even-odd flag",
+          "code": "done := 0;\n    while x = 0 & done = 0 do (\n        y := 100;\n        done := 1\n    );\n    while !(done = 1) & !(x = 0) do (\n        y := 200;\n        done := 1\n    )",
+          "state": {
+            "n": 7
+          },
+          "tool": "trace",
+          "blurb": "A program that walks an integer down and flips a flag — predict the trace."
+        },
+        {
+          "ref": "Exercise 5",
+          "title": "Parity check (is_odd)",
+          "code": "is_odd := 0;\n    m := n;\n    if m <= -1 then\n        m := 0 - m\n    else (\n        skip\n    );\n    while 1 <= m do (\n        m := m - 1;\n        is_odd := 1 - is_odd\n    )",
+          "state": {
+            "n": 9
+          },
+          "tool": "trace",
+          "blurb": "Set is_odd = 1 iff n is odd, using only +, -, :=, while."
+        },
+        {
+          "ref": "Exercise 6",
+          "title": "Counter with conditional",
+          "code": "count := 0;\n    i := 0;\n    while i * i * i <= n do (\n        if m <= i * i * i then\n            count := count + 1\n        else (\n            skip\n        );\n        i := i + 1\n    )",
+          "state": {
+            "n": 8
+          },
+          "tool": "trace",
+          "blurb": "A loop with a guarded if inside; predict the count."
+        },
+        {
+          "ref": "Exercise 7",
+          "title": "Multiplication — alternative form",
+          "code": "x := 0; y := 0;\n    while !(m * x + n * y = k) do (\n        x := x + 1;\n        y := 0;\n        while !(m * x + n * y = k) & y <= x & !(y = x) do (\n            if m * y + n * x = k then (\n                z := x;\n                x := y;\n                y := z\n            ) else (\n                y := y + 1\n            )\n        )\n    )",
+          "state": {
+            "m": 5,
+            "n": 4
+          },
+          "tool": "trace",
+          "blurb": "Same as Example 5 but a different loop structure; trace it."
+        },
+        {
+          "ref": "Exercise 13",
+          "title": "gcd — predict step count",
+          "code": "x := m; y := n;\n    while !(x = y) do (\n        if !(x <= y) then\n            x := x - y\n        else (\n            y := y - x\n        )\n    )",
+          "state": {
+            "m": 24,
+            "n": 36
+          },
+          "tool": "count",
+          "blurb": "gcd by subtraction; predict total small-steps from m, n."
+        },
+        {
+          "ref": "Exercise 15",
+          "title": "Conditional with done flag",
+          "code": "done := 0;\n    while x = 0 & done = 0 do (\n        y := 1;\n        done := 1\n    );\n    while !(done = 1) & !(x = 0) do (\n        y := 2;\n        done := 1\n    )",
+          "state": {
+            "n": 6
+          },
+          "tool": "trace",
+          "blurb": "Set done = 1 once a condition is reached; trace the unfolding."
+        }
+      ]
+    },
+    {
+      "label": "Chapter 3 — Complexity",
+      "caption": "Programs whose growth rate we measure with the step counter.",
+      "entries": [
+        {
+          "ref": "Example 4",
+          "title": "Decrementing loop — Θ(n)",
+          "code": "y := n - 1;\n    z := 1;\n    while 2 <= y & z = 1 do (\n        r := n;\n        while y <= r do (\n            r := r - y\n        );\n        if r = 0 then\n            z := 0\n        else (\n            skip\n        );\n        y := y - 1\n    )",
+          "state": {
+            "n": 12
+          },
+          "tool": "count",
+          "blurb": "Linear in n. Compare the step count for n = 5, 10, 20."
+        },
+        {
+          "ref": "Exercise 17",
+          "title": "Step count of a small program",
+          "code": "x := 1;\n    if x = 0 then\n        y := 1\n    else (\n        y := 2\n    );\n    while y <= 2 do (\n        x := x + 1;\n        y := y + 1\n    )",
+          "state": {
+            "n": 8
+          },
+          "tool": "count",
+          "blurb": "Predict the step count, then verify."
+        },
+        {
+          "ref": "Exercise 18",
+          "title": "Step count — alternative form",
+          "code": "x := 1;\n    if x = 0 then\n        y := 1\n    else (\n        y := 2\n    );\n    while y <= 2 do (\n        x := x + 1;\n        y := y + 1\n    )",
+          "state": {
+            "n": 8
+          },
+          "tool": "count",
+          "blurb": "Same task as Exercise 17, different loop. Same complexity?"
+        },
+        {
+          "ref": "Exercise 19",
+          "title": "Quadratic — Θ(n²)",
+          "code": "x := i * (i + 1); y := 0;\n    while 0 <= x do (\n        x := x - 2;\n        y := y + 1\n    )",
+          "state": {
+            "i": 6
+          },
+          "tool": "count",
+          "blurb": "Step count grows quadratically with i. Try i = 4, 8, 16."
+        },
+        {
+          "ref": "Exercise 23",
+          "title": "Constant program — Θ(1)",
+          "code": "x := 0;\n    i := 1;\n    while i <= n do (\n        j := 1;\n        while j <= i do (\n            x := x + j;\n            j := j + 1\n        );\n        i := i + 1\n    )",
+          "state": {
+            "n": 100
+          },
+          "tool": "count",
+          "blurb": "Step count is independent of n. Measure to confirm."
+        },
+        {
+          "ref": "Exercise 24",
+          "title": "Linear — counting up",
+          "code": "x := 0;\n    i := 1;\n    while i <= n do (\n        j := 1;\n        while j <= i do (\n            x := x + j;\n            j := j + 1\n        );\n        i := i + 1\n    )",
+          "state": {
+            "n": 20
+          },
+          "tool": "count",
+          "blurb": "Step count is linear; compute the constant factor."
+        },
+        {
+          "ref": "Exercise 25",
+          "title": "Three-variable counter",
+          "code": "x := n; y := n; z := n;\n    while 1 <= z do (\n        while 1 <= x do (\n            n := n + y;\n            x := x - 1\n        );\n        x := y;\n        z := z - 1\n    )",
+          "state": {
+            "n": 5
+          },
+          "tool": "count",
+          "blurb": "Three nested-ish loops; what is the asymptotic class?"
+        }
+      ]
+    },
+    {
+      "label": "Chapter 4 — Hoare logic",
+      "caption": "Programs we verify with {P} S {Q}. Switch to \"Verify Hoare\" tool.",
+      "entries": [
+        {
+          "ref": "Exercise 31",
+          "title": "Conditional — verify postcondition",
+          "code": "if 0 <= n then\n        x := 2 * n\n    else (\n        x := -2 * n - 1\n    )",
+          "state": {
+            "n": 5
+          },
+          "tool": "hoare",
+          "blurb": "A simple if/else; verify that the postcondition holds.",
+          "pre": "True",
+          "post": "True",
+          "samples": {
+            "n": [
+              -10,
+              10
+            ]
+          }
+        },
+        {
+          "ref": "Exercise 34",
+          "title": "Power — Hoare verification",
+          "code": "x := 1; y := n;\n    while 1 <= y do (\n        x := x * m;\n        y := y - 1\n    )",
+          "state": {
+            "n": 4
+          },
+          "tool": "hoare",
+          "blurb": "Verify a power program against {n ≥ 0} S {x = 2ⁿ}.",
+          "pre": "n >= 0",
+          "post": "True",
+          "samples": {
+            "n": [
+              0,
+              8
+            ]
+          }
+        },
+        {
+          "ref": "Exercise 35",
+          "title": "Sum 1..n — verify n(n+1)/2",
+          "code": "x := 0; i := 1;\n    while i <= n do (\n        x := x + i;\n        i := i + 1\n    )",
+          "state": {
+            "n": 10
+          },
+          "tool": "hoare",
+          "blurb": "Verify that sum 1..n satisfies x = n(n+1)/2.",
+          "pre": "n >= 0",
+          "post": "x == n*(n+1)//2",
+          "samples": {
+            "n": [
+              0,
+              30
+            ]
+          }
+        },
+        {
+          "ref": "Exercise 36",
+          "title": "Integer log₂ via halving",
+          "code": "x := 1; z := 0;\n    while x * 2 <= n do (\n        z := z + 1;\n        x := x * 2\n    )",
+          "state": {
+            "n": 100
+          },
+          "tool": "hoare",
+          "blurb": "Verify that the program computes ⌊log₂ n⌋.",
+          "pre": "n >= 1",
+          "post": "True",
+          "samples": {
+            "n": [
+              1,
+              100
+            ]
+          }
+        },
+        {
+          "ref": "Exercise 37",
+          "title": "Divisibility check",
+          "code": "d := n;\n    while 10 <= d do (d := d - 10);\n    r := d;\n    while 3 <= r do (r := r - 3);\n    if r = 0 then\n        z := 1\n    else (\n        z := 0\n    )",
+          "state": {
+            "n": 12,
+            "k": 3
+          },
+          "tool": "hoare",
+          "blurb": "Set d = 1 iff k divides n; verify against the obvious postcondition.",
+          "pre": "n >= 0 & k >= 1",
+          "post": "True",
+          "samples": {
+            "n": [
+              0,
+              50
+            ],
+            "k": [
+              1,
+              10
+            ]
+          }
+        },
+        {
+          "ref": "Exercise 61",
+          "title": "Power — total correctness",
+          "code": "x := 1; y := n;\n    while 1 <= y do (\n        x := x * m;\n        y := y - 1\n    )",
+          "state": {
+            "n": 5
+          },
+          "tool": "hoare",
+          "blurb": "Same as Exercise 34, framed as total-correctness with a variant.",
+          "pre": "n >= 0",
+          "post": "True",
+          "samples": {
+            "n": [
+              0,
+              8
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "label": "Chapter 5 — Computability",
+      "caption": "Programs that decide or semidecide a predicate.",
+      "entries": [
+        {
+          "ref": "Example 14",
+          "title": "Modulo 7 by repeated subtraction",
+          "code": "x := n;\nwhile 7 <= x do (\n  x := x - 7\n)",
+          "state": {
+            "n": 23
+          },
+          "tool": "trace",
+          "blurb": "x ends with n mod 7. A bounded computation, easy to decide."
+        },
+        {
+          "ref": "Example 15",
+          "title": "Multiplication via repeated addition",
+          "code": "z := 1; y := 1;\n    while z <= n - 1 do (y := y + 1; z := z + y);\n    if z = n then x := 1 else (x := 0)",
+          "state": {
+            "m": 4,
+            "n": 7
+          },
+          "tool": "trace",
+          "blurb": "Decidable: for any (m, n) the program halts and gives m·n."
+        },
+        {
+          "ref": "Example 16",
+          "title": "Power — variant",
+          "code": "z := 1; y := 1;\n    while z <= n - 1 do (y := y + 1; z := z + y);\n    if z = n then x := 1 else (x := 0)",
+          "state": {
+            "m": 2,
+            "n": 5
+          },
+          "tool": "trace",
+          "blurb": "Another decidable program; halts on every input."
+        },
+        {
+          "ref": "Exercise 39",
+          "title": "Decide an odd predicate",
+          "code": "x := 2 * n + 1;\n    n := x;\n    while 2 <= n do (n := n - 2);\n    if n = 0 then x := 1 else (x := 0)",
+          "state": {
+            "n": 7
+          },
+          "tool": "trace",
+          "blurb": "Check that the program correctly classifies n. Try n = 0, 1, 2, 7."
+        },
+        {
+          "ref": "Exercise 51",
+          "title": "Halting — bounded vs unbounded",
+          "code": "if 100 <= n & !(100 = n) then\n        x := n\n    else (\n        x := y\n    )",
+          "state": {
+            "n": 50
+          },
+          "tool": "trace",
+          "blurb": "A program where halting depends on n. Try n = 100, 99, 50, 200."
+        }
+      ]
+    },
+    {
+      "label": "Appendix — Big-step semantics",
+      "caption": "Programs from the appendix exercises (small-step trace shown).",
+      "entries": [
+        {
+          "ref": "Exercise 58",
+          "title": "Loop-free program — terminates",
+          "code": "x := 0; y := 0;\n    while !(m * x + n * y = k) do (\n        x := x + 1;\n        y := 0;\n        while !(m * x + n * y = k) & y <= x & !(y = x) do (\n            if m * y + n * x = k then (\n                z := x;\n                x := y;\n                y := z\n            ) else (\n                y := y + 1\n            )\n        )\n    )",
+          "state": {},
+          "tool": "trace",
+          "blurb": "Loop-free programs trivially terminate; trace and confirm."
+        },
+        {
+          "ref": "Exercise 59",
+          "title": "Equivalence under big-step",
+          "code": "x := 0; y := 0;\n    while !(m * x + n * y = k) do (\n        x := x + 1;\n        y := 0;\n        while !(m * x + n * y = k) & y <= x & !(y = x) do (\n            if m * y + n * x = k then (\n                z := x;\n                x := y;\n                y := z\n            ) else (\n                y := y + 1\n            )\n        )\n    )",
+          "state": {},
+          "tool": "trace",
+          "blurb": "A program for the big-step equivalence proof; trace its small-step run."
+        },
+        {
+          "ref": "Exercise 62",
+          "title": "Determinism showcase",
+          "code": "done := 0;\n    while x = 0 & done = 0 do (\n        y := 1;\n        done := 1\n    );\n    while !(done = 1) & !(x = 0) do (\n        y := 2;\n        done := 1\n    )",
+          "state": {
+            "n": 5
+          },
+          "tool": "trace",
+          "blurb": "Big-step is deterministic: the same start gives the same end every time."
+        },
+        {
+          "ref": "Exercise 64",
+          "title": "gcd — big-step view",
+          "code": "x := m; y := n;\n    while !(x = y) do (\n        if !(x <= y) then\n            x := x - y\n        else (\n            y := y - x\n        )\n    )",
+          "state": {
+            "m": 15,
+            "n": 35
+          },
+          "tool": "trace",
+          "blurb": "gcd as a big-step terminating computation."
+        },
+        {
+          "ref": "Exercise 66",
+          "title": "Multiplication — big-step",
+          "code": "x := m; y := n;\n    while !(x = y) do (\n        if !(x <= y) then\n            x := x - y\n        else (\n            y := y - x\n        )\n    )",
+          "state": {
+            "m": 3,
+            "n": 6
+          },
+          "tool": "trace",
+          "blurb": "Multiplication; the result is the unique big-step answer."
+        },
+        {
+          "ref": "Exercise 67",
+          "title": "Big-step ↔ small-step agreement",
+          "code": "x := 0; y := 0;\n    while !(m * x + n * y = k) do (\n        x := x + 1;\n        y := 0;\n        while !(m * x + n * y = k) & y <= x & !(y = x) do (\n            if m * y + n * x = k then (\n                z := x;\n                x := y;\n                y := z\n            ) else (\n                y := y + 1\n            )\n        )\n    )",
+          "state": {
+            "n": 4
+          },
+          "tool": "trace",
+          "blurb": "A program used in the proof that big-step and small-step agree."
+        }
+      ]
+    },
+    {
+      "label": "CS Classics — extras",
+      "caption": "Famous programs that aren't tied to a specific chapter exercise.",
+      "entries": [
+        {
+          "ref": "Extra",
+          "title": "sum 1..n",
+          "code": "result := 0;\ni := 1;\nwhile i <= n do (\n  result := result + i;\n  i := i + 1\n)",
+          "state": {
+            "n": 10
+          },
+          "tool": "trace",
+          "blurb": "The classic. result lands at n(n+1)/2."
+        },
+        {
+          "ref": "Extra",
+          "title": "factorial — n!",
+          "code": "result := 1;\ni := 1;\nwhile i <= n do (\n  result := result * i;\n  i := i + 1\n)",
+          "state": {
+            "n": 6
+          },
+          "tool": "trace",
+          "blurb": "n! by repeated multiplication."
+        },
+        {
+          "ref": "Extra",
+          "title": "Fibonacci — iterative",
+          "code": "a := 0;\nb := 1;\ni := 0;\nwhile i <= n do (\n  c := a + b;\n  a := b;\n  b := c;\n  i := i + 1\n)",
+          "state": {
+            "n": 8
+          },
+          "tool": "trace",
+          "blurb": "Fibonacci computed iteratively. b ends with the (n+2)-th Fibonacci number."
+        },
+        {
+          "ref": "Extra",
+          "title": "Collatz step counter",
+          "code": "steps := 0;\nwhile !(x = 1) do (\n  steps := steps + 1;\n  half := x;\n  count := 0;\n  while 2 <= half do (\n    half := half - 2;\n    count := count + 1\n  );\n  if half = 0 then\n    x := count\n  else (\n    x := 3 * x + 1\n  )\n)",
+          "state": {
+            "x": 27
+          },
+          "tool": "trace",
+          "blurb": "Collatz: halve if even, 3x+1 if odd. Famously decidable in practice but unproven in general. (Halving expanded since While has no /.)"
+        },
+        {
+          "ref": "Extra",
+          "title": "Primality test — trial division",
+          "code": "is_prime := 1;\ni := 2;\nwhile i + i <= n + 1 do (\n  q := n;\n  count := 0;\n  while i <= q do (\n    q := q - i;\n    count := count + 1\n  );\n  if q = 0 then (\n    is_prime := 0;\n    i := n\n  ) else (\n    skip\n  );\n  i := i + 1\n)",
+          "state": {
+            "n": 17
+          },
+          "tool": "trace",
+          "blurb": "Trial division up to ~√n. is_prime = 1 iff n is prime. Try 17, 21, 49."
+        },
+        {
+          "ref": "Extra",
+          "title": "Diophantine search — find x, y with ax + by = 1",
+          "code": "found := 0;\nx := 0;\ny := 0;\nwhile found = 0 do (\n  if a * x + b * y = 1 then\n    found := 1\n  else (\n    if x <= y then\n      x := x + 1\n    else (\n      y := y + 1\n    )\n  )\n)",
+          "state": {
+            "a": 3,
+            "b": 5
+          },
+          "tool": "trace",
+          "blurb": "Search for nonneg x, y solving ax + by = 1. Halts iff gcd(a,b) = 1."
+        },
+        {
+          "ref": "Extra",
+          "title": "Infinite loop (try infinite-loop guardrail)",
+          "code": "while tt do (skip)",
+          "state": {},
+          "tool": "trace",
+          "blurb": "Demonstrates the step-budget guardrail. Pasting this should NOT freeze the page."
+        }
+      ]
+    }
+  ]
+}
