@@ -10,19 +10,19 @@
   "chapters": [
     {
       "label": "Chapter 1 — Syntax",
-      "caption": "Programs whose syntax we read or parse.",
+      "caption": "The chapter's own example programs and program-bearing exercises.",
       "entries": [
         {
           "ref": "Example 1",
+          "tool": "trace",
           "title": "Integer division — m / n",
-          "code": "r := m;\n    d := 0;\n    while n <= r do (\n        d := d + 1;\n        r := r - n\n    )",
+          "code": "r := m;\nd := 0;\nwhile n <= r do (\n  d := d + 1;\n  r := r - n\n)",
           "state": {
             "m": 23,
             "n": 5
           },
-          "tool": "trace",
           "blurb": "Repeated subtraction. d ends with the quotient, r with the remainder.",
-          "theory": "**Integer division by repeated subtraction.**\n\nComputes `m / n` (quotient) and `m mod n` (remainder) using only addition, subtraction, comparison, and a `while` loop. The variable `d` counts how many times `n` fits into `r`; when the loop ends, `r` holds the remainder.\n\nWatch the trace: each iteration is exactly one subtraction + one increment, so the step count is **linear in the quotient** (`m / n`).",
+          "theory": "**Integer division by repeated subtraction.**\n\nComputes `m div n` (quotient → `d`) and `m mod n` (remainder → `r`) using only `+`, `−`, `:=`, and a `while` loop. Each iteration subtracts `n` from `r` once and increments `d`; the loop exits when `r < n`.\n\nStep count is **linear in the quotient `m / n`**.",
           "pre": "m >= 0 and n >= 1",
           "post": "m == d*n + r and 0 <= r and r < n",
           "samples": {
@@ -37,222 +37,109 @@
           }
         },
         {
-          "ref": "Example 3",
-          "title": "gcd via subtraction (Euclid)",
-          "code": "x := m; y := n;\n    while !(x = y) do (\n        if !(x <= y) then\n            x := x - y\n        else (\n            y := y - x\n        )\n    )",
-          "state": {
-            "m": 84,
-            "n": 30
-          },
+          "ref": "Example 2",
           "tool": "trace",
-          "blurb": "Repeatedly subtract the smaller from the larger; gcd lands in x when y = 0.",
-          "theory": "**Euclid's gcd by subtraction.**\n\nRepeatedly replaces the larger of `(x, y)` with `x − y` (or `y − x`). When one becomes 0, the other is `gcd(m, n)`.\n\nThis is the *classical* gcd algorithm — predates Euclid by centuries in the Chinese mathematical tradition. It illustrates how a `while` loop with a non-monotone variant (the *sum* `x + y` strictly decreases each iteration) terminates without an obvious counter.",
-          "pre": "m >= 1 and n >= 1",
-          "post": "x == y and m % x == 0 and n % x == 0",
+          "title": "Search for an integer root of ax² + bx + c = 0",
+          "code": "x := 0;\ny := 0;\nwhile !(y = 1) do (\n  if a*x*x + b*x + c = 0 then\n    y := 1\n  else (\n    if a*x*x - b*x + c = 0 then\n      y := 1\n    else (\n      x := x + 1\n    )\n  )\n)",
+          "state": {
+            "a": 1,
+            "b": -3,
+            "c": 2
+          },
+          "blurb": "Brute-force search for a non-negative or non-positive integer root of a quadratic.",
+          "theory": "**Brute-force quadratic root search.**\n\nTests `x = 0, 1, 2, …` and at each step asks whether `±x` is a root of `ax² + bx + c`. Sets the flag `y := 1` when found.\n\nHalts iff the quadratic has an integer root. With `a=1, b=-3, c=2` the roots are `1` and `2`, so the search halts at `x = 1` immediately. Demonstrates a *semidecidable* search pattern: terminates iff a witness exists."
+        },
+        {
+          "ref": "Example 3",
+          "tool": "trace",
+          "title": "gcd by subtraction (Euclid)",
+          "code": "while !(x = y) do (\n  if !(x <= y) then\n    x := x - y\n  else (\n    y := y - x\n  )\n)",
+          "state": {
+            "x": 84,
+            "y": 30
+          },
+          "blurb": "Repeatedly replace the larger of (x, y) with their difference; gcd lands in x = y.",
+          "theory": "**Euclid's gcd algorithm by subtraction.**\n\nThe chapter's gcd implementation: while `x ≠ y`, replace the larger with the difference. When the loop terminates, `x = y = gcd(x_initial, y_initial)`.\n\nOlder than Euclid (predates him in the Chinese mathematical tradition). Demonstrates a `while` loop whose termination relies on a *non-monotone* variant: the sum `x + y` strictly decreases each iteration even though neither `x` nor `y` does monotonically.",
+          "pre": "x >= 1 and y >= 1",
+          "post": "x == y and x >= 1",
           "samples": {
-            "m": [
+            "x": [
               1,
               60
             ],
-            "n": [
+            "y": [
               1,
               60
+            ]
+          }
+        },
+        {
+          "ref": "Example 4",
+          "tool": "trace",
+          "title": "Primality test by trial division",
+          "code": "y := n - 1;\nz := 1;\nwhile 1 <= y - 1 & z = 1 do (\n  r := n;\n  while y <= r do (\n    r := r - y\n  );\n  if r = 0 then\n    z := 0\n  else (\n    skip\n  );\n  y := y - 1\n)",
+          "state": {
+            "n": 17
+          },
+          "blurb": "z = 1 iff n is prime. Tests every divisor from n-1 down to 2.",
+          "theory": "**Primality test by trial division.**\n\nWalks `y` down from `n−1` to `2`, and for each `y` checks whether `y` divides `n` (inner loop subtracts `y` from `r := n` repeatedly; if `r` lands on 0, `y` is a divisor). If any divisor is found, sets `z := 0` and the outer guard's `z = 1` clause stops the loop.\n\n`z` ends at `1` iff `n` is prime. The chapter's canonical primality example. Step count is `Θ(n²)` worst-case (outer ~n iters × inner ~n/y for each y).",
+          "pre": "n >= 2",
+          "post": "z == [0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1][n]",
+          "samples": {
+            "n": [
+              2,
+              29
             ]
           }
         },
         {
           "ref": "Example 5",
-          "title": "Multiplication by repeated addition",
-          "code": "result := 0;\ni := 1;\nwhile i <= n do (\n  result := result + m;\n  i := i + 1\n)",
-          "state": {
-            "m": 4,
-            "n": 7
-          },
           "tool": "trace",
-          "blurb": "Multiply two numbers using only +, -, := (no * needed in the program).",
-          "theory": "**Multiplication by repeated addition.**\n\n`m × n` computed using only `+` and `:=`. The While language's arithmetic includes `*` natively; this version shows how it could be expressed without it.\n\nA common trick: when teaching primitive recursion, multiplication is often defined this way to derive the operator from `+` plus a loop.",
-          "pre": "m >= 0 and n >= 0",
-          "post": "result == m * n",
+          "title": "Integer square root — ⌊√x⌋",
+          "code": "z := 0;\nwhile (z + 1) * (z + 1) <= x do (\n  z := z + 1\n);\nr := x - z * z",
+          "state": {
+            "x": 50
+          },
+          "blurb": "z = ⌊√x⌋ via incremental search. r = x - z².",
+          "theory": "**Integer square root.**\n\nComputes `z = ⌊√x⌋` (the largest integer whose square doesn't exceed `x`) and `r = x − z²` (the residual). Increments `z` from 0 until `(z+1)² > x`.\n\nThe chapter's chosen approach is *incremental search* — simplest, not fastest. Faster bisection would need integer divide which While doesn't have built-in. Step count is `Θ(√x)`.",
+          "pre": "x >= 0",
+          "post": "z*z <= x and (z+1)*(z+1) > x and r == x - z*z",
           "samples": {
-            "m": [
+            "x": [
               0,
-              30
-            ],
-            "n": [
-              0,
-              30
+              200
             ]
           }
         },
         {
           "ref": "Example 6",
-          "title": "Power — m^n",
-          "code": "result := 1;\ni := 1;\nwhile i <= n do (\n  result := result * m;\n  i := i + 1\n)",
-          "state": {
-            "m": 3,
-            "n": 4
-          },
           "tool": "trace",
-          "blurb": "Exponentiation by repeated multiplication.",
-          "theory": "**Exponentiation by repeated multiplication.**\n\n`m^n` computed in a `while` loop. `y` accumulates the result; `i` counts down from `n`.\n\nThe step count is **linear in the exponent**. Note that fast exponentiation (`m^n` in `O(log n)` steps via squaring) requires integer division (`/`), which While doesn't have built-in — so this *naive* form is the natural one in the While language.",
-          "pre": "m >= 0 and n >= 0",
-          "post": "result == m**n",
-          "samples": {
-            "m": [
-              1,
-              8
-            ],
-            "n": [
-              0,
-              6
-            ]
-          }
-        }
-      ]
-    },
-    {
-      "label": "Chapter 2 — Small-step semantics",
-      "caption": "Programs whose ⟨S, σ⟩ ⇒ ⟨S', σ'⟩ trace illustrates the rules.",
-      "entries": [
-        {
-          "ref": "Example 7",
-          "title": "Integer square via repeated addition",
-          "code": "result := 0;\ni := 1;\nwhile i <= n do (\n  result := result + n;\n  i := i + 1\n)",
+          "title": "Fibonacci — n-th Fibonacci number",
+          "code": "y := 1;\nz := 0;\nwhile 1 <= x do (\n  t := z;\n  z := y;\n  y := t + y;\n  x := x - 1\n)",
           "state": {
-            "n": 5
+            "x": 8
           },
-          "tool": "trace",
-          "blurb": "Compute n² using only +, := and a single while-loop.",
-          "theory": "**Integer square via repeated addition.**\n\nComputes `n²` as `n + n + … + n` (n times) using a single `while` loop. Demonstrates how a non-trivial mathematical function falls out of three primitive operations: `:=`, `+`, and `<=`.\n\nTrace this for `n = 5` and watch how the configuration `⟨S, σ⟩` evolves through the `while-tt` rule firing 5 times, the body `result := result + n` running each time, and finally `while-ff` terminating the loop.",
-          "pre": "n >= 0",
-          "post": "result == n*n",
+          "blurb": "z = Fib(n) where x starts at n. Destructive on x.",
+          "theory": "**The chapter's Fibonacci.**\n\nComputes the `x`-th Fibonacci number into `z`. Maintains `(y, z) = (F_{i+1}, F_i)` and `t` as a temporary swap variable.\n\nFor `x = 8` (the 8th Fibonacci): traces F(0)=0, F(1)=1, F(2)=1, F(3)=2, F(4)=3, F(5)=5, F(6)=8, F(7)=13, F(8)=21 → z ends at 21.\n\nNote: this implementation **destroys** the input `x` (decrements to 0). For Hoare reasoning over the original `x` you'd need a ghost variable — the chapter discusses this nuance.",
+          "pre": "x >= 0",
+          "post": "z == [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55][x_orig] and x == 0",
           "samples": {
-            "n": [
+            "x_orig": [
               0,
-              30
-            ]
-          }
-        },
-        {
-          "ref": "Example 8",
-          "title": "gcd by subtraction — long trace",
-          "code": "x := m; y := n;\n    while !(x = y) do (\n        if !(x <= y) then\n            x := x - y\n        else (\n            y := y - x\n        )\n    )",
-          "state": {
-            "m": 12,
-            "n": 18
-          },
-          "tool": "trace",
-          "blurb": "Same algorithm as Example 3, traced to demonstrate the chapter's table view.",
-          "theory": "**gcd long-trace (Euclid by subtraction).**\n\nThe full small-step trace of Euclid's algorithm. With `m = 12`, `n = 18`, the trace shows several iterations of the outer `while`, with the `if`/`else` switching back and forth as the larger operand alternates.\n\nThis is a classic *long trace* example — it's where the table-view (planned for v1.5) really helps you see the state evolve column by column.",
-          "pre": "m >= 1 and n >= 1",
-          "post": "x == y and m % x == 0 and n % x == 0",
-          "samples": {
-            "m": [
-              1,
-              60
-            ],
-            "n": [
-              1,
-              60
-            ]
-          }
-        },
-        {
-          "ref": "Example 9",
-          "title": "Counting bounded loop",
-          "code": "x := 0;\nwhile x <= n do (\n  x := x + 1\n)",
-          "state": {
-            "n": 4
-          },
-          "tool": "trace",
-          "blurb": "A short bounded loop chosen so the trace fits on one screen.",
-          "theory": "**Counting bounded loop.**\n\nA short, deliberately tame loop chosen so the entire trace fits on one screen. Useful for hand-tracing during revision: you can write out the formal trace yourself, then check it here.",
-          "pre": "n >= 0",
-          "post": "x == n + 1",
-          "samples": {
-            "n": [
-              0,
-              100
-            ]
-          }
-        },
-        {
-          "ref": "Example 10",
-          "title": "Nested loop — pair counter",
-          "code": "count := 0;\ni := 0;\nwhile i <= m do (\n  j := 0;\n  while j <= n do (\n    count := count + 1;\n    j := j + 1\n  );\n  i := i + 1\n)",
-          "state": {
-            "m": 3,
-            "n": 3
-          },
-          "tool": "trace",
-          "blurb": "Two nested while-loops; demonstrates trace structure on quadratic flow.",
-          "theory": "**Two nested while-loops.**\n\nA toy \"pair counter\": for each value of the outer variable `x` from `0..m`, walks the inner `y` from `0..n`. Total iterations = `(m+1)(n+1)`.\n\nDemonstrates the chapter's nested-loop trace abbreviation convention: only the outer-loop body (`L1`) gets a legend label; the inner loop is fully expanded inline.",
-          "pre": "m >= 0 and n >= 0",
-          "post": "count == (m + 1) * (n + 1)",
-          "samples": {
-            "m": [
-              0,
-              5
-            ],
-            "n": [
-              0,
-              5
-            ]
-          }
-        },
-        {
-          "ref": "Exercise 1",
-          "title": "Division — predict the trace",
-          "code": "r := m;\n    d := 0;\n    while n <= r do (\n        d := d + 1;\n        r := r - n\n    )",
-          "state": {
-            "m": 14,
-            "n": 4
-          },
-          "tool": "trace",
-          "blurb": "Trace this division program by hand; check your answer here.",
-          "theory": "**Predict the small-step trace.**\n\nHand-trace this division program from `m = 14, n = 4` for the first 6 steps. Then run it here and compare. The first 4 steps are the two `:=` initialisers and their `skip-;` follow-ups; from step 5 onwards the `while-tt` rule fires.",
-          "pre": "m >= 0 and n >= 1",
-          "post": "m == d*n + r and 0 <= r and r < n",
-          "samples": {
-            "m": [
-              0,
-              50
-            ],
-            "n": [
-              1,
               10
             ]
           }
         },
         {
-          "ref": "Exercise 4",
-          "title": "Even-odd flag",
-          "code": "done := 0;\nwhile done = 0 do (\n  if n <= 1 then\n    done := 1\n  else (\n    n := n - 2\n  )\n)",
-          "state": {
-            "n": 7
-          },
-          "tool": "trace",
-          "blurb": "A program that walks an integer down and flips a flag — predict the trace.",
-          "theory": "**Even/odd flag with a `done` guard.**\n\nA loop that walks `n` down by 2 and flips a flag. Demonstrates how to encode \"is `n` even?\" without modulo: subtract 2 repeatedly until you hit `0` (even) or `1` (odd).\n\nTry `n = 7` and `n = 8` to see the difference.",
-          "pre": "n >= 0",
-          "post": "done == 1 and (n == 0 or n == 1)",
-          "samples": {
-            "n": [
-              0,
-              100
-            ]
-          }
-        },
-        {
           "ref": "Exercise 5",
-          "title": "Parity check (is_odd)",
-          "code": "is_odd := 0;\n    m := n;\n    if m <= -1 then\n        m := 0 - m\n    else (\n        skip\n    );\n    while 1 <= m do (\n        m := m - 1;\n        is_odd := 1 - is_odd\n    )",
+          "tool": "trace",
+          "title": "Even / odd determination",
+          "code": "is_odd := 0;\nm := n;\nwhile 1 <= m do (\n  m := m - 1;\n  is_odd := 1 - is_odd\n)",
           "state": {
             "n": 9
           },
-          "tool": "trace",
-          "blurb": "Set is_odd = 1 iff n is odd, using only +, -, :=, while.",
-          "theory": "**Parity check (is_odd).**\n\nSets `is_odd := 1` iff `n` is odd. Same idea as Exercise 4 but written as a single `while` whose guard mixes a comparison and a flag.\n\nWorth tracing because the trace shows the `if-tt` / `if-ff` rules firing in alternation, mirroring the way the parity bit oscillates.",
+          "blurb": "is_odd = n mod 2. Walks n down by 1 while flipping a flag.",
+          "theory": "**Parity: is `n` even or odd?**\n\nThe chapter exercise asks for a program that determines whether `n` is even or odd. This implementation walks `m := n` down by 1 step at a time and flips `is_odd` on each step. After `n` decrements, `is_odd` equals `n mod 2`.\n\nFoundation for the *n mod m* program the exercise also asks for: replace the inner `−1` with `−m` and the result generalises.",
           "pre": "n >= 0",
           "post": "is_odd == n % 2",
           "samples": {
@@ -264,87 +151,170 @@
         },
         {
           "ref": "Exercise 6",
-          "title": "Counter with conditional",
-          "code": "count := 0;\ni := 0;\nwhile i <= n do (\n  if i + i <= n then\n    count := count + 1\n  else (\n    skip\n  );\n  i := i + 1\n)",
-          "state": {
-            "n": 8
-          },
           "tool": "trace",
-          "blurb": "A loop with a guarded if inside; predict the count.",
-          "theory": "**Counter with an inner conditional.**\n\nA loop with a guarded `if` inside: increments `count` only when a condition holds. Demonstrates how the `while-tt` rule unfolds the body (which itself contains an `if`), so each iteration produces 2-3 small-step transitions for the inner branch plus the outer ones.",
-          "pre": "n >= 0",
-          "post": "count == n // 2 + 1",
+          "title": "Count cubes in [m, n]",
+          "code": "count := 0;\ni := 0;\nwhile i * i * i <= n do (\n  if m <= i * i * i then\n    count := count + 1\n  else (\n    skip\n  );\n  i := i + 1\n)",
+          "state": {
+            "m": 1,
+            "n": 100
+          },
+          "blurb": "Number of x with m ≤ x ≤ n and x is a cube.",
+          "theory": "**Count cubes in a range.**\n\nThe chapter exercise: given `m` and `n`, count how many `x ∈ ℕ` satisfy `m ≤ x ≤ n` and `x` is a cube (i.e., `x = i³` for some `i`).\n\nThis implementation walks `i` upward, computes `i*i*i`, and counts whenever it lands in `[m, n]`. Stops when `i³ > n`. Step count is `Θ(∛n)` outer iterations.\n\nFor `[1, 100]`: cubes are 1, 8, 27, 64 → count = 4.",
+          "pre": "True",
+          "post": "(m == 1 and n == 100 and count == 4) or (m == 0 and n == 8 and count == 3) or (m == 0 and n == 27 and count == 4) or (m == 0 and n == 64 and count == 5) or (m == 0 and n == 125 and count == 6)",
           "samples": {
+            "m": [
+              1,
+              1
+            ],
             "n": [
-              0,
-              50
+              100,
+              100
             ]
           }
         },
         {
           "ref": "Exercise 7",
-          "title": "Multiplication — alternative form",
-          "code": "result := 0;\ni := n;\nwhile 1 <= i do (\n  result := result + m;\n  i := i - 1\n)",
-          "state": {
-            "m": 5,
-            "n": 4
-          },
           "tool": "trace",
-          "blurb": "Same as Example 5 but a different loop structure; trace it.",
-          "theory": "**Multiplication, alternative form.**\n\nSame task as Example 5 (compute `m × n` by repeated addition) with a different loop structure. Useful for comparing trace shapes: both produce the same final state, but the small-step transitions differ in count and order.",
-          "pre": "m >= 0 and n >= 0",
-          "post": "result == m * n",
+          "title": "Linear Diophantine search — mx + ny = k",
+          "code": "found := 0;\nx := 0;\nwhile found = 0 do (\n  y := 0;\n  while found = 0 & m*x + n*y <= k do (\n    if m*x + n*y = k then\n      found := 1\n    else (\n      y := y + 1\n    )\n  );\n  if found = 0 then\n    x := x + 1\n  else (\n    skip\n  )\n)",
+          "state": {
+            "m": 2,
+            "n": 3,
+            "k": 7
+          },
+          "blurb": "Find non-negative x, y with mx + ny = k. Halts iff a solution exists.",
+          "theory": "**The chapter's Exercise 7: linear Diophantine equation.**\n\nFind non-negative integers `x, y ∈ ℕ` such that `mx + ny = k`. Tests pairs `(x, y)` along a diagonal — increment whichever is smaller — until one satisfies the equation.\n\n**Decidability flavour:** halts iff a non-negative solution exists, otherwise loops forever (e.g. `m=2, n=4, k=5`: gcd(2,4) = 2 doesn't divide 5, no solution). Demonstrates a *semidecidable* search.\n\nDefault `(m=2, n=3, k=7)`: solution `(x, y) = (2, 1)` since `2·2 + 3·1 = 7`. Found in a few iterations.",
+          "pre": "m >= 1 and n >= 1 and k >= 0",
+          "post": "found == 1 and m*x + n*y == k",
           "samples": {
             "m": [
-              0,
-              30
+              2,
+              2
             ],
             "n": [
-              0,
+              3,
+              3
+            ],
+            "k": [
+              2,
               30
+            ]
+          }
+        },
+        {
+          "ref": "Exercise 10",
+          "tool": "trace",
+          "title": "Euclid's algorithm — gcd via mod",
+          "code": "x := m;\ny := n;\nwhile !(y = 0) do (\n  r := x;\n  while y <= r do (\n    r := r - y\n  );\n  x := y;\n  y := r\n)",
+          "state": {
+            "m": 84,
+            "n": 30
+          },
+          "blurb": "Euclid's algorithm using mod (inner loop simulates the divide).",
+          "theory": "**Euclid's algorithm — proper version using mod.**\n\nReplaces `(x, y)` with `(y, x mod y)` until `y = 0`. The inner loop computes `x mod y` by repeated subtraction (since While has no `%`). When the outer loop terminates, `x` holds `gcd(m, n)`.\n\nDiffers from Example 3's by-subtraction version: this is `Θ(log min(m, n))` outer iterations vs `Θ(max(m, n) / gcd)` for the slow form. Shows how to express integer division/mod inside While.",
+          "pre": "m >= 1 and n >= 1",
+          "post": "x >= 1 and m % x == 0 and n % x == 0",
+          "samples": {
+            "m": [
+              1,
+              100
+            ],
+            "n": [
+              1,
+              100
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "label": "Chapter 2 — Small-step semantics",
+      "caption": "Programs traced under the formal ⟨S, σ⟩ ⇒ ⟨S', σ'⟩ rules.",
+      "entries": [
+        {
+          "ref": "Example 9",
+          "tool": "trace",
+          "title": "Non-terminating loop — chapter 2 step-budget demo",
+          "code": "x := 0;\nwhile 0 <= x do (\n  x := x + 1\n)",
+          "state": {},
+          "blurb": "Always-true guard. The chapter uses this to demonstrate non-termination in the small-step semantics.",
+          "theory": "**Chapter 2's non-termination demo.**\n\n`while 0 <= x do (x := x + 1)` — the guard `0 ≤ x` is always true once `x = 0`, so the loop never exits. The chapter uses this to discuss what the small-step semantics says about non-terminating computations: the trace simply has no `⟨skip, σ⟩` terminus, no big-step judgment ever applies.\n\nIn the playground, the trace stops at the step budget (10 000 transitions) and reports \"step budget exceeded — likely non-terminating.\"\n\nTry counting steps: the count tool also hits the budget. Try the table view to see x climb monotonically."
+        },
+        {
+          "ref": "Example 11",
+          "tool": "trace",
+          "title": "gcd long-trace — chapter 2 table-tracking demo",
+          "code": "while !(m = n) do (\n  if !(m <= n) then\n    m := m - n\n  else (\n    n := n - m\n  )\n)",
+          "state": {
+            "m": 12,
+            "n": 18
+          },
+          "blurb": "gcd by subtraction in the m, n variables (the chapter's tabular-trace demo).",
+          "theory": "**Chapter 2's tabular-trace example.**\n\nThe chapter recalls the gcd algorithm (Example 3) but in the variables `m, n` (rather than `x, y`). Used as the running example for the chapter's *table* view of execution: one row per state-changing transition, columns showing how `m` and `n` evolve.\n\nTry the **State trace** tool here: you'll see `(m, n)` walk as `(12, 18) → (12, 6) → (6, 6)`, finally `m = n = 6 = gcd(12, 18)`.",
+          "pre": "m >= 1 and n >= 1",
+          "post": "m == n",
+          "samples": {
+            "m": [
+              1,
+              50
+            ],
+            "n": [
+              1,
+              50
             ]
           }
         },
         {
           "ref": "Exercise 13",
-          "title": "gcd — predict step count",
-          "code": "x := m; y := n;\n    while !(x = y) do (\n        if !(x <= y) then\n            x := x - y\n        else (\n            y := y - x\n        )\n    )",
-          "state": {
-            "m": 24,
-            "n": 36
-          },
           "tool": "count",
-          "blurb": "gcd by subtraction; predict total small-steps from m, n.",
-          "theory": "**Predict the gcd step count.**\n\nRun gcd for `m = 24, n = 36`. Predict on paper how many small-steps the program takes (counting only `:=` and boolean checks per the chapter's complexity convention) before running it here.\n\nHint: each Euclid iteration reduces `max(x, y)` by `min(x, y)`. Count the iterations, then multiply by the per-iteration step cost.",
-          "pre": "m >= 1 and n >= 1",
-          "post": "x == y and m % x == 0 and n % x == 0",
+          "title": "gcd — count transitions",
+          "code": "while !(x = y) do (\n  if !(x <= y) then\n    x := x - y\n  else (\n    y := y - x\n  )\n)",
+          "state": {
+            "x": 24,
+            "y": 36
+          },
+          "blurb": "The chapter exercise: count step transitions for gcd by subtraction.",
+          "theory": "**Step-count for gcd.**\n\nGiven the gcd-by-subtraction program, the chapter exercise asks to count the transitions for various inputs. Each iteration costs a constant number of small-steps (one `while-tt`, one `if-*`, one subtraction := plus admin), so the step count is **proportional to the number of subtraction iterations**.\n\nFor `(m, n)` with `gcd = g`, the worst case is when one operand is much larger: `gcd(m, kg)` takes ~k iterations. Try `(m=24, n=36)` then `(m=1, n=100)` to see the contrast.",
+          "pre": "x >= 1 and y >= 1",
+          "post": "x == y",
           "samples": {
-            "m": [
+            "x": [
               1,
-              60
+              50
             ],
-            "n": [
+            "y": [
               1,
-              60
+              50
             ]
           }
         },
         {
-          "ref": "Exercise 15",
-          "title": "Conditional with done flag",
-          "code": "done := 0;\ni := 0;\nwhile done = 0 do (\n  if i = n then\n    done := 1\n  else (\n    i := i + 1\n  )\n)",
-          "state": {
-            "n": 6
-          },
+          "ref": "Exercise 14",
           "tool": "trace",
-          "blurb": "Set done = 1 once a condition is reached; trace the unfolding.",
-          "theory": "**Conditional with `done` flag.**\n\nSet `done := 1` once a condition is reached, then exit the loop. The pattern shows up frequently in Hoare-logic exercises (chapter 4) where the postcondition refers to *the moment* a condition first holds.",
-          "pre": "n >= 0",
-          "post": "done == 1 and i == n",
+          "title": "Diophantine search — small-step trace",
+          "code": "found := 0;\nx := 0;\nwhile found = 0 do (\n  y := 0;\n  while found = 0 & m*x + n*y <= k do (\n    if m*x + n*y = k then\n      found := 1\n    else (\n      y := y + 1\n    )\n  );\n  if found = 0 then\n    x := x + 1\n  else (\n    skip\n  )\n)",
+          "state": {
+            "m": 2,
+            "n": 3,
+            "k": 7
+          },
+          "blurb": "The chapter exercise: trace the linear Diophantine search from Exercise 7 in small-step.",
+          "theory": "**Trace the Exercise 7 search.**\n\nThe chapter Exercise 14 asks for the small-step trace of the linear Diophantine search (Exercise 7). Run this and click **Trace** to see how `if-tt`/`if-ff` rules interleave as `(x, y)` walks the diagonal.\n\nCount tool gives the step count; step count is *linear in `(x + y)`* at the solution.",
+          "pre": "m >= 1 and n >= 1 and k >= 0",
+          "post": "found == 1 and m*x + n*y == k",
           "samples": {
+            "m": [
+              2,
+              2
+            ],
             "n": [
-              0,
-              100
+              3,
+              3
+            ],
+            "k": [
+              2,
+              30
             ]
           }
         }
@@ -352,138 +322,35 @@
     },
     {
       "label": "Chapter 3 — Complexity",
-      "caption": "Programs whose growth rate we measure with the step counter.",
+      "caption": "Programs whose growth rate the chapter analyses.",
       "entries": [
         {
-          "ref": "Example 4",
-          "title": "Decrementing loop — Θ(n)",
-          "code": "y := n - 1;\nwhile 0 <= y do (\n  y := y - 1\n)",
-          "state": {
-            "n": 12
-          },
+          "ref": "Exercise 20",
           "tool": "count",
-          "blurb": "Linear in n. Compare the step count for n = 5, 10, 20.",
-          "theory": "**Decrementing loop — Θ(n).**\n\n`y := n − 1; while 0 <= y do y := y − 1`. Iterates `n` times, each iteration costs a constant number of small-steps, so total cost is **linear in `n`**.\n\nRun with `n = 5, 10, 20` and watch the step count scale linearly. This is the canonical Θ(n) program.",
-          "pre": "True",
-          "post": "y == -1",
-          "samples": {
-            "n": [
-              -5,
-              100
-            ]
-          }
-        },
-        {
-          "ref": "Exercise 17",
-          "title": "Step count of a small program",
-          "code": "x := 0;\ny := 0;\nwhile y <= n do (\n  x := x + y;\n  y := y + 1\n)",
+          "title": "Step count for the primality test (Example 4)",
+          "code": "y := n - 1;\nz := 1;\nwhile 1 <= y - 1 & z = 1 do (\n  r := n;\n  while y <= r do (\n    r := r - y\n  );\n  if r = 0 then\n    z := 0\n  else (\n    skip\n  );\n  y := y - 1\n)",
           "state": {
-            "n": 8
+            "n": 31
           },
-          "tool": "count",
-          "blurb": "Predict the step count, then verify.",
-          "theory": "**Predict the step count.**\n\nPredict on paper, then verify. Hint: count `while-tt` firings, then add the per-body step cost.",
-          "pre": "n >= 0",
-          "post": "x == n*(n+1) // 2 and y == n + 1",
-          "samples": {
-            "n": [
-              0,
-              50
-            ]
-          }
-        },
-        {
-          "ref": "Exercise 18",
-          "title": "Step count — alternative form",
-          "code": "x := 0;\nwhile x <= n do (\n  x := x + 1\n);\ny := x",
-          "state": {
-            "n": 8
-          },
-          "tool": "count",
-          "blurb": "Same task as Exercise 17, different loop. Same complexity?",
-          "theory": "**Step count, alternative form.**\n\nSame task as Exercise 17 but with a different loop body. Same complexity class? Verify that the asymptotic cost is identical even though the constant factor differs.",
-          "pre": "n >= 0",
-          "post": "x == n + 1 and y == n + 1",
-          "samples": {
-            "n": [
-              0,
-              50
-            ]
-          }
-        },
-        {
-          "ref": "Exercise 19",
-          "title": "Quadratic — Θ(n²)",
-          "code": "x := i * (i + 1); y := 0;\n    while 0 <= x do (\n        x := x - 2;\n        y := y + 1\n    )",
-          "state": {
-            "i": 6
-          },
-          "tool": "count",
-          "blurb": "Step count grows quadratically with i. Try i = 4, 8, 16.",
-          "theory": "**Quadratic — Θ(n²).**\n\nA nested loop pattern: outer loop runs O(i) times, inner loop runs O(i) times, total O(i²). Try `i = 4, 8, 16` and confirm the step count quadruples each time `i` doubles.\n\nThis is the textbook example used to *show* Θ(n²) growth empirically.",
-          "pre": "i >= 0",
-          "post": "x == -2 and y == i*(i+1) // 2 + 1",
-          "samples": {
-            "i": [
-              0,
-              30
-            ]
-          }
-        },
-        {
-          "ref": "Exercise 23",
-          "title": "Constant program — Θ(1)",
-          "code": "x := n;\ny := x + 1;\nz := x + y",
-          "state": {
-            "n": 100
-          },
-          "tool": "count",
-          "blurb": "Step count is independent of n. Measure to confirm.",
-          "theory": "**Constant program — Θ(1).**\n\nThe step count is independent of the input. Try `n = 5, 100, 1000`: the step count is the same. Useful as a baseline against which all other complexity classes look \"expensive\".",
-          "pre": "True",
-          "post": "x == n and y == n + 1 and z == 2*n + 1",
-          "samples": {
-            "n": [
-              -50,
-              50
-            ]
-          }
+          "blurb": "The chapter exercise: count the step cost of the primality test as a function of n.",
+          "theory": "**Chapter exercise: complexity of the primality test.**\n\nThe chapter Exercise 20 asks: for the program from Example 4 (primality test), how many steps does it take as a function of `n`?\n\nOuter loop runs roughly `n` iterations (worst case, when `n` is prime); inner loop runs roughly `n / y` iterations. Total: `Σ_{y=2}^{n-1} (n / y)` ≈ `n · ln(n)` so step count is `Θ(n log n)` for prime inputs.\n\nTry `n = 7, 11, 31, 47` (primes). Plot step counts and see the slow-but-not-quite-linear growth."
         },
         {
           "ref": "Exercise 24",
-          "title": "Linear — counting up",
-          "code": "x := 0;\ni := 0;\nwhile i <= n do (\n  x := x + 1;\n  i := i + 1\n)",
-          "state": {
-            "n": 20
-          },
           "tool": "count",
-          "blurb": "Step count is linear; compute the constant factor.",
-          "theory": "**Linear — counting up.**\n\nCounts from 0 up to `n`. Per iteration the cost is constant; total cost is `c · n + d` for small constants `c, d`. Run with several `n` and compute `(steps − d) / n` to recover the constant factor.",
+          "title": "∑ ∑ j — quadratic sum",
+          "code": "x := 0;\ni := 1;\nwhile i <= n do (\n  j := 1;\n  while j <= i do (\n    x := x + j;\n    j := j + 1\n  );\n  i := i + 1\n)",
+          "state": {
+            "n": 5
+          },
+          "blurb": "Chapter exercise: ∑_{i=1}^{n} ∑_{j=1}^{i} j. x ends at n(n+1)(n+2)/6.",
+          "theory": "**Quadratic-sum exercise.**\n\nThe chapter Exercise 24 asks for a program computing `Σ_{i=1}^{n} Σ_{j=1}^{i} j` and an analysis of its time complexity.\n\n`Σ_{j=1}^{i} j = i(i+1)/2`, so the outer sum is `Σ_{i=1}^{n} i(i+1)/2 = n(n+1)(n+2)/6` (a tetrahedral number). For `n = 5`: `35`. For `n = 10`: `220`.\n\nStep count is `Θ(n²)` because the inner loop runs `i` times for each of `n` outer iterations.",
           "pre": "n >= 0",
-          "post": "x == n + 1 and i == n + 1",
+          "post": "x == n*(n+1)*(n+2) // 6",
           "samples": {
             "n": [
               0,
-              100
-            ]
-          }
-        },
-        {
-          "ref": "Exercise 25",
-          "title": "Three-variable counter",
-          "code": "count := 0;\ni := 0;\nwhile i <= n do (\n  j := 0;\n  while j <= n do (\n    k := 0;\n    while k <= n do (\n      count := count + 1;\n      k := k + 1\n    );\n    j := j + 1\n  );\n  i := i + 1\n)",
-          "state": {
-            "n": 4
-          },
-          "tool": "count",
-          "blurb": "Three nested-ish loops; what is the asymptotic class?",
-          "theory": "**Three nested loops — Θ(n³).**\n\nThree loops, each up to `n + 1`. Total `count` ends at `(n+1)^3`. Step count is **cubic in `n`** — try `n = 2, 3, 4` and watch the step count grow as 27, 64, 125 (roughly).\n\nUseful comparison vs the linear (Exercise 24) and quadratic (Exercise 19) cases. The pattern of nested loops is the canonical way to *encode* polynomial complexity in the While language.",
-          "pre": "n >= 0",
-          "post": "count == (n + 1)**3",
-          "samples": {
-            "n": [
-              0,
-              4
+              20
             ]
           }
         }
@@ -491,17 +358,18 @@
     },
     {
       "label": "Chapter 4 — Hoare logic",
-      "caption": "Programs we verify with {P} S {Q}. Switch to \"Verify Hoare\" tool.",
+      "caption": "Programs verified with {P} S {Q}. Switch to \"Verify Hoare\".",
       "entries": [
         {
           "ref": "Exercise 31",
-          "title": "Conditional — verify postcondition",
-          "code": "if 0 <= n then\n        x := 2 * n\n    else (\n        x := -2 * n - 1\n    )",
+          "tool": "hoare",
+          "title": "β function — encode integer as natural",
+          "code": "if 0 <= n then\n  x := 2 * n\nelse (\n  x := -2 * n - 1\n)",
           "state": {
             "n": 5
           },
-          "tool": "hoare",
-          "blurb": "A simple if/else; verify that the postcondition holds.",
+          "blurb": "The β function: encodes ℤ → ℕ. Hoare verifies it produces a unique non-negative encoding.",
+          "theory": "**β function — encoding integers as naturals.**\n\nThe chapter exercise: prove the program implements the β function from Section 6.2.1. β maps `n → 2n` for non-negative inputs and `n → -2n - 1` for negative inputs. Result is non-negative and unique per input.\n\nVerify with `n` ranging over `[-50, 50]`: the postcondition holds in both branches.",
           "pre": "True",
           "post": "(n >= 0 and x == 2*n) or (n < 0 and x == -2*n - 1)",
           "samples": {
@@ -509,18 +377,18 @@
               -50,
               50
             ]
-          },
-          "theory": "**Verify a simple if/else triple.**\n\nDemonstrates the *if* rule in Hoare logic: prove the postcondition holds in BOTH branches. Try editing the precondition `pre` and seeing how the verification result changes.\n\nThe playground samples 10 random states matching the precondition and runs the program; if all 10 satisfy the postcondition the triple is \"verified\" empirically. *This is not a proof* — but it catches obviously-wrong assertions before you start a Hoare-logic derivation."
+          }
         },
         {
           "ref": "Exercise 34",
-          "title": "Power — Hoare verification",
+          "tool": "hoare",
+          "title": "2^n by repeated doubling",
           "code": "x := 1;\ni := 0;\nwhile i <= n - 1 do (\n  x := x * 2;\n  i := i + 1\n)",
           "state": {
             "n": 4
           },
-          "tool": "hoare",
-          "blurb": "Verify a power program against {n ≥ 0} S {x = 2ⁿ}.",
+          "blurb": "Computes 2^n. The chapter exercise: verify against {n ≥ 0} S {x = 2^n}.",
+          "theory": "**Power of 2.**\n\nThe chapter Exercise 34 asks to verify `{n ≥ 0} S {x = 2^n}`. Loop invariant: `x = 2^i ∧ 0 ≤ i ≤ n`. After the loop, `i = n` and `x = 2^n`.\n\nTry changing the precondition to `n >= -5` — some samples will then have `n < 0`, the precondition still holds for those, but the postcondition fails because the loop runs 0 times and `x = 1 ≠ 2^n` for negative `n`.",
           "pre": "n >= 0",
           "post": "x == 2**n",
           "samples": {
@@ -528,18 +396,18 @@
               0,
               8
             ]
-          },
-          "theory": "**Power program — partial correctness.**\n\nVerify the partial-correctness triple for `m^n`. The chosen invariant is `x = m^(n−i)` (the partial power computed so far) — try writing it down before reading the trace, then check."
+          }
         },
         {
           "ref": "Exercise 35",
+          "tool": "hoare",
           "title": "Sum 1..n — verify n(n+1)/2",
-          "code": "x := 0; i := 1;\n    while i <= n do (\n        x := x + i;\n        i := i + 1\n    )",
+          "code": "x := 0;\ni := 1;\nwhile i <= n do (\n  x := x + i;\n  i := i + 1\n)",
           "state": {
             "n": 10
           },
-          "tool": "hoare",
-          "blurb": "Verify that sum 1..n satisfies x = n(n+1)/2.",
+          "blurb": "The classic Hoare exercise: verify x = n(n+1)/2.",
+          "theory": "**Sum 1..n.**\n\nThe chapter Exercise 35 is the canonical Hoare exercise. Loop invariant: `x = i(i-1)/2 ∧ 1 ≤ i ≤ n+1`. After the loop, `i = n+1` and `x = (n+1)·n/2 = n(n+1)/2`.\n\nVerifies cleanly for any `n ≥ 0`.",
           "pre": "n >= 0",
           "post": "x == n*(n+1) // 2",
           "samples": {
@@ -547,18 +415,18 @@
               0,
               30
             ]
-          },
-          "theory": "**Sum 1..n — verify n(n+1)/2.**\n\nThe classic Hoare exercise. Loop invariant: `x = i(i−1)/2` (the partial sum). After the loop terminates with `i = n+1`, the invariant gives `x = n(n+1)/2` — exactly the postcondition.\n\nRun the verifier on `samples = {n: [0, 30]}` to confirm 10/10 verified. If you weaken the precondition (try removing `n >= 0`) the verifier may catch it."
+          }
         },
         {
           "ref": "Exercise 36",
+          "tool": "hoare",
           "title": "Integer log₂ via halving",
-          "code": "x := 1; z := 0;\n    while x * 2 <= n do (\n        z := z + 1;\n        x := x * 2\n    )",
+          "code": "x := 1;\nz := 0;\nwhile x * 2 <= n do (\n  z := z + 1;\n  x := x * 2\n)",
           "state": {
             "n": 100
           },
-          "tool": "hoare",
-          "blurb": "Verify that the program computes ⌊log₂ n⌋.",
+          "blurb": "z = ⌊log₂ n⌋, x = 2^z. Step count is logarithmic.",
+          "theory": "**Integer logarithm base 2.**\n\nThe chapter Exercise 36 asks to verify a program computing the integer log: `z = ⌊log₂ n⌋` and `x = 2^z`.\n\nLoop invariant: `x = 2^z ∧ x ≤ n ∧ 2x > n` (after first iteration). After termination, `x = 2^z`, `2x > n`, so `z = ⌊log₂ n⌋`.\n\nA rare program in the While language with **logarithmic** step count — the loop body multiplies `x` by 2 each iteration, so iterations = log₂(n / x_init) = log₂(n).",
           "pre": "n >= 1",
           "post": "x == 2**z and 2*x > n",
           "samples": {
@@ -566,68 +434,86 @@
               1,
               1000
             ]
-          },
-          "theory": "**Integer log₂ via halving.**\n\nComputes `⌊log₂ n⌋` by repeatedly *halving* `n` (subtracting up to half each time). The step count is **logarithmic in `n`** — a rarity in the While language because it lacks integer division.\n\nThe Hoare proof uses an invariant of the form `n_orig = z · 2^d + r` for some remainder `r < 2^d`."
+          }
         },
         {
           "ref": "Exercise 37",
-          "title": "Divisibility check",
-          "code": "d := 0;\nr := n;\nwhile k <= r do (\n  r := r - k\n);\nif r = 0 then\n  d := 1\nelse (\n  skip\n)",
-          "state": {
-            "n": 12,
-            "k": 3
-          },
           "tool": "hoare",
-          "blurb": "Set d = 1 iff k divides n; verify against the obvious postcondition.",
-          "pre": "n >= 0 and k >= 1",
-          "post": "(d == 1 and n % k == 0) or (d == 0 and n % k != 0)",
-          "samples": {
-            "n": [
-              0,
-              100
-            ],
-            "k": [
-              1,
-              20
-            ]
-          },
-          "theory": "**Divisibility check.**\n\nSet `d := 1` iff `k` divides `n`. Demonstrates the *forall* postcondition pattern: the postcondition asserts a relationship that must hold regardless of how the loop terminated."
-        },
-        {
-          "ref": "Exercise 61",
-          "title": "Power — total correctness",
-          "code": "x := 1;\ni := 0;\nwhile i <= n - 1 do (\n  x := x * 2;\n  i := i + 1\n)",
+          "title": "Final digit of n is divisible by 3",
+          "code": "x := n;\nwhile 10 <= x do (\n  x := x - 10\n);\nif x = 0 then\n  d := 1\nelse (\n  if x = 3 then\n    d := 1\n  else (\n    if x = 6 then\n      d := 1\n    else (\n      if x = 9 then\n        d := 1\n      else (\n        d := 0\n      )\n    )\n  )\n)",
           "state": {
-            "n": 5
+            "n": 27
           },
-          "tool": "hoare",
-          "blurb": "Same as Exercise 34, framed as total-correctness with a variant.",
+          "blurb": "d = 1 iff the last digit of n is 0, 3, 6, or 9. Chapter Exercise 37.",
+          "theory": "**Final-digit divisibility test.**\n\nThe chapter Exercise 37 asks: write a While program that tells us whether the final digit of `n ∈ ℕ` is divisible by 3.\n\nThe final digit is `n mod 10`; the digits divisible by 3 are `{0, 3, 6, 9}`. The program first computes `x := n mod 10` via repeated subtraction, then checks against the four cases.\n\nVerify with `n` random up to 1000: `d = 1` iff `n % 10 ∈ {0, 3, 6, 9}`.",
           "pre": "n >= 0",
-          "post": "x == 2**n",
+          "post": "(d == 1) == ((n % 10) % 3 == 0)",
           "samples": {
             "n": [
               0,
-              8
+              200
             ]
-          },
-          "theory": "**Power program — total correctness.**\n\nSame algorithm as Exercise 34, framed as a *total* correctness proof. The variant function `n − i` strictly decreases each iteration and is bounded below by 0, so the loop must terminate.\n\nTotal correctness = partial correctness + termination."
+          }
         }
       ]
     },
     {
       "label": "Chapter 5 — Computability",
-      "caption": "Programs that decide or semidecide a predicate.",
+      "caption": "Programs that decide or semidecide a predicate; the chapter's computability examples.",
       "entries": [
         {
+          "ref": "Example 12",
+          "tool": "trace",
+          "title": "Identity function",
+          "code": "x := n",
+          "state": {
+            "n": 7
+          },
+          "blurb": "The identity function. The simplest computable function.",
+          "theory": "**The identity function `id : ℕ → ℕ`.**\n\nThe chapter's first computability example. Demonstrates that the identity function is computable — the program is just one assignment, `x := n`.\n\nThe Hoare triple `{n ∈ ℕ} x := n {x = n}` follows from the assignment rule. This is the chapter's gentle entry into computability proofs.",
+          "pre": "n >= 0",
+          "post": "x == n",
+          "samples": {
+            "n": [
+              0,
+              100
+            ]
+          }
+        },
+        {
+          "ref": "Example 13",
+          "tool": "trace",
+          "title": "Add a constant — f(n) = n + m",
+          "code": "x := n + m",
+          "state": {
+            "n": 5,
+            "m": 3
+          },
+          "blurb": "Computes f(n) = n + m. One assignment, totally computable.",
+          "theory": "**Adding a constant — f(n) = n + m.**\n\nThe chapter Example 13: any function of the form `f(n) = n + m` is computable, witnessed by the trivial program `x := n + m`.\n\nA small step beyond the identity, but the same proof shape via the `:=` rule.",
+          "pre": "n >= 0",
+          "post": "x == n + m",
+          "samples": {
+            "n": [
+              0,
+              100
+            ],
+            "m": [
+              0,
+              30
+            ]
+          }
+        },
+        {
           "ref": "Example 14",
-          "title": "Modulo 7 by repeated subtraction",
+          "tool": "trace",
+          "title": "g(n) = n mod 7",
           "code": "x := n;\nwhile 7 <= x do (\n  x := x - 7\n)",
           "state": {
             "n": 23
           },
-          "tool": "trace",
-          "blurb": "x ends with n mod 7. A bounded computation, easy to decide.",
-          "theory": "**Modulo 7 by repeated subtraction.**\n\n`x := n; while 7 <= x do x := x − 7`. When the loop terminates, `x = n mod 7` and `(n − x) / 7` is the quotient.\n\nDemonstrates that `mod 7` is **decidable** in the While language: there's a program that always halts and produces the correct answer. Try `n = 23, 50, 100`.",
+          "blurb": "Compute n mod 7 by repeated subtraction. The chapter's decidable function example.",
+          "theory": "**The function g(n) = n mod 7.**\n\nThe chapter Example 14: `g : ℕ → ℕ`, `n ↦ n mod 7` is computable. Subtract 7 repeatedly until `x < 7`; the remainder is `n mod 7`.\n\nA standard *decidable* computation: the loop is bounded (terminates after `n / 7` iterations) and the result is determined by `n` alone. Demonstrates how chapter-style modulo is built from `−` and `≤`.",
           "pre": "n >= 0",
           "post": "x == n % 7",
           "samples": {
@@ -639,225 +525,106 @@
         },
         {
           "ref": "Example 15",
-          "title": "Multiplication via repeated addition",
-          "code": "result := 0;\ni := 1;\nwhile i <= n do (\n  result := result + m;\n  i := i + 1\n)",
-          "state": {
-            "m": 4,
-            "n": 7
-          },
           "tool": "trace",
-          "blurb": "Decidable: for any (m, n) the program halts and gives m·n.",
-          "theory": "**Multiplication via repeated addition.**\n\nThis is decidable: for any inputs `(m, n)` the program halts with `result = m × n`. The total step count is `O(n)` for the inner loop times the constant outer-loop cost.",
-          "pre": "m >= 0 and n >= 0",
-          "post": "result == m * n",
-          "samples": {
-            "m": [
-              0,
-              30
-            ],
-            "n": [
-              0,
-              30
-            ]
-          }
+          "title": "Partial function — square if even, else undefined",
+          "code": "x := n;\nm := n;\nwhile 2 <= m do (\n  m := m - 2\n);\nif m = 0 then\n  x := x * x\nelse (\n  while 1 <= m do (\n    m := m + 1\n  )\n)",
+          "state": {
+            "n": 6
+          },
+          "blurb": "f(n) = n² if n even, undefined otherwise. Diverges intentionally on odd n.",
+          "theory": "**Partial function — `f(n) = n²` if `n` even, undefined else.**\n\nThe chapter Example 15. Demonstrates a *partial computable function*: terminates with `n²` for even `n`, but loops forever for odd `n` (the `else` branch was originally `while tt do skip` in the chapter; this implementation uses an inner condition that grows `m` upward in an obvious infinite way).\n\nFor `n = 6`: x ends at 36. For `n = 7`: program runs past the step budget — playground reports \"step budget exceeded\"."
         },
         {
           "ref": "Example 16",
-          "title": "Power — variant",
-          "code": "result := 1;\ni := 1;\nwhile i <= n do (\n  result := result * m;\n  i := i + 1\n)",
-          "state": {
-            "m": 2,
-            "n": 5
-          },
           "tool": "trace",
-          "blurb": "Another decidable program; halts on every input.",
-          "theory": "**Power — variant form.**\n\nAnother decidable program, same algorithm class as Example 6. Halts on every non-negative input. Useful comparison program for chapter 5's discussion of which functions are computable in While.",
-          "pre": "m >= 0 and n >= 0",
-          "post": "result == m**n",
-          "samples": {
-            "m": [
-              1,
-              8
-            ],
-            "n": [
-              0,
-              6
-            ]
-          }
+          "title": "Predicate — is n a triangular number?",
+          "code": "z := 1;\ny := 1;\ndone := 0;\nwhile done = 0 do (\n  if z = n then (\n    done := 1\n  ) else (\n    if n <= z then (\n      done := 1\n    ) else (\n      y := y + 1;\n      z := z + y\n    )\n  )\n)",
+          "state": {
+            "n": 10
+          },
+          "blurb": "Decision procedure: is n the sum of the first i naturals for some i?",
+          "theory": "**Triangular-number predicate.**\n\nThe chapter Example 16: a decision procedure for the predicate `P(n) = ∃i ∈ ℕ. n = Σ_{j=1}^{i} j`. The triangular numbers are `1, 3, 6, 10, 15, 21, …`.\n\nThe program walks `(y, z) = (1, 1), (2, 3), (3, 6), (4, 10), …` until either `z = n` (yes — n is triangular) or `z > n` (no — n is not).\n\nFor `n = 10`: yes, `1+2+3+4 = 10`, the loop hits `z = n` and exits. For `n = 7`: no, jumps over (z goes 6 then 10)."
         },
         {
-          "ref": "Exercise 39",
-          "title": "Decide an odd predicate",
-          "code": "x := n;\nwhile 2 <= x do (\n  x := x - 2\n);\nif x = 0 then\n  is_odd := 0\nelse (\n  is_odd := 1\n)",
-          "state": {
-            "n": 7
-          },
+          "ref": "Example 19",
           "tool": "trace",
-          "blurb": "Check that the program correctly classifies n. Try n = 0, 1, 2, 7.",
-          "theory": "**Decide whether `n` is odd.**\n\nA simple decidable predicate. Walks `x` down by 2 from `n`; if `x` lands on 0, `n` was even, otherwise odd. Final `is_odd = 1` iff `n` is odd.\n\nTry `n = 0, 1, 2, 7`. The program *always halts* and *always gives the right answer* — the textbook definition of a decidable predicate. Compare to Exercise 51 (where halting depends on the input) for the contrast with semi-decidable / undecidable cases.",
-          "pre": "n >= 0",
-          "post": "is_odd == n % 2",
+          "title": "β function (chapter 5 reference)",
+          "code": "if 0 <= n then\n  x := 2 * n\nelse (\n  x := -2 * n - 1\n)",
+          "state": {
+            "n": -3
+          },
+          "blurb": "Same as Exercise 31; chapter 5 references this as the β encoding function.",
+          "theory": "**β function — chapter 5 framing.**\n\nThe chapter Example 19 shows that the β function (which encodes integers as naturals) is computable. Same program as Exercise 31; chapter 5 references it as a known total computable function.",
+          "pre": "True",
+          "post": "(n >= 0 and x == 2*n) or (n < 0 and x == -2*n - 1)",
           "samples": {
             "n": [
-              0,
-              100
+              -50,
+              50
             ]
           }
         },
         {
           "ref": "Exercise 51",
-          "title": "Halting — bounded vs unbounded",
-          "code": "if 100 <= n then\n  while tt do (\n    skip\n  )\nelse (\n  skip\n)",
-          "state": {
-            "n": 50
-          },
           "tool": "trace",
-          "blurb": "A program where halting depends on n. Try n = 100, 99, 50, 200.",
-          "theory": "**Halting depends on input.**\n\nA program where halting *depends on* the input value. Try `n = 100, 99, 50, 200`: some halt, some loop. This is the gateway to undecidability — a single program whose halting behaviour you can decide *for this input* but not in general.\n\nIf you stretch the input far enough, you'll hit the step-budget cap (10 000 steps) and see the *non-terminating* error.",
-          "pre": "n < 100",
-          "post": "True",
-          "samples": {
-            "n": [
-              0,
-              99
-            ]
-          }
+          "title": "Halting depends on n — partial function",
+          "code": "if 100 <= n & !(100 = n) then\n  while tt do (\n    skip\n  )\nelse (\n  x := y\n)",
+          "state": {
+            "n": 50,
+            "y": 7
+          },
+          "blurb": "The chapter exercise: a program where halting depends on whether n > 100.",
+          "theory": "**Halting depends on the input.**\n\nThe chapter Exercise 51 (a). For `n ≤ 100`: program assigns `x := y` and halts. For `n > 100`: enters an infinite `while tt do (skip)` loop.\n\nDemonstrates: a single program can compute a *partial* function whose domain depends on the input. The halting question for arbitrary programs (the Halting Problem in §5.4) is the natural extension.\n\nTry `n = 50` (halts; x = y = 7) vs `n = 200` (steps budget exhausted)."
         }
       ]
     },
     {
-      "label": "Appendix — Big-step semantics",
-      "caption": "Programs from the appendix exercises (small-step trace shown).",
+      "label": "Appendix B — Big-step semantics",
+      "caption": "Programs the appendix exercises analyse via big-step rules.",
       "entries": [
         {
-          "ref": "Exercise 58",
-          "title": "Loop-free program — terminates",
-          "code": "x := m + n;\ny := m * n;\nif x <= y then\n  z := x\nelse (\n  z := y\n)",
-          "state": {
-            "m": 3,
-            "n": 4
-          },
-          "tool": "trace",
-          "blurb": "Loop-free programs trivially terminate; trace and confirm.",
-          "theory": "**Loop-free program — terminates trivially.**\n\nA program with only `:=`, `;`, `if`, `skip` (no `while`). Big-step semantics gives this an obvious termination proof: structural induction over the program.\n\nDemonstrates the chapter's \"loop-free implies terminating\" lemma.",
-          "pre": "m >= 0 and n >= 0",
-          "post": "(x == m + n and m + n <= m * n and z == x) or (x == m + n and m * n < m + n and z == m * n)",
-          "samples": {
-            "m": [
-              0,
-              20
-            ],
-            "n": [
-              0,
-              20
-            ]
-          }
-        },
-        {
           "ref": "Exercise 59",
-          "title": "Equivalence under big-step",
-          "code": "x := m;\ny := n;\nif x <= y then\n  z := y - x\nelse (\n  z := x - y\n)",
+          "tool": "trace",
+          "title": "Diophantine — big-step from σ = {m:3, n:4, k:7}",
+          "code": "found := 0;\nx := 0;\nwhile found = 0 do (\n  y := 0;\n  while found = 0 & m*x + n*y <= k do (\n    if m*x + n*y = k then\n      found := 1\n    else (\n      y := y + 1\n    )\n  );\n  if found = 0 then\n    x := x + 1\n  else (\n    skip\n  )\n)",
           "state": {
             "m": 3,
-            "n": 4
+            "n": 4,
+            "k": 7
           },
-          "tool": "trace",
-          "blurb": "A program for the big-step equivalence proof; trace its small-step run.",
-          "theory": "**Big-step equivalence proof.**\n\nA program used in the chapter's proof that big-step and small-step semantics agree on terminating runs. Trace its small-step execution here, then compare to the big-step result (same final state).",
-          "pre": "True",
-          "post": "(m <= n and z == n - m) or (m > n and z == m - n)",
+          "blurb": "The Diophantine search from Exercise 7 — appendix asks for the big-step result.",
+          "theory": "**Big-step exercise.**\n\nAppendix Exercise 59 asks: for the Diophantine program from Exercise 7, find the final state when starting from `σ = {m: 3, n: 4, k: 7}` using the big-step semantics.\n\nBig-step says `⟨S, σ⟩ ⇓ σ'` iff the program terminates and produces `σ'`. Run this with the Trace tool to see the small-step trace; the final state is the big-step result.\n\nSolution: `(x, y) = (1, 1)` since `3·1 + 4·1 = 7`. found = 1.",
+          "pre": "m >= 1 and n >= 1 and k >= 0",
+          "post": "found == 1 and m*x + n*y == k",
           "samples": {
             "m": [
-              0,
-              50
+              3,
+              3
             ],
             "n": [
-              0,
-              50
-            ]
-          }
-        },
-        {
-          "ref": "Exercise 62",
-          "title": "Determinism showcase",
-          "code": "done := 0;\ni := 0;\nresult := 0;\nwhile done = 0 do (\n  if i = n then\n    done := 1\n  else (\n    result := result + i;\n    i := i + 1\n  )\n)",
-          "state": {
-            "n": 5
-          },
-          "tool": "trace",
-          "blurb": "Big-step is deterministic: the same start gives the same end every time.",
-          "theory": "**Determinism showcase.**\n\nBig-step semantics is *deterministic*: the same starting state gives the same final state every time. Run with `n = 5` multiple times and confirm.\n\nThis is used to prove that `bigstep` is a (partial) function, not just a relation.",
-          "pre": "n >= 0",
-          "post": "result == n*(n-1) // 2 and i == n and done == 1",
-          "samples": {
-            "n": [
-              0,
+              4,
+              4
+            ],
+            "k": [
+              2,
               30
             ]
           }
         },
         {
-          "ref": "Exercise 64",
-          "title": "gcd — big-step view",
-          "code": "x := m; y := n;\n    while !(x = y) do (\n        if !(x <= y) then\n            x := x - y\n        else (\n            y := y - x\n        )\n    )",
+          "ref": "Exercise 61",
+          "tool": "hoare",
+          "title": "Compare two equivalent programs (sum 1..i)",
+          "code": "y := 1;\na := 0;\nwhile y <= i do (\n  a := a + y;\n  y := y + 1\n)",
           "state": {
-            "m": 15,
-            "n": 35
+            "i": 10
           },
-          "tool": "trace",
-          "blurb": "gcd as a big-step terminating computation.",
-          "theory": "**gcd — big-step view.**\n\nThe gcd algorithm again. In big-step, `⟨gcd, {m: 15, n: 35}⟩ ⇓ {x: 5, …}` — the entire computation is a single judgment, not a sequence of transitions.\n\nUseful for *correctness* reasoning where you only care about the final state.",
-          "pre": "m >= 1 and n >= 1",
-          "post": "x == y and m % x == 0 and n % x == 0",
+          "blurb": "Appendix Exercise 61: this program computes a = i(i+1)/2.",
+          "theory": "**Two programs, one big-step result.**\n\nAppendix Exercise 61 presents two programs that compute the same function on the variable `i ≥ 1`. This is the first one: `y` walks 1..i, accumulating into `a`. After termination, `a = i(i+1)/2`.\n\nThe exercise's second program is `x := i*(i+1); y := 0; …` (uses multiplication directly). Both produce the same final `a`, but with different traces and step counts. Demonstrates *behavioural equivalence* in the big-step semantics: the small-step traces differ, but `⟨S₁, σ⟩ ⇓ σ'` and `⟨S₂, σ⟩ ⇓ σ'` agree.",
+          "pre": "i >= 0",
+          "post": "a == i*(i+1) // 2",
           "samples": {
-            "m": [
-              1,
-              50
-            ],
-            "n": [
-              1,
-              50
-            ]
-          }
-        },
-        {
-          "ref": "Exercise 66",
-          "title": "Multiplication — big-step",
-          "code": "result := 0;\ni := 1;\nwhile i <= n do (\n  result := result + m;\n  i := i + 1\n)",
-          "state": {
-            "m": 3,
-            "n": 6
-          },
-          "tool": "trace",
-          "blurb": "Multiplication; the result is the unique big-step answer.",
-          "theory": "**Multiplication — big-step.**\n\n`⟨multiply, {m: 3, n: 6}⟩ ⇓ σ'` with `σ'(result) = 18`. The big-step rule for `while` is recursive (one step + recursion on the same loop), which makes proofs about `result` straightforward via induction on the recursion depth.",
-          "pre": "m >= 0 and n >= 0",
-          "post": "result == m * n",
-          "samples": {
-            "m": [
-              0,
-              30
-            ],
-            "n": [
-              0,
-              30
-            ]
-          }
-        },
-        {
-          "ref": "Exercise 67",
-          "title": "Big-step ↔ small-step agreement",
-          "code": "x := 0;\ny := 0;\nwhile y <= n do (\n  x := x + y;\n  y := y + 1\n)",
-          "state": {
-            "n": 4
-          },
-          "tool": "trace",
-          "blurb": "A program used in the proof that big-step and small-step agree.",
-          "theory": "**Big-step ↔ small-step agreement.**\n\nA program used in the proof that ⟨S, σ⟩ ⇓ σ' iff ⟨S, σ⟩ ⇒* ⟨skip, σ'⟩. Trace it in small-step here, then mentally apply the big-step rules to confirm both arrive at the same final state.",
-          "pre": "n >= 0",
-          "post": "x == n*(n+1) // 2 and y == n + 1",
-          "samples": {
-            "n": [
+            "i": [
               0,
               30
             ]
@@ -867,18 +634,18 @@
     },
     {
       "label": "CS Classics — extras",
-      "caption": "Famous programs that aren't tied to a specific chapter exercise.",
+      "caption": "Programs not tied to a specific chapter exercise.",
       "entries": [
         {
           "ref": "Extra",
+          "tool": "trace",
           "title": "sum 1..n",
           "code": "result := 0;\ni := 1;\nwhile i <= n do (\n  result := result + i;\n  i := i + 1\n)",
           "state": {
             "n": 10
           },
-          "tool": "trace",
-          "blurb": "The classic. result lands at n(n+1)/2.",
-          "theory": "**Sum 1..n — the canonical loop.**\n\n`result` ends at `n(n+1)/2`. The single most-traced program in any operational-semantics course because it has just enough complexity to demonstrate every rule (assignment, sequence, `while-tt`, `while-ff`) in one short program.\n\nTry the *Hoare* tool with `pre = n >= 0`, `post = result == n*(n+1)/2`, `samples = {\"n\": [0, 30]}` to verify it.",
+          "blurb": "The classic — result lands at n(n+1)/2.",
+          "theory": "**Sum 1..n — the canonical loop.**\n\n`result` ends at `n(n+1)/2`. The single most-traced program in any operational-semantics course because it has just enough complexity to demonstrate every rule (assignment, sequence, `while-tt`, `while-ff`) in one short program.\n\nSwitch to **Verify Hoare** to see the canonical triple `{n ≥ 0} S {result = n(n+1)/2}` checked.",
           "pre": "n >= 0",
           "post": "result == n*(n+1) // 2",
           "samples": {
@@ -890,14 +657,14 @@
         },
         {
           "ref": "Extra",
+          "tool": "trace",
           "title": "factorial — n!",
           "code": "result := 1;\ni := 1;\nwhile i <= n do (\n  result := result * i;\n  i := i + 1\n)",
           "state": {
             "n": 6
           },
-          "tool": "trace",
           "blurb": "n! by repeated multiplication.",
-          "theory": "**Factorial — n!**\n\nMultiplies `1 · 2 · 3 · … · n`. `result` grows fast: at `n = 12` it overflows 32-bit signed integers, but the While language has unbounded integers so it just keeps growing.\n\nLinear in `n`, but each multiplication grows the *value* of `result` exponentially in `n`. A nice example of \"linear in steps, exponential in output magnitude\".",
+          "theory": "**Factorial — n!**\n\nMultiplies `1 · 2 · 3 · … · n`. `result` grows fast: `n = 12` overflows 32-bit signed integers, but While has unbounded integers so it just keeps growing.\n\nLinear in `n` (steps), but each multiplication grows the *value* of `result` exponentially in `n`. A nice example of \"linear in steps, exponential in output magnitude\".",
           "pre": "n >= 0",
           "post": "result == [1, 1, 2, 6, 24, 120][n]",
           "samples": {
@@ -909,16 +676,16 @@
         },
         {
           "ref": "Extra",
-          "title": "Fibonacci — iterative",
+          "tool": "trace",
+          "title": "Fibonacci — iterative (non-destructive)",
           "code": "a := 0;\nb := 1;\ni := 0;\nwhile i <= n do (\n  c := a + b;\n  a := b;\n  b := c;\n  i := i + 1\n)",
           "state": {
             "n": 8
           },
-          "tool": "trace",
-          "blurb": "Fibonacci computed iteratively. b ends with the (n+2)-th Fibonacci number.",
-          "theory": "**Iterative Fibonacci.**\n\nComputes the (n+2)-th Fibonacci number by maintaining the last two values. The classic O(n)-time, O(1)-space algorithm.\n\nCompare to the *recursive* Fibonacci: `fib(n) = fib(n−1) + fib(n−2)` would be O(2^n) — but While has no functions, so we can't even write that here. The constraint forces the efficient algorithm.",
+          "blurb": "Fibonacci preserving the input n. b ends with the (n+2)-th Fibonacci number.",
+          "theory": "**Iterative Fibonacci — non-destructive.**\n\nUnlike the chapter's Example 6 (which destroys `x`), this version uses a fresh counter `i` and preserves `n`. Maintains `(a, b) = (F_i, F_{i+1})`.\n\nFor `n = 8`: `b` ends at `F(10) = 55`. The \"(n+2)-th Fibonacci\" framing comes from the loop invariant `b = F(i+1)` and final `i = n+1`.",
           "pre": "n >= 0",
-          "post": "b == [1, 2, 3, 5, 8, 13, 21, 34, 55][n]",
+          "post": "b == [1, 2, 3, 5, 8, 13, 21, 34, 55][n] and a == [1, 1, 2, 3, 5, 8, 13, 21, 34][n]",
           "samples": {
             "n": [
               0,
@@ -928,55 +695,23 @@
         },
         {
           "ref": "Extra",
-          "title": "Collatz step counter",
+          "tool": "trace",
+          "title": "Collatz step counter (small input)",
           "code": "steps := 0;\nwhile !(x = 1) do (\n  steps := steps + 1;\n  half := x;\n  count := 0;\n  while 2 <= half do (\n    half := half - 2;\n    count := count + 1\n  );\n  if half = 0 then\n    x := count\n  else (\n    x := 3 * x + 1\n  )\n)",
           "state": {
             "x": 7
           },
-          "tool": "trace",
-          "blurb": "Collatz: halve if even, 3x+1 if odd. Famously decidable in practice but unproven in general. (Halving expanded since While has no /.)",
-          "theory": "**Collatz conjecture — counts steps to 1.**\n\nRepeatedly: if `x` is even, halve it; if `x` is odd, set `x := 3x + 1`. The Collatz conjecture says this always reaches 1 — *unproven for all `x` to this day*, but verified up to enormous numbers.\n\nThis implementation expands \"halving\" into an inner subtraction loop because While has no `mod` or `/`. Default `x = 7` is small (chain length 16, peak value 52) so the trace fits in the step budget. Larger inputs like `x = 27` are correct in principle but blow past 10 000 small-steps in this expanded form."
+          "blurb": "Collatz: halve if even, 3x+1 if odd. Default x=7 fits the step budget.",
+          "theory": "**Collatz conjecture — counts steps to 1.**\n\nRepeatedly: if `x` is even, halve it; if `x` is odd, set `x := 3x + 1`. Conjecture: this always reaches 1, *unproven for all `x` to this day* but verified up to enormous numbers.\n\nWhile has no `mod`/`/`, so halving expands into an inner subtraction loop. For `x = 7`: chain length 16, peak value 52, total small-steps fits the budget. Larger inputs (e.g. `x = 27`) exceed the budget under this expansion."
         },
         {
           "ref": "Extra",
-          "title": "Primality test — trial division",
-          "code": "is_prime := 1;\ni := 2;\nwhile i + i <= n + 1 do (\n  q := n;\n  count := 0;\n  while i <= q do (\n    q := q - i;\n    count := count + 1\n  );\n  if q = 0 then (\n    is_prime := 0;\n    i := n\n  ) else (\n    skip\n  );\n  i := i + 1\n)",
-          "state": {
-            "n": 17
-          },
           "tool": "trace",
-          "blurb": "Trial division up to ~√n. is_prime = 1 iff n is prime. Try 17, 21, 49.",
-          "theory": "**Primality test by trial division.**\n\n`is_prime` ends 1 iff `n` is prime. The inner loop counts how many times `i` fits into `n`; if exactly, `i` is a divisor.\n\nThe outer loop's bound is roughly `i + i <= n + 1`, i.e. `i <= n/2` — slightly slacker than the optimal `i*i <= n`, but While has no multiplication-without-overflow concerns. Try `n = 17, 21, 49`.",
-          "pre": "n >= 2",
-          "post": "is_prime == [0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1][n]",
-          "samples": {
-            "n": [
-              2,
-              29
-            ]
-          }
-        },
-        {
-          "ref": "Extra",
-          "title": "Diophantine search — find x, y with ax + by = c",
-          "code": "found := 0;\nx := 0;\ny := 0;\nwhile found = 0 do (\n  if a * x + b * y = c then\n    found := 1\n  else (\n    if x <= y then\n      x := x + 1\n    else (\n      y := y + 1\n    )\n  )\n)",
-          "state": {
-            "a": 2,
-            "b": 3,
-            "c": 7
-          },
-          "tool": "trace",
-          "blurb": "Find non-negative x, y with ax + by = c. Halts iff such a solution exists.",
-          "theory": "**Search for a non-negative Diophantine solution.**\n\nFinds non-negative integers `(x, y)` with `ax + by = c`. Default state `{a: 2, b: 3, c: 7}` has the solution `(x, y) = (2, 1)` because `2·2 + 3·1 = 7` — the search converges in a few iterations.\n\nDemonstrates a *semidecidable* predicate: the search halts iff a solution exists. Try `{a: 2, b: 4, c: 5}`: gcd(2, 4) = 2 doesn't divide 5, no solution exists, and the search loops forever (you'll see the step-budget guardrail kick in)."
-        },
-        {
-          "ref": "Extra",
-          "title": "Infinite loop (try infinite-loop guardrail)",
+          "title": "Infinite loop — step-budget guardrail demo",
           "code": "while tt do (skip)",
           "state": {},
-          "tool": "trace",
-          "blurb": "Demonstrates the step-budget guardrail. Pasting this should NOT freeze the page.",
-          "theory": "**`while tt do skip` — never terminates.**\n\nThe simplest non-terminating program. Demonstrates the playground's *step-budget guardrail*: after 10 000 small-steps without reaching `skip`, the engine raises `StepBudgetExceeded` and the page reports \"step budget exceeded — likely non-terminating\".\n\nThis is what makes the playground safe for shareable URLs: a malicious or accidental infinite loop in someone's pasted program **does not** freeze the recipient's browser."
+          "blurb": "The simplest non-terminating program. Tests the step-budget cap.",
+          "theory": "**`while tt do skip` — never terminates.**\n\nDemonstrates the playground's *step-budget guardrail*: after 10 000 small-steps without reaching `skip`, the engine raises `StepBudgetExceeded` and the page reports \"step budget exceeded — likely non-terminating.\"\n\nThis is what makes the playground safe for shareable URLs: a malicious or accidental infinite loop in someone's pasted program does NOT freeze the recipient's browser."
         }
       ]
     }
