@@ -1,0 +1,23 @@
+{
+  "name": "while-playground",
+  "version": "0.1.0",
+  "description": "A formal-semantics playground for the While language (COMP11212)",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/dev-server.mjs",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "test:all": "npm test && npm run test:e2e",
+    "sync-engine": "node scripts/sync-engine.mjs",
+    "fetch-pyodide-dev": "node scripts/fetch-pyodide-dev.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.0",
+    "vitest": "^2.1.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

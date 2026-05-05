@@ -1,0 +1,51 @@
+# docker-compose.yml — production deploy on Kamal's VPS.
+#
+# Assumes Traefik is already running on the host with a Let's Encrypt resolver
+# named "letsencrypt" and a shared "traefik" network.
+#
+# Deploy:
+#   GIT_SHA=$(git rev-parse --short HEAD) docker compose build
+#   GIT_SHA=$(git rev-parse --short HEAD) docker compose up -d
+#
+# Rollback:
+#   GIT_SHA=<prev-sha> docker compose up -d
+#
+# The image is tagged by git SHA (not :latest) so `docker images` keeps the
+# previous version around for instant rollback.
+
+services:
+  while-playground:
+    build:
+      context: .
+      args:
+        PYODIDE_VERSION: 0.27.0
+    image: while-playground:${GIT_SHA:-dev}
+    container_name: while-playground
+    restart: unless-stopped
+    networks:
+      - traefik
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik"
+      - "traefik.http.routers.while.rule=Host(`while.hassiba.cc`)"
+      - "traefik.http.routers.while.entrypoints=websecure"
+      - "traefik.http.routers.while.tls=true"
+      - "traefik.http.routers.while.tls.certresolver=letsencrypt"
+      - "traefik.http.services.while.loadbalancer.server.port=80"
+      # Optional: a www → apex redirect, in case anyone types www.
+      - "traefik.http.routers.while-www.rule=Host(`www.while.hassiba.cc`)"
+      - "traefik.http.routers.while-www.entrypoints=websecure"
+      - "traefik.http.routers.while-www.tls=true"
+      - "traefik.http.routers.while-www.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.while-www.middlewares=while-redirect-www"
+      - "traefik.http.middlewares.while-redirect-www.redirectregex.regex=^https://www\\.while\\.hassiba\\.cc/(.*)"
+      - "traefik.http.middlewares.while-redirect-www.redirectregex.replacement=https://while.hassiba.cc/$${1}"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O-", "http://localhost/healthz"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+networks:
+  traefik:
+    external: true

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>while.hassiba.cc — Formal-semantics playground</title>
+  <meta name="description" content="A zero-install web playground for the While language. Trace a program's small-step semantics, count its steps, verify a Hoare triple. Built for first-year undergrads studying operational semantics.">
+  <link rel="stylesheet" href="/main.css">
+  <link rel="stylesheet" href="/embed.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ctext y='14' font-size='14'%3E%E2%9F%A8%E2%9F%A9%3C/text%3E%3C/svg%3E">
+  <!-- Pyodide: must load before main.js. Self-hosted in production; CDN in dev. -->
+  <script src="/static/pyodide/pyodide.js"></script>
+  <!-- lz-string for shareable URLs (vendored as a static asset). -->
+  <script src="/static/lz-string.min.js"></script>
+</head>
+<body>
+
+  <header class="page-header">
+    <h1><a href="/">while.hassiba.cc</a></h1>
+    <p class="tagline">A formal-semantics playground for the While language.</p>
+  </header>
+
+  <main class="layout">
+
+    <section class="editor-pane">
+      <div class="editor-header">
+        <label for="editor">While program</label>
+        <div class="examples">
+          <span class="examples-label">Try:</span>
+          <button type="button" class="example-btn" data-example="sum">sum 1..n</button>
+          <button type="button" class="example-btn" data-example="gcd">gcd</button>
+          <button type="button" class="example-btn" data-example="factorial">factorial</button>
+        </div>
+      </div>
+      <textarea id="editor" spellcheck="false" autocomplete="off" autocapitalize="off"></textarea>
+
+      <details class="state-pane" open>
+        <summary>Initial state (JSON)</summary>
+        <textarea id="state-input" spellcheck="false" autocomplete="off"></textarea>
+      </details>
+
+      <details class="hoare-pane">
+        <summary>Hoare assertions (when tool = Verify Hoare)</summary>
+        <label>Precondition <code>P</code>
+          <input type="text" id="hoare-pre" placeholder="n &gt;= 0">
+        </label>
+        <label>Postcondition <code>Q</code>
+          <input type="text" id="hoare-post" placeholder="result == n*(n+1)/2">
+        </label>
+        <label>Sample-state schema (JSON)
+          <textarea id="hoare-samples" spellcheck="false" autocomplete="off" placeholder='{"n": [0, 30]}'></textarea>
+        </label>
+        <p class="hint">ASCII operators: <code>&amp;</code> = and · <code>|</code> = or · <code>!</code> = not · <code>&lt;=</code>, <code>&gt;=</code>.</p>
+      </details>
+    </section>
+
+    <section class="result-pane-wrap">
+      <div class="toolbar">
+        <div class="tool-group">
+          <button type="button" data-tool="trace" class="active">Trace</button>
+          <button type="button" data-tool="count">Count steps</button>
+          <button type="button" data-tool="hoare">Verify Hoare</button>
+        </div>
+        <div class="action-group">
+          <button type="button" id="run-btn" class="primary">▶ Run</button>
+          <button type="button" id="share-btn">Copy link</button>
+        </div>
+      </div>
+      <div id="result-pane" class="result-pane"></div>
+    </section>
+
+  </main>
+
+  <footer class="page-footer">
+    <p>
+      Built by Kamal Hassiba ·
+      <a href="https://github.com/zGeneral/COMP11212-web">source</a> ·
+      <a href="https://github.com/zGeneral/COMP11212">companion notebooks</a> ·
+      Unofficial student companion to UoM COMP11212. Engine runs in your browser via
+      <a href="https://pyodide.org/">Pyodide</a>.
+    </p>
+  </footer>
+
+  <script type="module" src="/main.js"></script>
+</body>
+</html>

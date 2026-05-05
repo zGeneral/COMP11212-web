@@ -1,0 +1,33 @@
+/* embed.css — applied when body has class 'embed' (set by main.js when ?embed=1).
+   Strips chrome so the playground becomes droppable into an iframe in a slide,
+   blog post, or note. */
+
+body.embed .page-header,
+body.embed .page-footer,
+body.embed .editor-header .examples,
+body.embed #share-btn {
+  display: none;
+}
+
+body.embed {
+  background: transparent;
+}
+
+body.embed .layout {
+  padding: 0;
+  gap: 0;
+  grid-template-columns: 1fr 1fr;
+  min-height: 100vh;
+}
+
+body.embed .editor-pane,
+body.embed .result-pane-wrap {
+  border-radius: 0;
+  border: 1px solid var(--border);
+}
+
+@media (max-width: 720px) {
+  body.embed .layout {
+    grid-template-columns: 1fr;
+  }
+}

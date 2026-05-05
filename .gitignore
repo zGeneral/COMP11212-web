@@ -1,0 +1,23 @@
+node_modules/
+.DS_Store
+*.log
+playwright-report/
+test-results/
+.vite/
+dist/
+.env
+.env.local
+# pyodide bundle is downloaded at Docker build time, not committed
+static/pyodide/pyodide.js
+static/pyodide/pyodide.asm.*
+static/pyodide/pyodide-lock.json
+static/pyodide/python_stdlib.zip
+static/pyodide/repodata.json
+static/pyodide/*.whl
+static/pyodide/package.json
+# but DO commit our wheels under static/wheels/ (they're vendored)
+!static/wheels/*.whl
+
+__pycache__/
+*.pyc
+
