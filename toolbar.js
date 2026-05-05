@@ -135,19 +135,19 @@ async function applyExample(value) {
   editor.setEditor(entry.code);
   editor.setState(entry.state || {});
 
-  // Hoare prefill if applicable.
-  if (entry.tool === 'hoare') {
-    const preEl = document.getElementById('hoare-pre');
-    const postEl = document.getElementById('hoare-post');
-    const sampEl = document.getElementById('hoare-samples');
-    if (preEl) preEl.value = entry.pre || '';
-    if (postEl) postEl.value = entry.post || '';
-    if (sampEl) {
-      sampEl.value =
-        entry.samples && Object.keys(entry.samples).length
-          ? JSON.stringify(entry.samples, null, 2)
-          : '';
-    }
+  // Always prefill the Hoare fields when an example has them — even if
+  // the example's default tool is 'trace'. The user can switch tools
+  // without losing the precondition / postcondition the example came with.
+  const preEl = document.getElementById('hoare-pre');
+  const postEl = document.getElementById('hoare-post');
+  const sampEl = document.getElementById('hoare-samples');
+  if (preEl)  preEl.value  = entry.pre  || '';
+  if (postEl) postEl.value = entry.post || '';
+  if (sampEl) {
+    sampEl.value =
+      entry.samples && Object.keys(entry.samples).length
+        ? JSON.stringify(entry.samples, null, 2)
+        : '';
   }
 
   showTheory(entry.theory || entry.blurb || '');
@@ -181,6 +181,12 @@ export async function setupToolbar({ onTool, onShare, initialTool = 'trace' }) {
       document.body.classList.toggle('tool-hoare', tool === 'hoare');
       document.body.classList.toggle('tool-count', tool === 'count');
       document.body.classList.toggle('tool-trace', tool === 'trace');
+      // Auto-expand the Hoare pane when switching to the Hoare tool so
+      // the user immediately sees the prefilled assertions.
+      if (tool === 'hoare') {
+        const hoarePane = document.querySelector('.hoare-pane');
+        if (hoarePane) hoarePane.open = true;
+      }
       onTool(tool);
     });
   });
