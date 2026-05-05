@@ -1,0 +1,34 @@
+{
+  "sheets": [
+    {
+      "slug": "semantics",
+      "title": "Chapters 1–2 — Syntax + Small-step semantics",
+      "file": "CHEATSHEET_SEMANTICS.md"
+    },
+    {
+      "slug": "complexity",
+      "title": "Chapter 3 — Complexity",
+      "file": "CHEATSHEET_COMPLEXITY.md"
+    },
+    {
+      "slug": "hoare",
+      "title": "Chapter 4 — Hoare logic",
+      "file": "CHEATSHEET_HOARE.md"
+    },
+    {
+      "slug": "computability",
+      "title": "Chapter 5 — Computability",
+      "file": "CHEATSHEET_COMPUTABILITY.md"
+    },
+    {
+      "slug": "encodings",
+      "title": "Chapter 6 — Encodings",
+      "file": "CHEATSHEET_ENCODINGS.md"
+    },
+    {
+      "slug": "appendix",
+      "title": "Appendix — Math + big-step semantics",
+      "file": "CHEATSHEET_APPENDIX.md"
+    }
+  ]
+}

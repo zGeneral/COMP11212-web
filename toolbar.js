@@ -6,6 +6,89 @@
 
 let _catalogue = null;
 
+// ─────────────────────────────────────────────────────────────────────────
+// Tiny markdown-lite renderer for the theory pane.
+//   **bold**  → <strong>
+//   *italic*  → <em>
+//   `code`    → <code>
+//   blank line → paragraph break
+//   "- " at line start → bullet list (consecutive lines group into one <ul>)
+// HTML-escapes everything else.
+// ─────────────────────────────────────────────────────────────────────────
+
+function escapeHtml(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function renderInlineMarkdown(text) {
+  let out = escapeHtml(text);
+  // code spans first so backticks don't get re-processed
+  out = out.replace(/`([^`]+)`/g, (_, c) => `<code>${c}</code>`);
+  // bold (greedy match for two-asterisk pairs)
+  out = out.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  // italic (single-asterisk pairs); avoid matching across already-bold spans
+  out = out.replace(/(^|[^*])\*([^*\n]+)\*(?!\*)/g, '$1<em>$2</em>');
+  return out;
+}
+
+export function renderMarkdownLite(text) {
+  if (!text) return '';
+  const lines = String(text).replace(/\r\n/g, '\n').split('\n');
+  const out = [];
+  let para = [];
+  let bullets = null;
+
+  const flushPara = () => {
+    if (para.length) {
+      out.push('<p>' + para.map(renderInlineMarkdown).join(' ') + '</p>');
+      para = [];
+    }
+  };
+  const flushBullets = () => {
+    if (bullets) {
+      out.push('<ul>' + bullets.map((l) => '<li>' + renderInlineMarkdown(l) + '</li>').join('') + '</ul>');
+      bullets = null;
+    }
+  };
+
+  for (const raw of lines) {
+    const line = raw.trim();
+    if (line === '') { flushPara(); flushBullets(); continue; }
+    if (line.startsWith('- ')) {
+      flushPara();
+      if (!bullets) bullets = [];
+      bullets.push(line.slice(2));
+      continue;
+    }
+    flushBullets();
+    para.push(line);
+  }
+  flushPara();
+  flushBullets();
+  return out.join('');
+}
+
+function showTheory(theoryText) {
+  if (typeof document === 'undefined') return;
+  const pane = document.getElementById('theory-pane');
+  const body = document.getElementById('theory-body');
+  if (!pane || !body) return;
+  if (!theoryText) { pane.hidden = true; body.innerHTML = ''; return; }
+  body.innerHTML = renderMarkdownLite(theoryText);
+  pane.hidden = false;
+}
+
+function hideTheory() {
+  if (typeof document === 'undefined') return;
+  const pane = document.getElementById('theory-pane');
+  if (pane) pane.hidden = true;
+}
+
 async function loadCatalogue() {
   if (_catalogue) return _catalogue;
   try {
@@ -67,6 +150,8 @@ async function applyExample(value) {
     }
   }
 
+  showTheory(entry.theory || entry.blurb || '');
+
   return entry;
 }
 
@@ -125,6 +210,10 @@ export async function setupToolbar({ onTool, onShare, initialTool = 'trace' }) {
     });
   }
 
+  // Theory-pane dismiss button.
+  const dismiss = document.getElementById('theory-dismiss');
+  if (dismiss) dismiss.addEventListener('click', () => hideTheory());
+
   // Examples dropdown — fetch catalogue and populate.
   const select = document.getElementById('examples-select');
   if (select) {
@@ -132,7 +221,7 @@ export async function setupToolbar({ onTool, onShare, initialTool = 'trace' }) {
     populateExamplesSelect(catalogue);
     select.addEventListener('change', async (ev) => {
       const value = ev.target.value;
-      if (!value) return;
+      if (!value) { hideTheory(); return; }
       const entry = await applyExample(value);
       if (entry && entry.tool) {
         const btn = document.querySelector(`[data-tool="${entry.tool}"]`);
@@ -141,8 +230,8 @@ export async function setupToolbar({ onTool, onShare, initialTool = 'trace' }) {
         const active = document.querySelector('[data-tool].active');
         if (active) onTool(active.getAttribute('data-tool'));
       }
-      // Reset dropdown back to the placeholder so re-selection re-runs.
-      ev.target.value = '';
+      // Selection persists so the user can see which example is loaded.
+      // Re-run is via the Run button.
     });
   }
 }

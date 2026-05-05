@@ -1,0 +1,349 @@
+<h1>COMP11212 Chapter 4 — Hoare Logic Cheat Sheet</h1>
+<p>Symbols, pronunciation, the 6 partial-correctness rules, the total-correctness while rule, and recipes for finding loop invariants and variants. Companion to <code>CHEATSHEET_SEMANTICS.md</code> (chapters 1–2) and <code>CHEATSHEET_COMPLEXITY.md</code> (chapter 3).</p>
+<hr>
+<h2>§1. Symbols — what to say out loud</h2>
+<h3>Hoare-logic notation</h3>
+<table>
+<thead>
+<tr>
+<th align="center">Symbol</th>
+<th align="left">Name</th>
+<th align="left">Say it like</th>
+<th align="left">What it means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><strong><code>{P} S {Q}</code></strong></td>
+<td align="left">Hoare triple, partial</td>
+<td align="left">&quot;P, S, Q&quot; / &quot;the Hoare triple P, S, Q&quot;</td>
+<td align="left">If S terminates from P-state, ends in Q-state.</td>
+</tr>
+<tr>
+<td align="center"><strong><code>{P} S {⇓ Q}</code></strong></td>
+<td align="left">Hoare triple, total</td>
+<td align="left">&quot;P, S, totally Q&quot; / &quot;P, S, terminates and Q&quot;</td>
+<td align="left">S terminates from P-state AND ends in Q-state.</td>
+</tr>
+<tr>
+<td align="center"><strong><code>⇓</code></strong></td>
+<td align="left">down-arrow / falls-to</td>
+<td align="left">&quot;terminates and&quot; / &quot;falls to&quot;</td>
+<td align="left">Termination flag in total correctness.</td>
+</tr>
+<tr>
+<td align="center"><strong><code>P[x ↦ a]</code></strong></td>
+<td align="left">substitution</td>
+<td align="left">&quot;P with x replaced by a&quot;</td>
+<td align="left">Predicate where every free <code>x</code> is swapped for <code>a</code>.</td>
+</tr>
+<tr>
+<td align="center"><strong><code>P → Q</code></strong></td>
+<td align="left">implication</td>
+<td align="left">&quot;P implies Q&quot; / &quot;if P then Q&quot;</td>
+<td align="left">Logical implication (in the meta-language).</td>
+</tr>
+<tr>
+<td align="center"><strong><code>P ↔ Q</code></strong></td>
+<td align="left">iff / biconditional</td>
+<td align="left">&quot;P iff Q&quot; / &quot;P if and only if Q&quot;</td>
+<td align="left">Both directions.</td>
+</tr>
+<tr>
+<td align="center"><strong><code>m̄, n̄, ī</code></strong></td>
+<td align="left">bar-letters / ghost variables</td>
+<td align="left">&quot;m-bar&quot; / &quot;the ghost m&quot;</td>
+<td align="left">Italic mathematical names that capture <em>original</em> input values; never mutated.</td>
+</tr>
+</tbody></table>
+<h3>Math you&#39;ll see in predicates</h3>
+<table>
+<thead>
+<tr>
+<th align="center">Symbol</th>
+<th align="left">Say it like</th>
+<th align="left">Notes</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><strong><code>∀x ∈ ℕ</code></strong></td>
+<td align="left">&quot;for all x in N&quot;</td>
+<td align="left">Universal quantifier; allowed in predicates (not in While).</td>
+</tr>
+<tr>
+<td align="center"><strong><code>∃k ∈ ℤ</code></strong></td>
+<td align="left">&quot;there exists k in Z&quot;</td>
+<td align="left">Existential quantifier.</td>
+</tr>
+<tr>
+<td align="center"><strong><code>m mod n</code></strong></td>
+<td align="left">&quot;m mod n&quot;</td>
+<td align="left">Allowed in predicates even though While has no mod operator.</td>
+</tr>
+<tr>
+<td align="center"><strong><code>m div n</code></strong></td>
+<td align="left">&quot;m div n&quot; / &quot;m integer-divide n&quot;</td>
+<td align="left">Same — meta-language can use any maths.</td>
+</tr>
+<tr>
+<td align="center"><strong><code>i | n</code></strong></td>
+<td align="left">&quot;i divides n&quot;</td>
+<td align="left">Divisibility relation.</td>
+</tr>
+<tr>
+<td align="center"><strong><code>gcd(m, n)</code></strong></td>
+<td align="left">&quot;gcd of m, n&quot;</td>
+<td align="left">Greatest common divisor.</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>§2. The six rules of partial correctness — quick reference</h2>
+<h3>Rule 1 — Assignment</h3>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">{</span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mopen">[</span><span class="mord mathnormal">x</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">↦</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathcal">A</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">a</span><span class="mclose">]}</span><span class="mspace"> </span><span class="mord mathnormal">x</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">a</span><span class="mspace"> </span><span class="mopen">{</span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mclose">}</span></span></span></span></span></p>
+<p><strong>Read backwards:</strong> to make <code>P</code> true <em>after</em>, the precondition is <code>P</code> with <code>x</code> substituted by <code>a</code>.</p>
+<p><strong>Mental cheat-sheet:</strong></p>
+<ul>
+<li>After <code>x := 5</code>, <code>x = 5</code> is just <code>tt</code>.</li>
+<li>After <code>x := x + 1</code>, <code>x &gt; 6</code> requires <code>x &gt; 5</code> before.</li>
+<li>After <code>y := y + 1</code>, anything not mentioning <code>y</code> is unchanged.</li>
+</ul>
+<h3>Rule 2 — Skip</h3>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">{</span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mclose">}</span><span class="mspace"> </span><span class="mord text"><span class="mord textbf">skip</span></span><span class="mspace"> </span><span class="mopen">{</span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mclose">}</span></span></span></span></span></p>
+<p>Trivial. State doesn&#39;t change.</p>
+<h3>Rule 3 — Composition</h3>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:2.3649em;vertical-align:-0.936em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.4289em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mopen">{</span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mclose">}</span><span class="mspace"> </span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mpunct">;</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6779em;"><span style="top:-2.989em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mspace"> </span><span class="mopen">{</span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mclose">}</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mopen">{</span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mclose">}</span><span class="mspace"> </span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mspace"> </span><span class="mopen">{</span><span class="mord mathnormal">Q</span><span class="mclose">}</span><span class="mspace" style="margin-right:2em;"></span><span class="mopen">{</span><span class="mord mathnormal">Q</span><span class="mclose">}</span><span class="mspace"> </span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7519em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mspace"> </span><span class="mopen">{</span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mclose">}</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.936em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></p>
+<p>Glue two triples via shared middle <code>Q</code>.</p>
+<h3>Rule 4 — Conditional</h3>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:2.3649em;vertical-align:-0.936em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.4289em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mopen">{</span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mclose">}</span><span class="mspace"> </span><span class="mord text"><span class="mord textbf">if </span></span><span class="mord mathnormal">b</span><span class="mord text"><span class="mord textbf"> then </span></span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mord text"><span class="mord textbf"> else </span></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6779em;"><span style="top:-2.989em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mspace"> </span><span class="mopen">{</span><span class="mord mathnormal">Q</span><span class="mclose">}</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mopen">{</span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">∧</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathcal" style="margin-right:0.0304em;">B</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">b</span><span class="mclose">}</span><span class="mspace"> </span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mspace"> </span><span class="mopen">{</span><span class="mord mathnormal">Q</span><span class="mclose">}</span><span class="mspace" style="margin-right:2em;"></span><span class="mopen">{</span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">∧</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">¬</span><span class="mord mathcal" style="margin-right:0.0304em;">B</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">b</span><span class="mclose">}</span><span class="mspace"> </span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7519em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mspace"> </span><span class="mopen">{</span><span class="mord mathnormal">Q</span><span class="mclose">}</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.936em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></p>
+<p>Both branches must establish the same <code>Q</code>. Each branch sees <code>P</code> plus knowledge of <code>b</code>&#39;s truth.</p>
+<h3>Rule 5 — While</h3>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:2.363em;vertical-align:-0.936em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.427em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mopen">{</span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mclose">}</span><span class="mspace"> </span><span class="mord text"><span class="mord textbf">while </span></span><span class="mord mathnormal">b</span><span class="mord text"><span class="mord textbf"> do </span></span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mspace"> </span><span class="mopen">{</span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">∧</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">¬</span><span class="mord mathcal" style="margin-right:0.0304em;">B</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">b</span><span class="mclose">}</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mopen">{</span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">∧</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathcal" style="margin-right:0.0304em;">B</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">b</span><span class="mclose">}</span><span class="mspace"> </span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mspace"> </span><span class="mopen">{</span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mclose">}</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.936em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></p>
+<p><code>P</code> is the <strong>loop invariant</strong>. Body preserves it when <code>b</code> is true. Post = <code>P ∧ ¬b</code> (we exited because <code>b</code> became false).</p>
+<h3>Rule 6 — Consequence</h3>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:2.3649em;vertical-align:-0.936em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.4289em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mopen">{</span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mclose">}</span><span class="mspace"> </span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mspace"> </span><span class="mopen">{</span><span class="mord mathnormal">Q</span><span class="mclose">}</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7519em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:1em;"></span><span class="mopen">{</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7519em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mclose">}</span><span class="mspace"> </span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mspace"> </span><span class="mopen">{</span><span class="mord"><span class="mord mathnormal">Q</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7519em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mclose">}</span><span class="mspace" style="margin-right:1em;"></span><span class="mord"><span class="mord mathnormal">Q</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7519em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord mathnormal">Q</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.936em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></p>
+<p><strong>Strengthen pre, weaken post.</strong> Lets you plug triples together when conditions don&#39;t match exactly.</p>
+<hr>
+<h2>§3. The total-correctness while rule — the only rule that changes</h2>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:2.363em;vertical-align:-0.936em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.427em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mopen">{</span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mclose">}</span><span class="mspace"> </span><span class="mord text"><span class="mord textbf">while </span></span><span class="mord mathnormal">b</span><span class="mord text"><span class="mord textbf"> do </span></span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mspace"> </span><span class="mopen">{</span><span class="mrel">⇓</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">∧</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">¬</span><span class="mord mathcal" style="margin-right:0.0304em;">B</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">b</span><span class="mclose">}</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord mathnormal">a</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≥</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">0</span><span class="mspace" style="margin-right:2em;"></span><span class="mopen">{</span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">∧</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathcal" style="margin-right:0.0304em;">B</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">b</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">∧</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathcal">A</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">a</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mclose">}</span><span class="mspace"> </span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mspace"> </span><span class="mopen">{</span><span class="mrel">⇓</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">∧</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathcal">A</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">a</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&lt;</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mclose">}</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.936em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></p>
+<p><strong>Two extra ingredients beyond partial:</strong></p>
+<ol>
+<li><strong><code>P → a ≥ 0</code></strong> — the invariant guarantees the variant is non-negative.</li>
+<li><strong><code>a</code> strictly decreases</strong> — encoded via fresh ghost <code>k</code> in pre, <code>a &lt; k</code> in post.</li>
+</ol>
+<p>The other 5 rules just gain the <code>⇓</code> arrow — the structure is identical to partial.</p>
+<hr>
+<h2>§4. Loop invariant vs loop variant — the critical distinction</h2>
+<table>
+<thead>
+<tr>
+<th align="left">Concept</th>
+<th align="left">What it is</th>
+<th align="left">What it does</th>
+<th align="center">Type</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>Loop invariant <code>P</code></strong></td>
+<td align="left">A <em>predicate</em> preserved by the body</td>
+<td align="left">Encodes what the loop is <em>computing</em> — the relationship between variables that holds at every loop boundary</td>
+<td align="center">predicate</td>
+</tr>
+<tr>
+<td align="left"><strong>Loop variant <code>a</code></strong></td>
+<td align="left">A <em>non-negative arithmetic expression</em> that strictly decreases each iteration</td>
+<td align="left">Proves the loop <em>terminates</em> — finitely many decreases possible from any starting value</td>
+<td align="center">expression</td>
+</tr>
+</tbody></table>
+<p><strong>Both are needed for total correctness.</strong> Partial correctness needs only the invariant.</p>
+<p><strong>Easy confusion to avoid:</strong> &quot;the variant&quot; vs &quot;the invariant&quot; sound almost the same and both involve loops. Different concepts. The variant is one specific thing (an expression). The invariant is the entire predicate that captures what the loop is doing.</p>
+<hr>
+<h2>§5. Loop invariant heuristics — finding good ones</h2>
+<p>A typical loop has <em>infinitely many</em> invariants. We want one <strong>strong enough to imply the postcondition</strong> when combined with <code>¬b</code>. Three guidelines:</p>
+<ol>
+<li><strong>Look at the postcondition first.</strong> Often a chunk of the post can be lifted directly. (Division: <code>m̄ = d·n̄ + r</code> is both invariant and core post.)</li>
+<li><strong>Trace the loop on a small input</strong> — <code>n = 4</code> or whatever. What relationship between the variables holds <em>every</em> iteration boundary?</li>
+<li><strong>Include <code>≥ 0</code> clauses</strong> when the invariant needs to support a variant for total correctness (e.g. <code>0 ≤ r</code> for division).</li>
+</ol>
+<p><strong>Bad invariant signs:</strong></p>
+<ul>
+<li>It doesn&#39;t mention any variable changed by the body. (Then it&#39;s just a constant fact about inputs.)</li>
+<li>Combined with <code>¬b</code>, it doesn&#39;t imply the post.</li>
+<li>It fails on iteration 1 of a small example.</li>
+</ul>
+<p><strong>Empirical sanity check:</strong> use <code>verify_triple(invariant, body, invariant, [...some sample states with b true...])</code> from <code>while_lang.py</code>. If counter-examples appear, your candidate isn&#39;t an invariant.</p>
+<hr>
+<h2>§6. Loop variant patterns</h2>
+<table>
+<thead>
+<tr>
+<th align="left">Loop shape</th>
+<th align="left">Typical variant</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><code>while x ≤ n do (...; x := x + 1)</code></td>
+<td align="left"><code>n − x</code> (or <code>n + 1 − x</code>)</td>
+</tr>
+<tr>
+<td align="left"><code>while 1 ≤ x do (...; x := x − 1)</code></td>
+<td align="left"><code>x</code></td>
+</tr>
+<tr>
+<td align="left"><code>while x ≤ n do (...; x := x · 2)</code></td>
+<td align="left"><code>n − x</code> (or <code>log₂ n − log₂ x</code> if you want exact)</td>
+</tr>
+<tr>
+<td align="left"><code>while ¬(x = y) do (decrease x or y)</code></td>
+<td align="left"><code>x + y</code> (when neither alone monotonically decreases — gcd pattern)</td>
+</tr>
+<tr>
+<td align="left"><code>while ¬(switch = 1) do (...switch := 1...)</code></td>
+<td align="left">Hard. Often need a domain-specific quantity.</td>
+</tr>
+<tr>
+<td align="left"><code>while ¬(y = 1) do (search forward via x := x + 1)</code></td>
+<td align="left"><code>|target| − x</code> — works only if you know a target exists</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>§7. Recipes for proofs</h2>
+<h3>Standard proof template (partial correctness)</h3>
+<pre><code>Goal: {P} S {Q}
+
+If S = (S1; S2; ...; Sk):
+  Apply ; rule repeatedly. Pick intermediate conditions that link them up.
+
+If S has a loop:
+  1. Find a candidate loop invariant I.
+  2. Show {I ∧ b} body {I}.
+  3. Apply while rule: {I} loop {I ∧ ¬b}.
+  4. Use consequence + ; rules to glue with the rest.
+
+For each assignment x := a:
+  Apply := rule (read backwards).
+  Pre = post[x ↦ a].
+
+Use consequence whenever conditions don&#39;t match up exactly.
+</code></pre>
+<h3>Total-correctness extensions</h3>
+<pre><code>Same as above, plus:
+  - For each loop, find a variant a (non-negative arithmetic expression).
+  - Show I → a ≥ 0.
+  - In the body proof, introduce ghost k = a, show a &lt; k in the post.
+  - Apply the total while rule.
+</code></pre>
+<h3>Sanity checking a spec — the trivial-program attack</h3>
+<p>Before committing to a long proof, check: does the trivial program <code>m := 0; n := 1; ...</code> (or some other reset) satisfy the spec? If yes, you&#39;re missing a ghost variable. <strong>Always check this.</strong></p>
+<hr>
+<h2>§8. The compact derivation format (for exam answers)</h2>
+<p>The chapter&#39;s preferred format. Numbered lines, each citing the rule and which previous lines it depends on:</p>
+<pre><code>1. {P} ... {Q1}    by := rule
+2. {Q1} ... {Q2}    by ; rule
+3. {Q3} body {Q3}    by := rules + algebra
+4. {Q3} loop {Q3 ∧ ¬b}    from 3 by while rule
+5. {P} S {final}    from 1, 4 by ; rule and consequence
+</code></pre>
+<p>Each line states a triple and how it&#39;s justified. Use indentation/grouping in long lines to make the reading clear.</p>
+<hr>
+<h2>§9. Things that are NOT in While but ARE in predicates</h2>
+<p>The predicate language is the meta-language — far richer than the program language:</p>
+<table>
+<thead>
+<tr>
+<th align="left">Construct</th>
+<th align="center">In While?</th>
+<th align="center">In predicates?</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><code>+</code>, <code>−</code>, <code>×</code></td>
+<td align="center">✓</td>
+<td align="center">✓</td>
+</tr>
+<tr>
+<td align="left"><code>mod</code>, <code>div</code>, <code>√</code></td>
+<td align="center">✗</td>
+<td align="center">✓</td>
+</tr>
+<tr>
+<td align="left"><code>&lt;</code>, <code>≥</code>, <code>&gt;</code></td>
+<td align="center">✗ (only <code>≤</code> and <code>=</code>)</td>
+<td align="center">✓</td>
+</tr>
+<tr>
+<td align="left"><code>∨</code>, <code>→</code>, <code>↔</code></td>
+<td align="center">✗ (only <code>∧</code> and <code>¬</code>)</td>
+<td align="center">✓</td>
+</tr>
+<tr>
+<td align="left"><code>∀</code>, <code>∃</code></td>
+<td align="center">✗</td>
+<td align="center">✓</td>
+</tr>
+<tr>
+<td align="left">Divisibility <code>i | n</code></td>
+<td align="center">✗</td>
+<td align="center">✓</td>
+</tr>
+<tr>
+<td align="left">Powers <code>m^n</code></td>
+<td align="center">✗ (must compute via loop)</td>
+<td align="center">✓</td>
+</tr>
+<tr>
+<td align="left"><code>gcd</code>, <code>lcm</code>, factorials</td>
+<td align="center">✗</td>
+<td align="center">✓</td>
+</tr>
+<tr>
+<td align="left">Anything else from maths</td>
+<td align="center">✗</td>
+<td align="center">✓</td>
+</tr>
+</tbody></table>
+<p><strong>Use this asymmetry.</strong> Your spec can refer to <code>m̄ mod n̄</code> even though the program has no mod operator.</p>
+<hr>
+<h2>§10. Common pitfalls</h2>
+<ol>
+<li><p><strong>Forgetting ghost variables.</strong> <code>{m ≥ 0} S {m = d·n + r}</code> is satisfied by <code>m := 0; n := 0; d := 0; r := 0</code>. Pin the inputs with <code>m̄, n̄</code>.</p>
+</li>
+<li><p><strong>Mistaking &quot;loop variant&quot; for &quot;loop invariant&quot;.</strong> Variant is an expression that decreases. Invariant is a predicate that&#39;s preserved. They serve different purposes (termination vs correctness).</p>
+</li>
+<li><p><strong>Over-strong loop invariants.</strong> If the invariant claims more than the body can re-establish, the proof gets stuck. Strengthen it just enough.</p>
+</li>
+<li><p><strong>Under-strong loop invariants.</strong> If <code>I ∧ ¬b</code> doesn&#39;t imply the postcondition, the invariant is too weak. Add the missing piece.</p>
+</li>
+<li><p><strong>Forgetting <code>0 ≤ a</code> clauses for variants.</strong> The total-correctness rule requires the invariant to imply <code>a ≥ 0</code>. If your invariant doesn&#39;t say <code>r ≥ 0</code> and your variant is <code>r</code>, the proof fails.</p>
+</li>
+<li><p><strong>Total correctness when termination is genuinely unprovable.</strong> Quadratic search, Collatz, etc. Don&#39;t aim for <code>⇓</code> if the program might not terminate — settle for partial.</p>
+</li>
+<li><p><strong>The chapter&#39;s <code>B b</code> notation.</strong> This means &quot;the boolean evaluator B applied to expression b&quot; — i.e. its truth value in the current state. When writing in pre/post conditions, you can usually just write <code>b</code> and have it mean &quot;b is true.&quot;</p>
+</li>
+</ol>
+<hr>
+<h2>§11. The two systems on one page</h2>
+<pre><code>PARTIAL CORRECTNESS — {P} S {Q}
+
+  {P[x ↦ A a]} x := a {P}                      (assignment)
+  {P} skip {P}                                  (skip)
+  {P} S {Q}, {Q} S&#39; {R} ⟹ {P} S; S&#39; {R}        (composition)
+  {P ∧ b} S {Q}, {P ∧ ¬b} S&#39; {Q} 
+      ⟹ {P} if b then S else S&#39; {Q}            (if)
+  {P ∧ b} S {P} ⟹ {P} while b do S {P ∧ ¬b}    (while — needs invariant)
+  P→P&#39;, Q&#39;→Q, {P&#39;} S {Q&#39;} ⟹ {P} S {Q}          (consequence)
+
+
+TOTAL CORRECTNESS — {P} S {⇓ Q}
+
+  Same as above, with ⇓ everywhere, EXCEPT the while rule:
+
+  P → a ≥ 0,  {P ∧ b ∧ a = k} S {⇓ P ∧ a &lt; k} 
+      ⟹ {P} while b do S {⇓ P ∧ ¬b}            (while — needs invariant + variant)
+</code></pre>
+<hr>
+<h2>§12. The two-line elevator pitch</h2>
+<blockquote>
+<p><strong>Hoare logic</strong> lets us <em>prove</em> a program does the right thing.
+A triple <code>{P} S {Q}</code> says: starting in P, S either doesn&#39;t terminate or ends in Q.
+The total version <code>{P} S {⇓ Q}</code> adds termination — proven via a loop variant (a non-negative expression that strictly decreases each iteration).</p>
+</blockquote>

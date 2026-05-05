@@ -1,0 +1,336 @@
+<h1>COMP11212 Chapter 5 — Computability Cheat Sheet</h1>
+<p>Symbols, definitions, the Halting Problem proof skeleton, and the closure properties of decidable / semidecidable predicates. Companion to the chapter 1–4 cheatsheets.</p>
+<hr>
+<h2>§1. Symbols — what to say out loud</h2>
+<h3>Computability notation</h3>
+<table>
+<thead>
+<tr>
+<th align="center">Symbol</th>
+<th align="left">Name</th>
+<th align="left">Say it like</th>
+<th align="left">What it means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><strong><code>f : ℕ → ℕ</code></strong></td>
+<td align="left">total function</td>
+<td align="left">&quot;f from N to N&quot;</td>
+<td align="left">Every input has exactly one output.</td>
+</tr>
+<tr>
+<td align="center"><strong><code>f : ℕ ⇀ ℕ</code></strong></td>
+<td align="left">partial function</td>
+<td align="left">&quot;f partially from N to N&quot; / &quot;f from N to N partial&quot;</td>
+<td align="left">Some inputs may be undefined. The half-arrow signals partial.</td>
+</tr>
+<tr>
+<td align="center"><strong><code>χ_P</code></strong></td>
+<td align="left">characteristic function</td>
+<td align="left">&quot;chi sub P&quot; / &quot;chi-of-P&quot;</td>
+<td align="left"><code>χ_P(x) = tt if P(x), else ff</code>. Decidable predicate ⟺ χ_P computable.</td>
+</tr>
+<tr>
+<td align="center"><strong><code>⟦S⟧</code></strong></td>
+<td align="left">semantic brackets / partial function computed by S</td>
+<td align="left">&quot;the semantics of S&quot; / &quot;the function S computes&quot;</td>
+<td align="left">The partial function <code>n ↦ k</code> such that S deterministically produces k from input n.</td>
+</tr>
+<tr>
+<td align="center"><strong><code>η_i</code></strong></td>
+<td align="left">program-with-index-i&#39;s function</td>
+<td align="left">&quot;eta sub i&quot;</td>
+<td align="left"><code>η_i = ⟦S_i⟧</code> where <code>S_i</code> is the program with index i.</td>
+</tr>
+<tr>
+<td align="center"><strong><code>ζ</code></strong></td>
+<td align="left">universal partial function</td>
+<td align="left">&quot;zeta&quot;</td>
+<td align="left"><code>ζ(i, j) = η_i(j)</code>. Single function that captures all computable partial functions.</td>
+</tr>
+<tr>
+<td align="center"><strong><code>U</code></strong></td>
+<td align="left">universal program</td>
+<td align="left">&quot;universal U&quot;</td>
+<td align="left">The single program that computes ζ.</td>
+</tr>
+<tr>
+<td align="center"><strong><code>φ_S</code></strong></td>
+<td align="left">program-encoding bijection</td>
+<td align="left">&quot;phi sub S&quot; / &quot;phi-of-S&quot;</td>
+<td align="left">Bijection between While programs and ℕ.</td>
+</tr>
+<tr>
+<td align="center"><strong><code>φ</code></strong></td>
+<td align="left">pair-encoding bijection</td>
+<td align="left">&quot;phi&quot;</td>
+<td align="left">Bijection between ℕ × ℕ and ℕ (Cantor pairing).</td>
+</tr>
+<tr>
+<td align="center"><strong><code>β, β&#39;</code></strong></td>
+<td align="left">integer-encoding bijections</td>
+<td align="left">&quot;beta&quot;, &quot;beta prime&quot;</td>
+<td align="left">Bijections between ℤ and ℕ.</td>
+</tr>
+</tbody></table>
+<h3>Cardinality and other meta-language symbols</h3>
+<table>
+<thead>
+<tr>
+<th align="center">Symbol</th>
+<th align="left">Say it like</th>
+<th align="left">What it means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><strong><code>ℵ₀</code></strong></td>
+<td align="left">&quot;aleph null&quot; / &quot;aleph zero&quot;</td>
+<td align="left">The cardinality of countably infinite sets — same size as ℕ.</td>
+</tr>
+<tr>
+<td align="center"><strong><code>2^ℵ₀</code></strong></td>
+<td align="left">&quot;two to the aleph null&quot; / &quot;the cardinality of the continuum&quot;</td>
+<td align="left">The cardinality of the power set of ℕ — same size as ℝ. <strong>Strictly bigger</strong> than ℵ₀.</td>
+</tr>
+<tr>
+<td align="center"><strong><code>Fun(S, T)</code></strong></td>
+<td align="left">&quot;the function space&quot; / &quot;S to T&quot;</td>
+<td align="left">Set of all functions from S to T. <code>|Fun(ℕ, ℕ)| = 2^ℵ₀</code>.</td>
+</tr>
+<tr>
+<td align="center"><strong><code>PFun(S, T)</code></strong></td>
+<td align="left">&quot;the partial-function space&quot;</td>
+<td align="left">Set of all partial functions from S to T.</td>
+</tr>
+<tr>
+<td align="center"><strong><code>⊨</code></strong></td>
+<td align="left">&quot;models&quot; / &quot;satisfies&quot;</td>
+<td align="left">Used in Hoare-logic context: σ ⊨ P means state σ satisfies predicate P.</td>
+</tr>
+<tr>
+<td align="center"><strong><code>⇒*</code></strong></td>
+<td align="left">&quot;reduces to in many steps&quot;</td>
+<td align="left">Reflexive-transitive closure of small-step (from chapter 2).</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>§2. The four levels of &quot;answerable&quot;</h2>
+<p>A predicate <code>P</code> on ℕ falls into exactly one of:</p>
+<table>
+<thead>
+<tr>
+<th align="left">Level</th>
+<th align="left">Definition</th>
+<th align="left">Example</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>Computable / decidable</strong></td>
+<td align="left">χ_P is computable; decision procedure always terminates</td>
+<td align="left">Primality, evenness, &quot;is sum of triangular numbers&quot;</td>
+</tr>
+<tr>
+<td align="left"><strong>Semidecidable</strong></td>
+<td align="left">Partial χ_P is computable; semi-decider terminates iff P holds</td>
+<td align="left">Halting, first-order-logic validity</td>
+</tr>
+<tr>
+<td align="left"><strong>Co-semidecidable</strong></td>
+<td align="left">¬P is semidecidable</td>
+<td align="left">&quot;Program does NOT halt&quot;</td>
+</tr>
+<tr>
+<td align="left"><strong>Neither</strong> (truly undecidable)</td>
+<td align="left">Neither P nor ¬P is semidecidable</td>
+<td align="left">&quot;Diophantine equation has solution&quot; (Hilbert&#39;s 10th — actually undecidable, but is semi-decidable since you can search)</td>
+</tr>
+</tbody></table>
+<p><strong>Hierarchy:</strong> decidable ⊊ (semidecidable ∩ co-semidecidable) = decidable ⊊ semidecidable ⊊ all. Each containment strict.</p>
+<hr>
+<h2>§3. Computability via Hoare triples</h2>
+<h3>Total function <code>f : ℕ → ℕ</code> (Definition 14)</h3>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="mord text"><span class="mord"> computable</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⟺</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">∃</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mord text"><span class="mord"> While program</span></span><span class="mord">.</span><span class="mspace"> </span><span class="mopen">{</span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6069em;vertical-align:-0.0391em;"></span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.5678em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">n</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.25em;"><span class="mord">ˉ</span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathbb">N</span><span class="mclose">}</span><span class="mspace"> </span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mspace"> </span><span class="mopen">{</span><span class="mrel">⇓</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">x</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="mopen">(</span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.5678em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">n</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.25em;"><span class="mord">ˉ</span></span></span></span></span></span></span><span class="mclose">)}</span></span></span></span></span></p>
+<h3>Partial function <code>f : ℕ ⇀ ℕ</code> (Definition 15)</h3>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="mord text"><span class="mord"> computable</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⟺</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">∃</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mord">.</span><span class="mspace"> </span><span class="mopen">{</span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6069em;vertical-align:-0.0391em;"></span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.5678em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">n</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.25em;"><span class="mord">ˉ</span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6889em;"></span><span class="mord mathbb">N</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">∧</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="mopen">(</span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.5678em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">n</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.25em;"><span class="mord">ˉ</span></span></span></span></span></span></span><span class="mclose">)</span><span class="mord text"><span class="mord"> defined</span></span><span class="mclose">}</span><span class="mspace"> </span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mspace"> </span><span class="mopen">{</span><span class="mrel">⇓</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">x</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="mopen">(</span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.5678em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">n</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.25em;"><span class="mord">ˉ</span></span></span></span></span></span></span><span class="mclose">)}</span></span></span></span></span></p>
+<h3>Generalized: <code>f : S ⇀ T</code> (Definition 16)</h3>
+<p>Use injections <code>γ : ℕ → S</code> and <code>δ : T → ℕ</code>:</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="mord text"><span class="mord"> computable</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⟺</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0379em;">δ</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">∘</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">∘</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0556em;">γ</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6889em;"></span><span class="mord mathbb">N</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⇀</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathbb">N</span><span class="mord text"><span class="mord"> computable</span></span></span></span></span></span></p>
+<p><strong>Practical reading:</strong> if you can encode S and T as natural numbers, computability reduces to ℕ ⇀ ℕ.</p>
+<hr>
+<h2>§4. The 6 (or 7) building blocks of decidability proofs</h2>
+<p>Once you have a decidable predicate, you can build more:</p>
+<table>
+<thead>
+<tr>
+<th align="left">Construction</th>
+<th align="left">If P and Q are decidable, ...</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>¬P</strong></td>
+<td align="left">... is decidable. (Build T = S; if x = 0 then x := 1 else x := 0.)</td>
+</tr>
+<tr>
+<td align="left"><strong>P ∧ Q</strong></td>
+<td align="left">... is decidable. (Build T = S_P; if x = 1 then S_Q else skip.)</td>
+</tr>
+<tr>
+<td align="left"><strong>P ∨ Q</strong></td>
+<td align="left">... is decidable. (Build T = S_P; if x = 1 then skip else S_Q.)</td>
+</tr>
+<tr>
+<td align="left"><strong>P → Q</strong></td>
+<td align="left">... is decidable. (Equivalent to ¬P ∨ Q.)</td>
+</tr>
+<tr>
+<td align="left"><strong>Bounded ∀</strong> (<code>∀i &lt; n. P(i)</code>)</td>
+<td align="left">... is decidable. (Loop i = 0..n-1 running S_P, AND the results.)</td>
+</tr>
+<tr>
+<td align="left"><strong>Bounded ∃</strong> (<code>∃i &lt; n. P(i)</code>)</td>
+<td align="left">... is decidable. (Same loop but OR.)</td>
+</tr>
+</tbody></table>
+<p><strong>For semidecidability:</strong></p>
+<table>
+<thead>
+<tr>
+<th align="left">Construction</th>
+<th align="left">If P, Q semidecidable...</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>¬P</strong></td>
+<td align="left">... NOT necessarily semidecidable. Counter-example: ¬Halting is <em>co-semidecidable</em> but not semi-decidable.</td>
+</tr>
+<tr>
+<td align="left"><strong>P ∧ Q</strong></td>
+<td align="left">... is semidecidable. (Run S_P then S_Q sequentially; both must halt.)</td>
+</tr>
+<tr>
+<td align="left"><strong>P ∨ Q</strong></td>
+<td align="left">... is semidecidable. (Dovetail: interleave steps of S_P and S_Q.)</td>
+</tr>
+<tr>
+<td align="left"><strong>P → Q</strong></td>
+<td align="left">... NOT necessarily semidecidable. (Equivalent to ¬P ∨ Q; the ¬P part can break it.)</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>§5. The Halting Problem proof skeleton</h2>
+<p>If you&#39;re asked to prove the Halting Problem on the exam, here&#39;s the template:</p>
+<pre><code>ASSUME (for contradiction) that H exists with:
+  {m = m̄ ∈ ℕ ∧ n = n̄ ∈ ℕ} H {⇓ (P → x = 1) ∧ (¬P → x = 0)}
+where P = &quot;S_m̄ halts on input n̄&quot;.
+
+STEP 1 — restrict H to the diagonal.
+  Build H&#39; = (n := m; H).
+  Spec: {m = m̄} H&#39; {⇓ (P&#39; → x = 1) ∧ (¬P&#39; → x = 0)}
+  where P&#39; = &quot;S_m̄ halts on input m̄&quot; (self-application).
+
+STEP 2 — invert via H&#39;&#39;.
+  Build H&#39;&#39; = H&#39;; if x = 1 then (while tt do skip) else x := 1.
+  Reading: H&#39;&#39; diverges if H&#39; says &quot;halts,&quot; terminates with x = 1 if H&#39; says &quot;doesn&#39;t halt.&quot;
+
+STEP 3 — Hoare-derive the contradiction.
+  By construction (partial correctness only):
+    {m = m̄} H&#39;&#39; {¬P&#39; → x = 1}.
+
+STEP 4 — feed H&#39;&#39; its own index, get a contradiction.
+  Set m̄ = φ_S(H&#39;&#39;). Then P&#39; = &quot;H&#39;&#39; halts on its own index.&quot;
+  - If P&#39; (H&#39;&#39; halts on m̄): by step 2, H&#39; returned 1 ⟹ infinite loop ⟹ H&#39;&#39; doesn&#39;t halt. Contradiction.
+  - If ¬P&#39; (H&#39;&#39; doesn&#39;t halt on m̄): by step 7 we have ¬P&#39; → x = 1, so if H&#39;&#39; terminates, it halts with x = 1. By step 2&#39;s else-branch, H&#39;&#39; DOES terminate. Contradiction.
+
+CONTRADICTION ⟹ H cannot exist. ∎
+</code></pre>
+<p><strong>Memorise the four steps</strong> and you can reproduce the proof from scratch.</p>
+<hr>
+<h2>§6. The universal program</h2>
+<table>
+<thead>
+<tr>
+<th align="left">Concept</th>
+<th align="left">What it is</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>Universal partial function</strong> ζ</td>
+<td align="left">ζ(i, j) = η_i(j). Captures ALL computable partials in one function.</td>
+</tr>
+<tr>
+<td align="left"><strong>Universal program</strong> U</td>
+<td align="left">A single While program computing ζ. Decodes input program from index, walks AST, simulates step-by-step.</td>
+</tr>
+<tr>
+<td align="left"><strong>Parameterization Theorem</strong> (Theorem 23)</td>
+<td align="left">Given computable f : ℕ × ℕ ⇀ ℕ, there&#39;s total computable h : ℕ → ℕ with f(i, j) = η_{h(i)}(j).</td>
+</tr>
+<tr>
+<td align="left"><strong>s-m-n theorem</strong></td>
+<td align="left">Generalises Parameterization to any number of inputs.</td>
+</tr>
+</tbody></table>
+<p><strong>Key idea:</strong> generating program <em>text</em> from data is itself a computable operation. We can produce indices on demand.</p>
+<hr>
+<h2>§7. The Church-Turing thesis</h2>
+<table>
+<thead>
+<tr>
+<th align="left">Statement</th>
+<th align="center">Has it been proven?</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">All sufficiently powerful models compute the same set of partial functions</td>
+<td align="center"><strong>Empirically supported, not a theorem.</strong></td>
+</tr>
+<tr>
+<td align="left">Turing machines, λ-calculus, While, register machines compute the same set</td>
+<td align="center">✓ (provable equivalences between specific models)</td>
+</tr>
+<tr>
+<td align="left">Quantum computers compute strictly MORE</td>
+<td align="center">✗ (only faster on some problems, same set)</td>
+</tr>
+<tr>
+<td align="left">All physical computational devices compute exactly Turing-machine-computable</td>
+<td align="center">Almost certainly yes (no counter-example known)</td>
+</tr>
+</tbody></table>
+<p><strong>Why it&#39;s a thesis, not a theorem:</strong> &quot;effectively computable&quot; is an intuition, not a formal concept. We can&#39;t prove that two intuitive notions coincide; we can only prove that two formal notions do.</p>
+<hr>
+<h2>§8. Things that are NOT quite obvious</h2>
+<ol>
+<li><p><strong>&quot;Most&quot; functions ℕ → ℕ are uncomputable.</strong> The set of computable functions has cardinality ℵ₀; Fun(ℕ, ℕ) has cardinality 2^ℵ₀. Almost all functions can&#39;t be computed.</p>
+</li>
+<li><p><strong>The Halting Problem isn&#39;t &quot;hard.&quot; It&#39;s <em>impossible</em>.</strong> No algorithm of any kind, in any model, can solve it.</p>
+</li>
+<li><p><strong>You CAN run programs and see if they stop.</strong> Halting is semidecidable. The interesting question is whether you can ALWAYS get an answer — and you can&#39;t.</p>
+</li>
+<li><p><strong>Decidable ⊊ Semidecidable.</strong> A decidable predicate has more guarantees, so the inclusion is strict in one direction. The reverse inclusion fails: some semidecidable predicates (like halting) aren&#39;t decidable.</p>
+</li>
+<li><p><strong>The universal program U exists for While, but isn&#39;t trivial to write.</strong> It would be a huge program — but it&#39;s finite. Writing one in a real programming language is straightforward (we already have one — <code>while_lang.py</code> + the <code>run</code> function). The While version requires the encoding from §6.3.</p>
+</li>
+<li><p><strong>&quot;Effectively computable&quot; might mean different things to different people.</strong> That&#39;s OK — Church-Turing says all reasonable formalisations agree. The intuition is robust even if the words aren&#39;t.</p>
+</li>
+</ol>
+<hr>
+<h2>§9. Common pitfalls</h2>
+<ol>
+<li><p><strong>Confusing &quot;undecidable&quot; with &quot;hard.&quot;</strong> Undecidable = no algorithm exists, ever. Hard = takes a long time but is solvable.</p>
+</li>
+<li><p><strong>Assuming negation preserves semidecidability.</strong> It doesn&#39;t. Halting is semidecidable; non-halting is <em>co</em>-semidecidable, not semidecidable.</p>
+</li>
+<li><p><strong>Thinking the cardinality argument exhibits an uncomputable function.</strong> It doesn&#39;t — it just proves existence. The Halting Problem (§5.4) is the explicit example.</p>
+</li>
+<li><p><strong>Treating ⟦S⟧ as a function of all input variables.</strong> It&#39;s only a function of <code>n</code>. If S&#39;s output depends on other variables, ⟦S⟧ is undefined for <em>every</em> input, not partially defined.</p>
+</li>
+<li><p><strong>Treating Church-Turing as a theorem.</strong> It isn&#39;t. The mathematical equivalences between specific models are theorems; the bridge to the intuitive concept is a thesis.</p>
+</li>
+</ol>
+<hr>
+<h2>§10. The two-line elevator pitch</h2>
+<blockquote>
+<p><strong>Computability theory</strong> asks &quot;what can be computed at all?&quot; — the answer is &quot;less than you&#39;d think.&quot;
+Most functions ℕ → ℕ have no algorithm. The Halting Problem is the classical example: no program can decide whether arbitrary programs halt on arbitrary inputs. But anything that <em>can</em> be computed in any reasonable model can be computed in any other — that&#39;s the Church-Turing thesis.</p>
+</blockquote>

@@ -1,0 +1,506 @@
+<h1>COMP11212 Chapter 3 — Complexity Cheat Sheet</h1>
+<p>Symbols, pronunciation, class hierarchy, recognition rules, and the propositions you&#39;ll use to simplify expressions. Companion to <code>CHEATSHEET_SEMANTICS.md</code> (which covers chapters 1–2).</p>
+<hr>
+<h2>§1. Symbols — what to say out loud</h2>
+<h3>The three asymptotic classes</h3>
+<table>
+<thead>
+<tr>
+<th align="center">Symbol</th>
+<th align="left">Name</th>
+<th align="left">Say it like</th>
+<th align="left">What it means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><strong><code>O(f)</code></strong></td>
+<td align="left">big O</td>
+<td align="left">&quot;big O of f&quot;</td>
+<td align="left"><strong>Upper bound</strong> — set of functions growing no faster than <code>f</code>.</td>
+</tr>
+<tr>
+<td align="center"><strong><code>Ω(f)</code></strong></td>
+<td align="left">big Omega</td>
+<td align="left">&quot;big Omega of f&quot; / &quot;big omega&quot;</td>
+<td align="left"><strong>Lower bound</strong> — <code>f</code> grows no slower than the function.</td>
+</tr>
+<tr>
+<td align="center"><strong><code>Θ(f)</code></strong></td>
+<td align="left">big Theta</td>
+<td align="left">&quot;big Theta of f&quot; / &quot;big theta&quot;</td>
+<td align="left"><strong>Tight bound</strong> — <code>f</code> grows at the same rate.</td>
+</tr>
+</tbody></table>
+<p>Three more letters you&#39;ll see in passing:</p>
+<table>
+<thead>
+<tr>
+<th align="center">Symbol</th>
+<th align="left">Name</th>
+<th align="left">Say it like</th>
+<th align="left">What it means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><strong>o(f)</strong></td>
+<td align="left">little o</td>
+<td align="left">&quot;little O of f&quot;</td>
+<td align="left">Strict upper bound: <code>f</code> grows <em>strictly slower</em> (not used in this chapter, but mentioned in COMP26120).</td>
+</tr>
+<tr>
+<td align="center"><strong>ω(f)</strong></td>
+<td align="left">little omega</td>
+<td align="left">&quot;little omega&quot;</td>
+<td align="left">Strict lower bound.</td>
+</tr>
+<tr>
+<td align="center"><strong><code>f ∼ g</code></strong></td>
+<td align="left">tilde / equivalent</td>
+<td align="left">&quot;f tilde g&quot; / &quot;f and g are asymptotically equivalent&quot;</td>
+<td align="left"><code>O(f) = O(g)</code>.</td>
+</tr>
+</tbody></table>
+<h3>Set theory + relations</h3>
+<table>
+<thead>
+<tr>
+<th align="center">Symbol</th>
+<th align="left">Say it like</th>
+<th align="left">What it means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><strong><code>⊊</code></strong></td>
+<td align="left">&quot;strictly contained in&quot; / &quot;proper subset of&quot;</td>
+<td align="left"><code>O(n) ⊊ O(n²)</code> — left side is a strictly smaller class.</td>
+</tr>
+<tr>
+<td align="center"><strong><code>⊆</code></strong></td>
+<td align="left">&quot;contained in&quot; / &quot;subset of&quot;</td>
+<td align="left">Allows equality.</td>
+</tr>
+<tr>
+<td align="center"><strong><code>∈</code></strong></td>
+<td align="left">&quot;is in&quot; / &quot;is a member of&quot;</td>
+<td align="left"><code>f ∈ O(g)</code> — <code>f</code> is in the big-O class.</td>
+</tr>
+<tr>
+<td align="center"><strong><code>⋃</code></strong></td>
+<td align="left">&quot;union&quot;</td>
+<td align="left"><code>⋃ₘ O(nᵐ)</code> — union over all polynomial classes.</td>
+</tr>
+<tr>
+<td align="center"><strong><code>ℝ⁺</code></strong></td>
+<td align="left">&quot;the non-negative reals&quot; / &quot;R-plus&quot;</td>
+<td align="left"><code>{x ∈ ℝ : x ≥ 0}</code> — domain of complexity functions.</td>
+</tr>
+</tbody></table>
+<h3>Math you&#39;ll see in proofs</h3>
+<table>
+<thead>
+<tr>
+<th align="center">Symbol</th>
+<th align="left">Say it like</th>
+<th align="left">What it means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><strong><code>⌊x⌋</code></strong></td>
+<td align="left">&quot;floor of x&quot;</td>
+<td align="left">Greatest integer ≤ <code>x</code>.</td>
+</tr>
+<tr>
+<td align="center"><strong><code>⌈x⌉</code></strong></td>
+<td align="left">&quot;ceiling of x&quot;</td>
+<td align="left">Smallest integer ≥ <code>x</code>.</td>
+</tr>
+<tr>
+<td align="center"><strong><code>|f(x)|</code></strong></td>
+<td align="left">&quot;absolute value of f of x&quot;</td>
+<td align="left">Magnitude — used in big-O def to handle functions that might go negative.</td>
+</tr>
+<tr>
+<td align="center"><strong><code>log x</code></strong></td>
+<td align="left">&quot;log of x&quot;</td>
+<td align="left">Logarithm — base doesn&#39;t matter for big-O (different bases differ by a constant).</td>
+</tr>
+<tr>
+<td align="center"><strong><code>logₐ b</code></strong></td>
+<td align="left">&quot;log base a of b&quot;</td>
+<td align="left">Specific base. Identity: <code>logᵦ x = (1/logₐ b) · logₐ x</code>.</td>
+</tr>
+<tr>
+<td align="center"><strong><code>Σᵢ₌₁ⁿ</code></strong></td>
+<td align="left">&quot;sum from i equals 1 to n&quot;</td>
+<td align="left">Summation.</td>
+</tr>
+<tr>
+<td align="center"><strong><code>Hₙ</code></strong></td>
+<td align="left">&quot;n-th harmonic number&quot;</td>
+<td align="left"><code>Hₙ = 1 + 1/2 + 1/3 + ... + 1/n ≈ ln n</code>. Comes up in primality analysis.</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>§2. The big-O definition — three tightening notions</h2>
+<table>
+<thead>
+<tr>
+<th align="left">Notion</th>
+<th align="left">Definition</th>
+<th align="left">Use when...</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong><code>f</code> dominates <code>g</code></strong></td>
+<td align="left">For all <code>x</code>: <code>f(x) ≥ g(x)</code>.</td>
+<td align="left">Almost never — too strict.</td>
+</tr>
+<tr>
+<td align="left"><strong><code>f</code> eventually dominates <code>g</code></strong></td>
+<td align="left">There exists <code>k</code>, for all <code>x ≥ k</code>: <code>f(x) ≥ g(x)</code>.</td>
+<td align="left">Captures &quot;f beats g at large x.&quot;</td>
+</tr>
+<tr>
+<td align="left"><strong><code>g</code> is <code>O(f)</code></strong></td>
+<td align="left">There exist <code>c, k ∈ ℝ⁺</code>, for all <code>x ≥ k</code>: <code>|g(x)| ≤ c · f(x)</code>.</td>
+<td align="left">The standard tool — ignores constant factors AND small inputs.</td>
+</tr>
+</tbody></table>
+<p><strong>Practical takeaway:</strong> in <code>O</code>, you get to pick BOTH a starting point <code>k</code> and a multiplier <code>c</code>. That&#39;s why constants and lower-order terms become invisible.</p>
+<hr>
+<h2>§3. The class hierarchy — memorize this</h2>
+<pre><code>O(1)  ⊊  O(log n)  ⊊  O(n)  ⊊  O(n log n)  ⊊  O(n²)  ⊊  O(n³)  ⊊  …  ⊊  O(2ⁿ)  ⊊  O(n!)
+</code></pre>
+<p>All inclusions strict. Each step grows asymptotically faster than the previous.</p>
+<table>
+<thead>
+<tr>
+<th align="center">Class</th>
+<th align="left">Name</th>
+<th align="left">Typical example</th>
+<th align="center">Tractable?</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><code>O(1)</code></td>
+<td align="left">constant</td>
+<td align="left">array access by index, hash lookup</td>
+<td align="center">✓</td>
+</tr>
+<tr>
+<td align="center"><code>O(log n)</code></td>
+<td align="left">logarithmic</td>
+<td align="left">binary search</td>
+<td align="center">✓</td>
+</tr>
+<tr>
+<td align="center"><code>O(n)</code></td>
+<td align="left">linear</td>
+<td align="left">linear scan, count occurrences</td>
+<td align="center">✓</td>
+</tr>
+<tr>
+<td align="center"><code>O(n log n)</code></td>
+<td align="left">linearithmic / &quot;n log n&quot;</td>
+<td align="left">mergesort, heapsort</td>
+<td align="center">✓</td>
+</tr>
+<tr>
+<td align="center"><code>O(n²)</code></td>
+<td align="left">quadratic</td>
+<td align="left">bubble sort, nested-loop comparison</td>
+<td align="center">✓</td>
+</tr>
+<tr>
+<td align="center"><code>O(n³)</code></td>
+<td align="left">cubic</td>
+<td align="left">naive matrix multiplication</td>
+<td align="center">✓</td>
+</tr>
+<tr>
+<td align="center"><code>O(2ⁿ)</code></td>
+<td align="left">exponential</td>
+<td align="left">brute-force subset enumeration</td>
+<td align="center">✗</td>
+</tr>
+<tr>
+<td align="center"><code>O(n!)</code></td>
+<td align="left">factorial</td>
+<td align="left">brute-force permutations (TSP)</td>
+<td align="center">✗</td>
+</tr>
+</tbody></table>
+<p><strong>Tractable ≈ polynomial.</strong> If your algorithm is <code>O(nᵐ)</code> for any fixed <code>m</code>, it&#39;s tractable. Anything growing faster than every polynomial is intractable.</p>
+<hr>
+<h2>§4. Recognising classes by inspection — the loop heuristic</h2>
+<p>Most of the time you don&#39;t need to count steps exactly. Look at the loops.</p>
+<table>
+<thead>
+<tr>
+<th align="left">Pattern</th>
+<th align="center">Class</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">No loops</td>
+<td align="center"><code>O(1)</code></td>
+</tr>
+<tr>
+<td align="left">Single loop bounded by <code>n</code>, body is <code>O(1)</code></td>
+<td align="center"><code>O(n)</code></td>
+</tr>
+<tr>
+<td align="left">Single loop bounded by <code>n</code>, body is <code>O(n)</code></td>
+<td align="center"><code>O(n²)</code></td>
+</tr>
+<tr>
+<td align="left"><code>k</code> nested loops, each bounded by <code>n</code></td>
+<td align="center"><code>O(nᵏ)</code></td>
+</tr>
+<tr>
+<td align="left">Loop counter halves each iteration (<code>x := x / 2</code>)</td>
+<td align="center"><code>O(log n)</code></td>
+</tr>
+<tr>
+<td align="left">Loop counter doubles each iteration (<code>x := x * 2</code>)</td>
+<td align="center"><code>O(log n)</code></td>
+</tr>
+<tr>
+<td align="left">Outer doubles, inner is <code>O(n)</code></td>
+<td align="center"><code>O(n log n)</code></td>
+</tr>
+<tr>
+<td align="left">Loop body itself doubles (recursive split with no work-saving)</td>
+<td align="center"><code>O(2ⁿ)</code></td>
+</tr>
+<tr>
+<td align="left">Sequential loops (one after another)</td>
+<td align="center">The slower one wins</td>
+</tr>
+</tbody></table>
+<p><strong>Two rules:</strong></p>
+<ol>
+<li><strong>Nested loops multiply.</strong> Two nested loops bounded by <code>n</code> give <code>O(n²)</code>. Three give <code>O(n³)</code>. And so on.</li>
+<li><strong>Sequential loops add — but the bigger one wins.</strong> <code>O(n) + O(n²) = O(n²)</code>. The smaller term gets absorbed.</li>
+</ol>
+<hr>
+<h2>§5. Simplification rules (Proposition 9) — quick reference</h2>
+<p>Drop everything except the leading term:</p>
+<table>
+<thead>
+<tr>
+<th align="left">Rule</th>
+<th align="left">Says</th>
+<th align="left">Example</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">(1) Positive scaling preserves O</td>
+<td align="left"><code>f ∈ O(h)</code> ⟹ <code>r·f ∈ O(h)</code> for <code>r &gt; 0</code></td>
+<td align="left"><code>5x ∈ O(x)</code> ⟹ <code>5·(5x) = 25x ∈ O(x)</code></td>
+</tr>
+<tr>
+<td align="left">(2) Constants are invisible</td>
+<td align="left"><code>O(r·f) = O(f)</code> for <code>r &gt; 0</code></td>
+<td align="left"><code>O(100n) = O(n)</code></td>
+</tr>
+<tr>
+<td align="left">(3) Sums in same class stay in class</td>
+<td align="left"><code>f, g ∈ O(h)</code> ⟹ <code>f+g ∈ O(h)</code></td>
+<td align="left"><code>n ∈ O(n²)</code> and <code>100 ∈ O(n²)</code> ⟹ <code>n + 100 ∈ O(n²)</code></td>
+</tr>
+<tr>
+<td align="left">(4) Smaller term invisible</td>
+<td align="left"><code>g ∈ O(f)</code> ⟹ <code>O(f+g) = O(f)</code></td>
+<td align="left"><code>O(n² + 5n + 7) = O(n²)</code></td>
+</tr>
+</tbody></table>
+<p><strong>The recipe for simplifying <code>O(...)</code>:</strong></p>
+<ol>
+<li>Identify the <em>leading term</em> (highest-order).</li>
+<li>Drop everything else (Rule 4).</li>
+<li>Drop the constant on the leading term (Rule 2).</li>
+</ol>
+<p>So <code>O(7x³ + 100x² + 50)</code> → leading is <code>7x³</code> → drop the <code>+ 100x² + 50</code> → drop the <code>7</code> → <code>O(x³)</code>.</p>
+<hr>
+<h2>§6. Polynomial classes (Propositions 10, 11)</h2>
+<p><strong>Proposition 10:</strong> for <code>m &lt; m&#39;</code>, <code>O(nᵐ) ⊊ O(nᵐ&#39;)</code>. <strong>Strictly</strong> smaller. The hierarchy is real.</p>
+<p><strong>Proposition 11:</strong> every polynomial of degree <code>m</code> is <code>Θ(nᵐ)</code>. So:</p>
+<ul>
+<li><code>5x³ + 3x² − 7</code> is <code>Θ(x³)</code>.</li>
+<li><code>100x − 50</code> is <code>Θ(x)</code>.</li>
+<li><code>42</code> is <code>Θ(1)</code>.</li>
+</ul>
+<p>The leading-term degree is the entire complexity class.</p>
+<hr>
+<h2>§7. Logarithmic class (Proposition 12)</h2>
+<p><code>O(1) ⊊ O(log n) ⊊ O(n)</code>. Both inclusions strict.</p>
+<p><strong>Why log base doesn&#39;t matter:</strong> <code>logᵦ x = (1/logₐ b) · logₐ x</code>. The factor <code>(1/logₐ b)</code> is a positive constant — invisible by Rule 2. So <code>O(log₂ n) = O(log₁₀ n) = O(ln n)</code>. Just write <code>O(log n)</code> and don&#39;t specify the base.</p>
+<hr>
+<h2>§8. Big Ω and Θ — the mirrors</h2>
+<table>
+<thead>
+<tr>
+<th align="left"></th>
+<th align="left">Big O</th>
+<th align="left">Big Ω</th>
+<th align="left">Big Θ</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>Pronounce</strong></td>
+<td align="left">&quot;big O of g&quot;</td>
+<td align="left">&quot;big Omega of g&quot;</td>
+<td align="left">&quot;big Theta of g&quot;</td>
+</tr>
+<tr>
+<td align="left"><strong>Says</strong></td>
+<td align="left"><code>f</code> grows ≤ <code>g</code></td>
+<td align="left"><code>f</code> grows ≥ <code>g</code></td>
+<td align="left"><code>f</code> grows = <code>g</code></td>
+</tr>
+<tr>
+<td align="left"><strong>Definition</strong></td>
+<td align="left"><code>|f(x)| ≤ c · g(x)</code> for <code>x ≥ k</code></td>
+<td align="left"><code>f(x) ≥ c · |g(x)|</code> for <code>x ≥ k</code> (Ex 26)</td>
+<td align="left"><code>c·|g| ≤ f ≤ c&#39;·|g|</code> for <code>x ≥ k</code> (Ex 28)</td>
+</tr>
+<tr>
+<td align="left"><strong>Equivalently</strong></td>
+<td align="left">—</td>
+<td align="left"><code>g ∈ O(f)</code></td>
+<td align="left"><code>f ∈ O(g)</code> AND <code>g ∈ O(f)</code></td>
+</tr>
+<tr>
+<td align="left"><strong>Use for</strong></td>
+<td align="left">upper bound</td>
+<td align="left">lower bound</td>
+<td align="left">tight bound</td>
+</tr>
+</tbody></table>
+<p><strong>When to use which:</strong></p>
+<ul>
+<li><strong><code>O</code></strong> — you&#39;ve shown your algorithm is <em>no worse than</em> something. &quot;My program is <code>O(n²)</code>.&quot;</li>
+<li><strong><code>Ω</code></strong> — you&#39;ve shown a <em>problem</em> is <em>no easier than</em> something. &quot;Sorting is <code>Ω(n log n)</code> (lower bound across all algorithms).&quot;</li>
+<li><strong><code>Θ</code></strong> — your algorithm is <em>exactly</em> this rate. Both bounds match. &quot;Mergesort is <code>Θ(n log n)</code>.&quot;</li>
+</ul>
+<hr>
+<h2>§9. What to count</h2>
+<p>The chapter (§3.1.4) chooses to count two things:</p>
+<table>
+<thead>
+<tr>
+<th align="center">Counts?</th>
+<th align="left">Operation</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">✓</td>
+<td align="left">Assignment <code>x := a</code> (the <code>:=</code> rule)</td>
+</tr>
+<tr>
+<td align="center">✓</td>
+<td align="left">Boolean condition check (<code>if-tt</code>, <code>if-ff</code>, <code>while-tt</code>, <code>while-ff</code> rules)</td>
+</tr>
+<tr>
+<td align="center">✗</td>
+<td align="left">The <code>;</code> administrative rule</td>
+</tr>
+<tr>
+<td align="center">✗</td>
+<td align="left">The <code>skip-;</code> administrative rule</td>
+</tr>
+</tbody></table>
+<p><strong>Why exclude admin rules?</strong> They&#39;re not work the program is doing — they&#39;re how the small-step semantics propagates intermediate results. Counting them is like counting parentheses as separate operations.</p>
+<p><strong>Different problems use different counters.</strong> Sorting → comparisons. Search → lookups. Matrix work → entry accesses. As long as the count is <em>representative</em>, the asymptotic class comes out the same.</p>
+<hr>
+<h2>§10. Best, worst, average</h2>
+<table>
+<thead>
+<tr>
+<th align="left">Case</th>
+<th align="left">When to use</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>Best</strong></td>
+<td align="left">Almost never — too optimistic to be useful.</td>
+</tr>
+<tr>
+<td align="left"><strong>Average</strong></td>
+<td align="left">When you have a probability distribution over inputs, and average behaviour matters. Hard to compute rigorously.</td>
+</tr>
+<tr>
+<td align="left"><strong>Worst</strong></td>
+<td align="left">The default. Gives an upper-bound <em>guarantee</em>: &quot;no matter what input, ≤ this many steps.&quot;</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>§11. The <code>O</code> / <code>Ω</code> / <code>Θ</code> proofs you&#39;ll use most</h2>
+<h3>To show <code>f ∈ O(g)</code></h3>
+<p><strong>Goal:</strong> find specific <code>c, k ∈ ℝ⁺</code> with <code>\|f(x)\| ≤ c · g(x)</code> for <code>x ≥ k</code>.</p>
+<p><strong>Standard trick:</strong> factor out the dominant term, bound the rest by a constant.</p>
+<p>Example: show <code>3n² + 5n + 7 ∈ O(n²)</code>.</p>
+<ul>
+<li>For <code>n ≥ 1</code>: <code>3n² + 5n + 7 ≤ 3n² + 5n² + 7n² = 15n²</code>.</li>
+<li>So <code>c = 15, k = 1</code> works.</li>
+</ul>
+<h3>To show <code>f ∉ O(g)</code></h3>
+<p><strong>Goal:</strong> show that for <em>any</em> <code>c</code>, there exists arbitrarily large <code>x</code> with <code>f(x) &gt; c · g(x)</code>.</p>
+<p><strong>Standard trick:</strong> pick <code>x</code> based on <code>c</code> to break the bound.</p>
+<p>Example: show <code>n² ∉ O(n)</code>.</p>
+<ul>
+<li>Suppose <code>c, k</code> exist with <code>n² ≤ c · n</code> for <code>n ≥ k</code>. Equivalently <code>n ≤ c</code>.</li>
+<li>Pick <code>n = max(c, k) + 1</code>. Then <code>n &gt; c</code> — contradiction.</li>
+</ul>
+<h3>To show <code>f ∈ Θ(g)</code></h3>
+<p>Show <code>f ∈ O(g)</code> AND <code>f ∈ Ω(g)</code> separately. Done.</p>
+<hr>
+<h2>§12. Properties of the relation (Exercises 21, 22, 27)</h2>
+<table>
+<thead>
+<tr>
+<th align="left">Property</th>
+<th align="center">Holds?</th>
+<th align="left">Why / Counter-example</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Reflexive (<code>f ∈ O(f)</code>)</td>
+<td align="center">✓</td>
+<td align="left">Take <code>c = 1, k = 0</code>.</td>
+</tr>
+<tr>
+<td align="left">Transitive (<code>f ∈ O(g), g ∈ O(h)</code> ⟹ <code>f ∈ O(h)</code>)</td>
+<td align="center">✓</td>
+<td align="left">Multiply the constants <code>c₁ · c₂</code>.</td>
+</tr>
+<tr>
+<td align="left">Symmetric</td>
+<td align="center">✗</td>
+<td align="left"><code>n ∈ O(n²)</code> but <code>n² ∉ O(n)</code>.</td>
+</tr>
+<tr>
+<td align="left">Antisymmetric</td>
+<td align="center">✗</td>
+<td align="left"><code>n</code> and <code>2n</code> are both <code>O</code> of each other but <code>n ≠ 2n</code>.</td>
+</tr>
+</tbody></table>
+<p>So <code>O</code> is a <strong>pre-order</strong>, not a partial order.</p>
+<p><code>f ∼ g</code> defined by <code>O(f) = O(g)</code> IS an equivalence relation (reflexive + symmetric + transitive — Exercise 27).</p>
+<hr>
+<h2>§13. Common pitfalls</h2>
+<ol>
+<li><strong><code>O(2n) ≠ O(n²)</code>.</strong> <code>O(2n) = O(n)</code> — the <code>2</code> is a constant, not an exponent.</li>
+<li><strong><code>O(log² n)</code> (logarithmic squared) is NOT <code>O(log n²)</code>.</strong> The first is <code>(log n)²</code>; the second is <code>log(n²) = 2 log n = O(log n)</code>. Different classes.</li>
+<li><strong>Nested vs sequential matters.</strong> <code>for ... for ...</code> (nested) is <code>O(n²)</code>. <code>for ...; for ...</code> (sequential) is <code>O(n)</code>.</li>
+<li><strong>The leading coefficient doesn&#39;t determine which class.</strong> <code>0.0001 · n³</code> is still <code>O(n³)</code> — slower in practice for small <code>n</code>, but asymptotically cubic.</li>
+<li><strong><code>O(f)</code> is an upper bound, not a description.</strong> Saying &quot;this is <code>O(n²)</code>&quot; doesn&#39;t claim it&#39;s <em>not</em> <code>O(n)</code>. Use <code>Θ</code> if you want to claim a tight bound.</li>
+<li><strong>The base of the log is irrelevant in <code>O</code>.</strong> <code>log₂ n</code>, <code>log₁₀ n</code>, and <code>ln n</code> are all <code>Θ(log n)</code>.</li>
+</ol>
+<hr>
+<h2>§14. The two-line elevator pitch</h2>
+<blockquote>
+<p><strong>A program&#39;s complexity</strong> is a function from input-size to step-count.
+<strong><code>O(f)</code></strong> is the set of functions growing no faster than <code>f</code>, up to a constant factor and beyond some starting point. <strong>The whole point</strong> is to ignore exact constants and lower-order terms so we can compare <em>growth rates</em> — that&#39;s what matters when input sizes get big.</p>
+</blockquote>

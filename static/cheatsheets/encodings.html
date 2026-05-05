@@ -1,0 +1,332 @@
+<h1>COMP11212 Chapter 6 — Encodings Cheat Sheet</h1>
+<p>Symbols, bijections (β, φ, ψ, φ_A, φ_B, φ_S), and decoding recipes. Companion to the chapter 1–5 cheatsheets.</p>
+<hr>
+<h2>§1. Symbols — what to say out loud</h2>
+<h3>The bijections</h3>
+<table>
+<thead>
+<tr>
+<th align="center">Symbol</th>
+<th align="left">Name</th>
+<th align="left">Say it like</th>
+<th align="left">Type</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><strong>β</strong></td>
+<td align="left">beta</td>
+<td align="left">&quot;beta&quot;</td>
+<td align="left">ℤ → ℕ (integer encoder)</td>
+</tr>
+<tr>
+<td align="center"><strong>β&#39;</strong></td>
+<td align="left">beta-prime</td>
+<td align="left">&quot;beta prime&quot; / &quot;beta inverse&quot;</td>
+<td align="left">ℕ → ℤ (integer decoder)</td>
+</tr>
+<tr>
+<td align="center"><strong>φ</strong></td>
+<td align="left">phi</td>
+<td align="left">&quot;phi&quot; / &quot;the pairing function&quot;</td>
+<td align="left">ℕ × ℕ → ℕ (pair encoder)</td>
+</tr>
+<tr>
+<td align="center"><strong>φ&#39;</strong></td>
+<td align="left">phi-prime</td>
+<td align="left">&quot;phi prime&quot; / &quot;phi inverse&quot;</td>
+<td align="left">ℕ → ℕ × ℕ (pair decoder)</td>
+</tr>
+<tr>
+<td align="center"><strong>ψ</strong></td>
+<td align="left">psi</td>
+<td align="left">&quot;psi&quot; / &quot;the list encoding&quot;</td>
+<td align="left">List(ℕ) → ℕ</td>
+</tr>
+<tr>
+<td align="center"><strong>φ_V</strong></td>
+<td align="left">phi sub V</td>
+<td align="left">&quot;phi-sub-V&quot; / &quot;the variable encoder&quot;</td>
+<td align="left">Vars → ℕ</td>
+</tr>
+<tr>
+<td align="center"><strong>φ_A</strong></td>
+<td align="left">phi sub A</td>
+<td align="left">&quot;phi-sub-A&quot; / &quot;the AExp encoder&quot;</td>
+<td align="left">AExp → ℕ</td>
+</tr>
+<tr>
+<td align="center"><strong>φ_B</strong></td>
+<td align="left">phi sub B</td>
+<td align="left">&quot;phi-sub-B&quot; / &quot;the BExp encoder&quot;</td>
+<td align="left">BExp → ℕ</td>
+</tr>
+<tr>
+<td align="center"><strong>φ_S</strong></td>
+<td align="left">phi sub S</td>
+<td align="left">&quot;phi-sub-S&quot; / &quot;the program encoder&quot;</td>
+<td align="left">Stmt → ℕ</td>
+</tr>
+</tbody></table>
+<h3>Cardinality</h3>
+<table>
+<thead>
+<tr>
+<th align="center">Symbol</th>
+<th align="left">Say it like</th>
+<th align="left">What it means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><strong>ℵ₀</strong></td>
+<td align="left">&quot;aleph null&quot; / &quot;aleph zero&quot;</td>
+<td align="left">Cardinality of ℕ. The countable infinity.</td>
+</tr>
+<tr>
+<td align="center"><strong>2^ℵ₀</strong></td>
+<td align="left">&quot;two to the aleph null&quot; / &quot;the cardinality of the continuum&quot;</td>
+<td align="left">Cardinality of P(ℕ) ≅ Fun(ℕ, 𝔹) ≅ ℝ.</td>
+</tr>
+<tr>
+<td align="center"><strong><code>Fun(S, T)</code></strong></td>
+<td align="left">&quot;function space S to T&quot;</td>
+<td align="left">Set of all functions S → T.</td>
+</tr>
+<tr>
+<td align="center"><strong><code>PFun(S, T)</code></strong></td>
+<td align="left">&quot;partial function space&quot;</td>
+<td align="left">Set of partial functions.</td>
+</tr>
+<tr>
+<td align="center"><strong><code>P(S)</code></strong></td>
+<td align="left">&quot;power set of S&quot;</td>
+<td align="left">Set of all subsets of S.</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>§2. The bijections, in formula form</h2>
+<h3>β: ℤ → ℕ</h3>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0528em;">β</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:3em;vertical-align:-1.25em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;"><span class="delimsizing size4">{</span></span><span class="mord"><span class="mtable"><span class="col-align-l"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.69em;"><span style="top:-3.69em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mord">2</span><span class="mord mathnormal">x</span></span></span><span style="top:-2.25em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mord">−</span><span class="mord">2</span><span class="mord mathnormal">x</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.19em;"><span></span></span></span></span></span><span class="arraycolsep" style="width:1em;"></span><span class="col-align-l"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.69em;"><span style="top:-3.69em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≥</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">0</span></span></span><span style="top:-2.25em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&lt;</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.19em;"><span></span></span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></p>
+<p><strong>Inverse:</strong></p>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0519em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0528em;">β</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8019em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:3em;vertical-align:-1.25em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;"><span class="delimsizing size4">{</span></span><span class="mord"><span class="mtable"><span class="col-align-l"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.69em;"><span style="top:-3.69em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mord mathnormal">n</span><span class="mord">/2</span></span></span><span style="top:-2.25em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mord">−</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">1</span><span class="mclose">)</span><span class="mord">/2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.19em;"><span></span></span></span></span></span><span class="arraycolsep" style="width:1em;"></span><span class="col-align-l"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.69em;"><span style="top:-3.69em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mord mathnormal">n</span><span class="mord text"><span class="mord"> even</span></span></span></span><span style="top:-2.25em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mord mathnormal">n</span><span class="mord text"><span class="mord"> odd</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.19em;"><span></span></span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></p>
+<p><strong>Pattern:</strong> zigzag — <code>0 ↔ 0, -1 ↔ 1, 1 ↔ 2, -2 ↔ 3, 2 ↔ 4, ...</code></p>
+<h3>φ: ℕ × ℕ → ℕ</h3>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">φ</span><span class="mopen">(</span><span class="mord mathnormal">m</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">n</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7144em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">m</span></span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord">2</span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span></span></p>
+<p><strong>Decoding <code>k</code>:</strong></p>
+<ol>
+<li><code>s = k + 1</code></li>
+<li><code>m</code> = largest power of 2 dividing <code>s</code></li>
+<li><code>2n + 1 = s / 2^m</code>, so <code>n = (s / 2^m - 1) / 2</code></li>
+</ol>
+<h3>Tuples (k-tuples)</h3>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord text"><span class="mord">encode</span></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner">…</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0315em;">k</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">φ</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">φ</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner">…</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0315em;">k</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">))</span></span></span></span></span></p>
+<p>Right-fold. Decode by repeated <code>φ&#39;</code>.</p>
+<h3>ψ: lists → ℕ</h3>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">ψ</span><span class="mopen">([</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mclose">])</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:2em;"></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">ψ</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">::</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0197em;">l</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">φ</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">ψ</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0197em;">l</span><span class="mclose">))</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span></span></p>
+<p>The <code>+1</code> distinguishes the empty list (encoded <code>0</code>) from <code>φ(0, 0) = 0</code>.</p>
+<h3>φ_V: Vars → ℕ</h3>
+<p>By convention: <code>φ_V(x_i) = i</code>.</p>
+<h3>φ_A: AExp → ℕ</h3>
+<table>
+<thead>
+<tr>
+<th align="left">AExp form</th>
+<th align="left">Encoding</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">numeral <code>n</code></td>
+<td align="left"><code>5 · β(n)</code> (residue 0 mod 5)</td>
+</tr>
+<tr>
+<td align="left">variable <code>x</code></td>
+<td align="left"><code>1 + 5 · φ_V(x)</code> (residue 1 mod 5)</td>
+</tr>
+<tr>
+<td align="left"><code>a + a&#39;</code></td>
+<td align="left"><code>2 + 5 · φ(φ_A a, φ_A a&#39;)</code> (residue 2 mod 5)</td>
+</tr>
+<tr>
+<td align="left"><code>a − a&#39;</code></td>
+<td align="left"><code>3 + 5 · φ(φ_A a, φ_A a&#39;)</code> (residue 3 mod 5)</td>
+</tr>
+<tr>
+<td align="left"><code>a × a&#39;</code></td>
+<td align="left"><code>4 + 5 · φ(φ_A a, φ_A a&#39;)</code> (residue 4 mod 5)</td>
+</tr>
+</tbody></table>
+<h3>φ_B: BExp → ℕ</h3>
+<table>
+<thead>
+<tr>
+<th align="left">BExp form</th>
+<th align="left">Encoding</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><code>ff</code></td>
+<td align="left"><code>0</code></td>
+</tr>
+<tr>
+<td align="left"><code>tt</code></td>
+<td align="left"><code>1</code></td>
+</tr>
+<tr>
+<td align="left"><code>a = a&#39;</code></td>
+<td align="left"><code>2 + 4 · φ(φ_A a, φ_A a&#39;)</code></td>
+</tr>
+<tr>
+<td align="left"><code>a ≤ a&#39;</code></td>
+<td align="left"><code>3 + 4 · φ(φ_A a, φ_A a&#39;)</code></td>
+</tr>
+<tr>
+<td align="left"><code>¬b</code></td>
+<td align="left"><code>4 + 4 · φ_B b</code></td>
+</tr>
+<tr>
+<td align="left"><code>b ∧ b&#39;</code></td>
+<td align="left"><code>5 + 4 · φ(φ_B b, φ_B b&#39;)</code></td>
+</tr>
+</tbody></table>
+<h3>φ_S: Stmt → ℕ</h3>
+<table>
+<thead>
+<tr>
+<th align="left">Stmt form</th>
+<th align="left">Encoding</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><code>skip</code></td>
+<td align="left"><code>0</code></td>
+</tr>
+<tr>
+<td align="left"><code>x := a</code></td>
+<td align="left"><code>1 + 4 · φ(φ_V x, φ_A a)</code></td>
+</tr>
+<tr>
+<td align="left"><code>S ; S&#39;</code></td>
+<td align="left"><code>2 + 4 · φ(φ_S S, φ_S S&#39;)</code></td>
+</tr>
+<tr>
+<td align="left"><code>if b then S else S&#39;</code></td>
+<td align="left"><code>3 + 4 · φ(φ_B b, φ(φ_S S, φ_S S&#39;))</code></td>
+</tr>
+<tr>
+<td align="left"><code>while b do S</code></td>
+<td align="left"><code>4 + 4 · φ(φ_B b, φ_S S)</code></td>
+</tr>
+</tbody></table>
+<hr>
+<h2>§3. Decoding recipes (work backwards from <code>n</code>)</h2>
+<h3>Decoding an AExp from <code>n</code></h3>
+<pre><code>r = n mod 5
+q = n // 5
+
+if r == 0:    return Num(β&#39;(q))             // numeral
+if r == 1:    return Var(name with index q) // variable
+if r in 2..4: 
+    (a_idx, b_idx) = φ&#39;(q)
+    left  = decode_aexp(a_idx)
+    right = decode_aexp(b_idx)
+    op = {2: Add, 3: Sub, 4: Mul}[r]
+    return op(left, right)
+</code></pre>
+<h3>Decoding a BExp from <code>n</code></h3>
+<pre><code>if n == 0: return BFalse
+if n == 1: return BTrue
+r = n mod 4
+q = n // 4
+
+if r == 2: 
+    (a_idx, b_idx) = φ&#39;(q)
+    return Eq(decode_aexp(a_idx), decode_aexp(b_idx))
+if r == 3: 
+    (a_idx, b_idx) = φ&#39;(q)
+    return Le(decode_aexp(a_idx), decode_aexp(b_idx))
+if r == 0:                  // ¬, since n = 4 + 4·k for k = q-1
+    return Not(decode_bexp(q - 1))
+if r == 1:                  // ∧, since n = 5 + 4·k for k = q-1
+    (a_idx, b_idx) = φ&#39;(q - 1)
+    return And(decode_bexp(a_idx), decode_bexp(b_idx))
+</code></pre>
+<h3>Decoding a Stmt from <code>n</code></h3>
+<pre><code>if n == 0: return Skip
+r = n mod 4
+q = n // 4
+
+if r == 1:
+    (v_idx, a_idx) = φ&#39;(q)
+    return Assign(x_{v_idx}, decode_aexp(a_idx))
+if r == 2:
+    (s_idx, s&#39;_idx) = φ&#39;(q)
+    return Seq(decode_stmt(s_idx), decode_stmt(s&#39;_idx))
+if r == 3:
+    (b_idx, rest) = φ&#39;(q)
+    (s_idx, s&#39;_idx) = φ&#39;(rest)
+    return If(decode_bexp(b_idx), decode_stmt(s_idx), decode_stmt(s&#39;_idx))
+if r == 0:                  // while, since n = 4 + 4·k for k = q-1
+    (b_idx, s_idx) = φ&#39;(q - 1)
+    return While(decode_bexp(b_idx), decode_stmt(s_idx))
+</code></pre>
+<hr>
+<h2>§4. Quick decoding examples</h2>
+<p><strong>Decode 13 as a pair.</strong></p>
+<p>13 + 1 = 14 = 2¹ × 7. So m = 1, 2n+1 = 7, n = 3. Pair: <code>(1, 3)</code>. ✓</p>
+<p><strong>Decode 40815 as a pair.</strong></p>
+<p>40815 + 1 = 40816 = 2⁴ × 2551. m = 4, n = (2551 − 1)/2 = 1275. Pair: <code>(4, 1275)</code>.</p>
+<p><strong>Decode 5 as a Stmt.</strong></p>
+<p>5 mod 4 = 1, so this is an assignment. q = 1. φ&#39;(1) = (1, 0). So <code>Assign(x_1, decode_aexp(0))</code>. <code>decode_aexp(0)</code>: 0 mod 5 = 0, so numeral with <code>β&#39;(0) = 0</code>. Result: <code>x_1 := 0</code>.</p>
+<p><strong>Encoding <code>skip; x_1 := 0</code>.</strong></p>
+<p>φ_S(skip) = 0. φ_S(x_1 := 0) = 1 + 4·φ(1, 0) = 1 + 4·1 = 5. φ_S(skip; x_1 := 0) = 2 + 4·φ(0, 5) = 2 + 4·10 = <strong>42</strong>.</p>
+<hr>
+<h2>§5. Cantor diagonal — proof template</h2>
+<p>To show <code>Fun(S, T)</code> is uncountable (where <code>S</code> is countably infinite and <code>|T| ≥ 2</code>):</p>
+<ol>
+<li><strong>Suppose for contradiction</strong> there&#39;s an enumeration <code>f₀, f₁, f₂, …</code> of all functions S → T.</li>
+<li><strong>List the elements of S</strong> as <code>s₀, s₁, s₂, …</code>.</li>
+<li><strong>Construct a diagonal-flipping g</strong> : for each <code>i</code>, choose <code>g(s_i) ∈ T</code> with <code>g(s_i) ≠ f_i(s_i)</code>. (Possible because <code>|T| ≥ 2</code>.)</li>
+<li><strong>g is not on the list</strong>: for any <code>i</code>, <code>g(s_i) ≠ f_i(s_i)</code>, so <code>g ≠ f_i</code>.</li>
+<li><strong>Contradiction.</strong> No enumeration exists. ∎</li>
+</ol>
+<p><strong>Specialised to <code>Fun(ℕ, ℕ)</code>:</strong> <code>g(n) = f_n(n) + 1</code>.
+<strong>Specialised to <code>Fun(ℕ, 𝔹)</code>:</strong> <code>g(n) = ¬f_n(n)</code>.</p>
+<hr>
+<h2>§6. Common pitfalls</h2>
+<ol>
+<li><p><strong>Confusing β and β&#39;.</strong> β goes ℤ → ℕ; β&#39; goes ℕ → ℤ. The chapter sometimes mentions β&#39; where β was intended (e.g., the formula <code>φ_A(n) = 5 · β&#39;(n)</code> in the chapter is most consistent if read as <code>5 · β(n)</code>).</p>
+</li>
+<li><p><strong>Forgetting <code>+1</code> in ψ for lists.</strong> Without it, the empty list and <code>[0]</code> collide.</p>
+</li>
+<li><p><strong>Treating <code>φ_V(x_i) = i</code> and <code>φ_V(x_0) = 1</code> as compatible.</strong> They&#39;re not. The chapter&#39;s Example 23 has an arithmetic inconsistency here; the formal definition is <code>φ_V(x_i) = i</code>, so <code>φ_V(x_0) = 0</code>.</p>
+</li>
+<li><p><strong>Expecting Gödel numbers to be small.</strong> They&#39;re not. A simple while loop has a 1900-digit encoding. The encoding is correct but not practical — it&#39;s a theoretical existence proof.</p>
+</li>
+<li><p><strong>Mistaking encoding/decoding for compilation.</strong> Decoding produces an AST you can re-execute; it doesn&#39;t &quot;translate&quot; between languages in any meaningful sense — it&#39;s just unpacking nested tuples.</p>
+</li>
+</ol>
+<hr>
+<h2>§7. The encoding stack — how chapters 5 and 6 connect</h2>
+<pre><code>Real-world data type          chapter 5 needs ℕ → ℕ
+        |                              |
+        v                              v
+  encode_X (chapter 6)  --&gt;  computability arguments work on ℕ
+        ^                              |
+        |                              v
+  decode_X (chapter 6)  &lt;--  result encoded as ℕ
+        |
+        v
+  Real-world data type
+</code></pre>
+<p><strong>Three places this matters in chapter 5:</strong></p>
+<ol>
+<li><strong>Halting Problem proof.</strong> Need to feed program H&#39;&#39; to itself — requires <code>φ_S(H&#39;&#39;)</code>.</li>
+<li><strong>Universal program U.</strong> Decodes input <code>(i, j)</code> into <code>(S_i, j)</code>, then simulates.</li>
+<li><strong>Parameterization Theorem.</strong> Needs to compute the index of a synthesised program.</li>
+</ol>
+<p>Without chapter 6&#39;s encodings, chapter 5 would be unprovable.</p>
+<hr>
+<h2>§8. The two-line elevator pitch</h2>
+<blockquote>
+<p><strong>Chapter 6 is plumbing.</strong> It provides the bijections that turn programs and data structures into natural numbers, so the abstract &quot;computability for ℕ → ℕ&quot; notion of chapter 5 covers everything in practice.
+The diagonal proof of Theorem 25 + the encoding of While programs as ℕ together imply: most functions ℕ → ℕ are uncomputable. That&#39;s the punchline of chapter 5, made rigorous by chapter 6.</p>
+</blockquote>

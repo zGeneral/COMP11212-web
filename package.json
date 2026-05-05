@@ -12,7 +12,9 @@
     "test:all": "npm test && npm run test:e2e",
     "sync-engine": "node scripts/sync-engine.mjs",
     "fetch-pyodide-dev": "node scripts/fetch-pyodide-dev.mjs",
-    "build:editor": "node scripts/build-editor.mjs"
+    "build:editor": "node scripts/build-editor.mjs",
+    "build:cheatsheets": "node scripts/build-cheatsheets.mjs",
+    "build": "npm run build:editor && npm run build:cheatsheets"
   },
   "devDependencies": {
     "@codemirror/commands": "^6.10.3",
@@ -23,6 +25,8 @@
     "@lezer/highlight": "^1.2.3",
     "@playwright/test": "^1.49.0",
     "esbuild": "^0.28.0",
+    "katex": "^0.16.45",
+    "marked": "^18.0.3",
     "vitest": "^2.1.0"
   },
   "engines": {

@@ -1,0 +1,770 @@
+<h1>COMP11212 Week 6 — Cheat Sheet</h1>
+<p>One page (well, a few) covering: every symbol with how to actually pronounce it, every concept with the Python that <em>is</em> that concept, the 6 small-step rules, and the phrases to use in exam answers.</p>
+<hr>
+<h2>§1. Symbols — what to say out loud</h2>
+<p>When you read a symbol in the chapter, this is how it gets said in lectures, and how to say it in your own head while you read.</p>
+<h3>Greek letters (used as state names)</h3>
+<table>
+<thead>
+<tr>
+<th align="center">Symbol</th>
+<th align="left">Name</th>
+<th align="left">Say it like</th>
+<th align="left">What it usually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><strong>σ</strong></td>
+<td align="left">sigma</td>
+<td align="left">&quot;SIG-mah&quot;</td>
+<td align="left">A state (function from variables to integers)</td>
+</tr>
+<tr>
+<td align="center"><strong>τ</strong></td>
+<td align="left">tau</td>
+<td align="left">&quot;TAU&quot; (rhymes with &quot;now&quot;)</td>
+<td align="left">Another state, often the <em>final</em> one</td>
+</tr>
+<tr>
+<td align="center"><strong>ρ</strong></td>
+<td align="left">rho</td>
+<td align="left">&quot;ROW&quot;</td>
+<td align="left">Another state, often an intermediate one</td>
+</tr>
+<tr>
+<td align="center"><strong>σ′</strong></td>
+<td align="left">sigma-prime</td>
+<td align="left">&quot;sig-mah PRIME&quot;</td>
+<td align="left">The state after one step from σ</td>
+</tr>
+</tbody></table>
+<p>You&#39;ll see <code>σ</code>, <code>σ&#39;</code>, <code>σ&#39;&#39;</code> everywhere — they&#39;re all states, just different ones in a chain. The prime (<code>&#39;</code>) doesn&#39;t mean &quot;different kind of thing,&quot; it just means &quot;the next one.&quot;</p>
+<h3>Logic and math symbols</h3>
+<table>
+<thead>
+<tr>
+<th align="center">Symbol</th>
+<th align="left">Say it like</th>
+<th align="left">What it means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><strong>¬</strong></td>
+<td align="left">&quot;not&quot;</td>
+<td align="left">Logical negation. <code>¬b</code> = &quot;not b&quot;.</td>
+</tr>
+<tr>
+<td align="center"><strong>∧</strong></td>
+<td align="left">&quot;and&quot;</td>
+<td align="left">Logical conjunction. <code>b ∧ b&#39;</code> = &quot;b and b&#39;&quot;.</td>
+</tr>
+<tr>
+<td align="center"><strong>∨</strong></td>
+<td align="left">&quot;or&quot;</td>
+<td align="left">Logical disjunction. (Not in While; encode via De Morgan.)</td>
+</tr>
+<tr>
+<td align="center"><strong>→</strong></td>
+<td align="left">&quot;implies&quot;</td>
+<td align="left">Logical implication. (Not in While; encode as <code>¬a ∨ b</code>.)</td>
+</tr>
+<tr>
+<td align="center"><strong>≡</strong></td>
+<td align="left">&quot;is equivalent to&quot;</td>
+<td align="left">Logical equivalence — same truth table.</td>
+</tr>
+<tr>
+<td align="center"><strong>≤</strong></td>
+<td align="left">&quot;less than or equal to&quot;</td>
+<td align="left">Inequality on integers.</td>
+</tr>
+<tr>
+<td align="center"><strong>=</strong></td>
+<td align="left">&quot;equals&quot; (in BExp)</td>
+<td align="left">Equality test, returns a boolean.</td>
+</tr>
+<tr>
+<td align="center"><strong>×</strong></td>
+<td align="left">&quot;times&quot;</td>
+<td align="left">Multiplication.</td>
+</tr>
+<tr>
+<td align="center"><strong>∈</strong></td>
+<td align="left">&quot;is in&quot; / &quot;is a member of&quot;</td>
+<td align="left">Set membership. <code>n ∈ ℤ</code> = &quot;n is in the integers&quot;.</td>
+</tr>
+<tr>
+<td align="center"><strong>∀</strong></td>
+<td align="left">&quot;for all&quot;</td>
+<td align="left">Universal quantifier. (Used in proofs.)</td>
+</tr>
+<tr>
+<td align="center"><strong>∃</strong></td>
+<td align="left">&quot;there exists&quot;</td>
+<td align="left">Existential quantifier.</td>
+</tr>
+<tr>
+<td align="center"><strong>∎</strong></td>
+<td align="left">&quot;Q-E-D&quot; / &quot;end of proof&quot;</td>
+<td align="left">Marks the end of a proof. (Halmos symbol.)</td>
+</tr>
+<tr>
+<td align="center"><strong>iff</strong></td>
+<td align="left">&quot;if and only if&quot;</td>
+<td align="left">Two-way implication.</td>
+</tr>
+</tbody></table>
+<h3>Number sets</h3>
+<table>
+<thead>
+<tr>
+<th align="center">Symbol</th>
+<th align="left">Say it like</th>
+<th align="left">What it means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><strong>ℤ</strong></td>
+<td align="left">&quot;the integers&quot; / &quot;Z&quot;</td>
+<td align="left">All whole numbers, positive and negative. {…, −2, −1, 0, 1, 2, …}</td>
+</tr>
+<tr>
+<td align="center"><strong>ℕ</strong></td>
+<td align="left">&quot;the naturals&quot; / &quot;N&quot;</td>
+<td align="left">Non-negative integers. {0, 1, 2, …}. (Some books exclude 0; Manchester includes it.)</td>
+</tr>
+<tr>
+<td align="center"><strong>𝔹</strong></td>
+<td align="left">&quot;the booleans&quot; / &quot;B&quot;</td>
+<td align="left">{tt, ff} — the truth values.</td>
+</tr>
+</tbody></table>
+<h3>State manipulation</h3>
+<table>
+<thead>
+<tr>
+<th align="center">Symbol</th>
+<th align="left">Say it like</th>
+<th align="left">What it means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><strong>σ(x)</strong></td>
+<td align="left">&quot;sigma of x&quot;</td>
+<td align="left">The value of variable x in state σ.</td>
+</tr>
+<tr>
+<td align="center"><strong>σx</strong></td>
+<td align="left">&quot;sigma x&quot;</td>
+<td align="left">Same as σ(x) — chapter writes it both ways.</td>
+</tr>
+<tr>
+<td align="center"><strong>σ[x ↦ n]</strong></td>
+<td align="left">&quot;sigma with x maps to n&quot;</td>
+<td align="left">Update — new state where x has value n, everything else like σ.</td>
+</tr>
+<tr>
+<td align="center"><strong>σ[x ↦ n, y ↦ m]</strong></td>
+<td align="left">&quot;sigma with x maps to n, y maps to m&quot;</td>
+<td align="left">Multiple updates left-to-right.</td>
+</tr>
+<tr>
+<td align="center"><strong>{x ↦ 1, y ↦ 2}</strong></td>
+<td align="left">&quot;the state where x maps to 1 and y maps to 2&quot;</td>
+<td align="left">Description of a state — only non-zero entries listed.</td>
+</tr>
+</tbody></table>
+<h3>The two evaluators</h3>
+<table>
+<thead>
+<tr>
+<th align="center">Symbol</th>
+<th align="left">Say it like</th>
+<th align="left">What it means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><strong>𝒜</strong> (script A)</td>
+<td align="left">&quot;script A&quot; / &quot;the A function&quot; / &quot;A&quot;</td>
+<td align="left">Evaluates an arithmetic expression in a state to an integer.</td>
+</tr>
+<tr>
+<td align="center"><strong>ℬ</strong> (script B)</td>
+<td align="left">&quot;script B&quot; / &quot;the B function&quot; / &quot;B&quot;</td>
+<td align="left">Evaluates a boolean expression in a state to a truth value.</td>
+</tr>
+<tr>
+<td align="center"><strong>𝒩</strong> (script N)</td>
+<td align="left">&quot;script N&quot; / &quot;numeral interpretation&quot;</td>
+<td align="left">Maps a numeral (string) to the integer it denotes. Often elided.</td>
+</tr>
+<tr>
+<td align="center"><strong>𝒜⟦a⟧σ</strong></td>
+<td align="left">&quot;script A of a, sigma&quot; / &quot;A semantic-brackets a, sigma&quot;</td>
+<td align="left">A applied to expression a in state σ.</td>
+</tr>
+</tbody></table>
+<p>In our notebooks we just write <code>A(a, sigma)</code> and <code>B(b, sigma)</code>. Same thing.</p>
+<h3>Configurations and transitions</h3>
+<table>
+<thead>
+<tr>
+<th align="center">Symbol</th>
+<th align="left">Say it like</th>
+<th align="left">What it means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><strong>⟨S, σ⟩</strong></td>
+<td align="left">&quot;S and sigma&quot; / &quot;configuration S sigma&quot; / &quot;angle-bracket S sigma&quot;</td>
+<td align="left">A <em>configuration</em> — program S together with state σ.</td>
+</tr>
+<tr>
+<td align="center"><strong>⇒</strong></td>
+<td align="left">&quot;yields&quot; / &quot;steps to&quot; / &quot;reduces to&quot; / &quot;transitions to&quot;</td>
+<td align="left">One small-step transition.</td>
+</tr>
+<tr>
+<td align="center"><strong>⇒ⁿ</strong></td>
+<td align="left">&quot;yields in n steps&quot; / &quot;reduces to in n steps&quot;</td>
+<td align="left">Exactly n transitions.</td>
+</tr>
+<tr>
+<td align="center"><strong>⇒</strong>*</td>
+<td align="left">&quot;yields eventually&quot; / &quot;reduces to&quot; / &quot;yields star&quot;</td>
+<td align="left">Reflexive transitive closure — <em>some</em> number of steps (possibly zero).</td>
+</tr>
+<tr>
+<td align="center"><strong>⟨skip, σ⟩</strong></td>
+<td align="left">&quot;skip sigma&quot; / &quot;the skip configuration&quot;</td>
+<td align="left">Terminal configuration — no rule applies. Means &quot;done, in state σ&quot;.</td>
+</tr>
+</tbody></table>
+<p>The full thing <code>⟨S, σ⟩ ⇒ ⟨S&#39;, σ&#39;⟩</code> reads as: &quot;S in state sigma yields S-prime in state sigma-prime.&quot;</p>
+<h3>BNF grammar notation</h3>
+<table>
+<thead>
+<tr>
+<th align="center">Symbol</th>
+<th align="left">Say it like</th>
+<th align="left">What it means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><strong><code>&lt;aexp&gt;</code></strong></td>
+<td align="left">&quot;a-exp&quot; / &quot;an arithmetic expression&quot; / &quot;a non-terminal&quot;</td>
+<td align="left">A category — gets defined by the grammar.</td>
+</tr>
+<tr>
+<td align="center"><strong><code>::=</code></strong></td>
+<td align="left">&quot;is defined as&quot; / &quot;produces&quot; / &quot;rewrites to&quot;</td>
+<td align="left">Defines a grammar rule.</td>
+</tr>
+<tr>
+<td align="center"><strong><code>|</code></strong> (in BNF)</td>
+<td align="left">&quot;or&quot;</td>
+<td align="left">Separates alternatives in a rule.</td>
+</tr>
+<tr>
+<td align="center"><strong><code>&lt;&gt;</code></strong></td>
+<td align="left">&quot;angle brackets&quot; — surround non-terminals</td>
+<td align="left">Visual delimiter only; not part of programs.</td>
+</tr>
+</tbody></table>
+<h3>While statements</h3>
+<table>
+<thead>
+<tr>
+<th align="center">Symbol</th>
+<th align="left">Say it like</th>
+<th align="left">What it means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><strong><code>:=</code></strong></td>
+<td align="left">&quot;becomes&quot; / &quot;gets&quot; / &quot;is assigned&quot; / &quot;assignment&quot;</td>
+<td align="left">Variable assignment. <strong>NOT &quot;equals&quot;</strong> — that&#39;s <code>=</code>.</td>
+</tr>
+<tr>
+<td align="center"><strong><code>;</code></strong></td>
+<td align="left">&quot;then&quot; / &quot;semicolon&quot; / &quot;do then&quot;</td>
+<td align="left">Sequential composition: do this, then that.</td>
+</tr>
+<tr>
+<td align="center"><strong><code>tt</code></strong></td>
+<td align="left">&quot;true&quot; / &quot;tee-tee&quot;</td>
+<td align="left">The boolean true.</td>
+</tr>
+<tr>
+<td align="center"><strong><code>ff</code></strong></td>
+<td align="left">&quot;false&quot; / &quot;ef-ef&quot;</td>
+<td align="left">The boolean false.</td>
+</tr>
+<tr>
+<td align="center"><strong><code>skip</code></strong></td>
+<td align="left">&quot;skip&quot;</td>
+<td align="left">A program that does nothing. (Crucial as the <em>terminal</em> program.)</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>§2. Concepts ↔ Python — one row per idea</h2>
+<p>For every theoretical concept in the chapter, here&#39;s what it <em>is</em> in Python (specifically in <code>while_lang.py</code>):</p>
+<table>
+<thead>
+<tr>
+<th align="left">Concept</th>
+<th align="left">In the chapter</th>
+<th align="left">In Python (<code>while_lang.py</code>)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>Variable</strong></td>
+<td align="left"><code>x ∈ Vars</code>, name</td>
+<td align="left"><code>Var(name=&#39;x&#39;)</code> — a string-named AST node</td>
+</tr>
+<tr>
+<td align="left"><strong>Numeral</strong></td>
+<td align="left"><code>n ∈ Num</code></td>
+<td align="left"><code>Num(value=5)</code> — an int wrapped in a class</td>
+</tr>
+<tr>
+<td align="left"><strong>Arithmetic expression (AExp)</strong></td>
+<td align="left"><code>&lt;aexp&gt; ::= &lt;num&gt; | &lt;var&gt; | &lt;aexp&gt; + &lt;aexp&gt; | ...</code></td>
+<td align="left">Union type: <code>Num | Var | Add | Sub | Mul</code></td>
+</tr>
+<tr>
+<td align="left"><strong>Boolean expression (BExp)</strong></td>
+<td align="left"><code>&lt;bexp&gt; ::= ff | tt | ...</code></td>
+<td align="left">Union: <code>BTrue | BFalse | Eq | Le | Not | And</code></td>
+</tr>
+<tr>
+<td align="left"><strong>Statement (Stmt)</strong></td>
+<td align="left"><code>&lt;stmt&gt; ::= := | skip | ; | if | while</code></td>
+<td align="left">Union: <code>Skip | Assign | Seq | If | While</code></td>
+</tr>
+<tr>
+<td align="left"><strong>State σ</strong></td>
+<td align="left">Function <code>σ: Vars → ℤ</code>, finitely many non-zero</td>
+<td align="left"><code>dict[str, int]</code> with <code>.get(name, 0)</code> for default-zero</td>
+</tr>
+<tr>
+<td align="left"><strong>State update σ[x ↦ n]</strong></td>
+<td align="left">New state agreeing with σ except at x</td>
+<td align="left"><code>{**sigma, &#39;x&#39;: n}</code> — copy + set</td>
+</tr>
+<tr>
+<td align="left"><strong>Multi-update σ[x ↦ n, y ↦ m]</strong></td>
+<td align="left">Apply updates left-to-right</td>
+<td align="left"><code>{**sigma, &#39;x&#39;: n, &#39;y&#39;: m}</code> (last write wins on duplicates)</td>
+</tr>
+<tr>
+<td align="left"><strong>The 𝒜 evaluator</strong></td>
+<td align="left">Recursive function: AExp × St → ℤ</td>
+<td align="left"><code>def A(expr, sigma) -&gt; int:</code> with <code>isinstance</code> cases</td>
+</tr>
+<tr>
+<td align="left"><strong>The ℬ evaluator</strong></td>
+<td align="left">Recursive function: BExp × St → 𝔹</td>
+<td align="left"><code>def B(expr, sigma) -&gt; bool:</code> with <code>isinstance</code> cases</td>
+</tr>
+<tr>
+<td align="left"><strong>Configuration ⟨S, σ⟩</strong></td>
+<td align="left">Pair of program + state</td>
+<td align="left"><code>Config(stmt=S, state=sigma)</code> dataclass</td>
+</tr>
+<tr>
+<td align="left"><strong>Transition ⇒</strong></td>
+<td align="left">One step of the small-step semantics</td>
+<td align="left"><code>step(cfg) -&gt; Transition | None</code></td>
+</tr>
+<tr>
+<td align="left"><strong>Transition labelled with rule</strong></td>
+<td align="left">Applied rule (<code>:=</code>, <code>if-tt</code>, etc.)</td>
+<td align="left"><code>Transition.rule: str</code> field</td>
+</tr>
+<tr>
+<td align="left"><strong>Terminal configuration</strong></td>
+<td align="left"><code>⟨skip, σ⟩</code> — no further rule applies</td>
+<td align="left"><code>step()</code> returns <code>None</code> when stmt is Skip</td>
+</tr>
+<tr>
+<td align="left"><strong>n-step relation ⇒ⁿ</strong></td>
+<td align="left">Exactly n transitions</td>
+<td align="left">A list of n transitions from <code>step_iter</code></td>
+</tr>
+<tr>
+<td align="left"><strong>Reflexive-transitive closure ⇒</strong>*</td>
+<td align="left">Some number of steps (≥ 0)</td>
+<td align="left">The full <code>step_iter(prog, sigma)</code> generator</td>
+</tr>
+<tr>
+<td align="left"><strong>Termination</strong></td>
+<td align="left"><code>⟨S, σ⟩ ⇒* ⟨skip, σ&#39;⟩</code> exists</td>
+<td align="left"><code>run(prog, sigma)</code> returns a dict</td>
+</tr>
+<tr>
+<td align="left"><strong>Non-termination</strong></td>
+<td align="left">No such σ&#39; exists</td>
+<td align="left"><code>run(...)</code> raises <code>StepBudgetExceeded</code></td>
+</tr>
+<tr>
+<td align="left"><strong>Operational semantics</strong></td>
+<td align="left">Rules defining how programs behave</td>
+<td align="left"><code>step()</code> IS the operational semantics</td>
+</tr>
+<tr>
+<td align="left"><strong>Determinism</strong></td>
+<td align="left">At most one rule applies at each step</td>
+<td align="left"><code>step()</code> is a function (not a relation)</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>§3. The six small-step rules — at a glance</h2>
+<p>These are the rules the exam tests. One line each: formal → plain English → which Python branch in <code>step()</code>.</p>
+<table>
+<thead>
+<tr>
+<th align="left">Rule</th>
+<th align="left">Formal</th>
+<th align="left">Plain English</th>
+<th align="left">Python branch</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong><code>:=</code></strong></td>
+<td align="left"><code>⟨x := a, σ⟩ ⇒ ⟨skip, σ[x ↦ 𝒜 a σ]⟩</code></td>
+<td align="left">&quot;Assign: store the value, replace with skip.&quot;</td>
+<td align="left"><code>isinstance(s, Assign)</code></td>
+</tr>
+<tr>
+<td align="left"><strong><code>skip-;</code></strong></td>
+<td align="left"><code>⟨skip; T, σ⟩ ⇒ ⟨T, σ⟩</code></td>
+<td align="left">&quot;Drop a finished skip from the front of a <code>;</code>.&quot;</td>
+<td align="left"><code>isinstance(s, Seq) and isinstance(s.first, Skip)</code></td>
+</tr>
+<tr>
+<td align="left"><strong><code>;</code> (general)</strong></td>
+<td align="left"><code>⟨S, σ⟩ ⇒ ⟨S&#39;, σ&#39;⟩</code> implies <code>⟨S; T, σ⟩ ⇒ ⟨S&#39;; T, σ&#39;⟩</code></td>
+<td align="left">&quot;Step the left side, drag the right side along unchanged.&quot;</td>
+<td align="left"><code>isinstance(s, Seq)</code> (other case) — recursive <code>step</code> on <code>s.first</code></td>
+</tr>
+<tr>
+<td align="left"><strong><code>if-tt</code></strong></td>
+<td align="left">When <code>ℬ b σ = tt</code>: <code>⟨if b then S else (S&#39;), σ⟩ ⇒ ⟨S, σ⟩</code></td>
+<td align="left">&quot;Condition true → take the then-branch.&quot;</td>
+<td align="left"><code>isinstance(s, If) and B(s.cond, sigma)</code></td>
+</tr>
+<tr>
+<td align="left"><strong><code>if-ff</code></strong></td>
+<td align="left">When <code>ℬ b σ = ff</code>: <code>⟨if b then S else (S&#39;), σ⟩ ⇒ ⟨S&#39;, σ⟩</code></td>
+<td align="left">&quot;Condition false → take the else-branch.&quot;</td>
+<td align="left"><code>isinstance(s, If) and not B(s.cond, sigma)</code></td>
+</tr>
+<tr>
+<td align="left"><strong><code>while-tt</code></strong></td>
+<td align="left">When <code>ℬ b σ = tt</code>: <code>⟨while b do (S), σ⟩ ⇒ ⟨S; while b do (S), σ⟩</code></td>
+<td align="left">&quot;Condition true → unfold: body, then loop again.&quot;</td>
+<td align="left"><code>isinstance(s, While) and B(s.cond, sigma)</code></td>
+</tr>
+<tr>
+<td align="left"><strong><code>while-ff</code></strong></td>
+<td align="left">When <code>ℬ b σ = ff</code>: <code>⟨while b do (S), σ⟩ ⇒ ⟨skip, σ⟩</code></td>
+<td align="left">&quot;Condition false → become skip.&quot;</td>
+<td align="left"><code>isinstance(s, While) and not B(s.cond, sigma)</code></td>
+</tr>
+</tbody></table>
+<p><strong>Two big things to notice:</strong></p>
+<ol>
+<li><strong>All rules except <code>:=</code> leave σ unchanged.</strong> Only assignment changes state.</li>
+<li><strong>Only <code>while-tt</code> makes the program text grow.</strong> Every other rule shrinks it or keeps it the same. That&#39;s why programs without while-loops always terminate.</li>
+</ol>
+<hr>
+<h2>§4. Common While ↔ ASCII conversions</h2>
+<p>When typing a program into our interpreter (or onto a keyboard) you can&#39;t type <code>≤</code>. Here&#39;s the map:</p>
+<table>
+<thead>
+<tr>
+<th align="center">Chapter writes</th>
+<th align="center">Type instead</th>
+<th align="left">What it means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><code>≤</code></td>
+<td align="center"><code>&lt;=</code></td>
+<td align="left">less-than-or-equal</td>
+</tr>
+<tr>
+<td align="center"><code>¬</code></td>
+<td align="center"><code>!</code></td>
+<td align="left">not</td>
+</tr>
+<tr>
+<td align="center"><code>∧</code></td>
+<td align="center"><code>&amp;</code></td>
+<td align="left">and</td>
+</tr>
+<tr>
+<td align="center"><code>×</code></td>
+<td align="center"><code>*</code></td>
+<td align="left">multiplication</td>
+</tr>
+<tr>
+<td align="center"><code>tt</code></td>
+<td align="center"><code>tt</code></td>
+<td align="left">true (same)</td>
+</tr>
+<tr>
+<td align="center"><code>ff</code></td>
+<td align="center"><code>ff</code></td>
+<td align="left">false (same)</td>
+</tr>
+<tr>
+<td align="center"><code>:=</code></td>
+<td align="center"><code>:=</code></td>
+<td align="left">assignment (same)</td>
+</tr>
+<tr>
+<td align="center"><code>=</code></td>
+<td align="center"><code>=</code></td>
+<td align="left">equality test (same)</td>
+</tr>
+</tbody></table>
+<p><strong>No native <code>&lt;</code>, <code>&gt;</code>, <code>≥</code>, <code>∨</code>, <code>→</code>.</strong> Workarounds:</p>
+<table>
+<thead>
+<tr>
+<th align="left">Want</th>
+<th align="left">Encode as</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><code>a &lt; b</code></td>
+<td align="left"><code>a &lt;= b &amp; !(a = b)</code></td>
+</tr>
+<tr>
+<td align="left"><code>a &gt; b</code></td>
+<td align="left"><code>b &lt;= a &amp; !(a = b)</code></td>
+</tr>
+<tr>
+<td align="left"><code>a ≥ b</code></td>
+<td align="left"><code>b &lt;= a</code></td>
+</tr>
+<tr>
+<td align="left"><code>a ∨ b</code></td>
+<td align="left"><code>!((!a) &amp; (!b))</code> (De Morgan)</td>
+</tr>
+<tr>
+<td align="left"><code>a → b</code></td>
+<td align="left"><code>!(a &amp; !b)</code></td>
+</tr>
+</tbody></table>
+<hr>
+<h2>§5. Properties and propositions to remember</h2>
+<p>These come up in exam-style questions. Memorize the <em>names</em> and <em>what they say</em> — proofs are by case-analysis on rules.</p>
+<table>
+<thead>
+<tr>
+<th align="left">Name</th>
+<th align="left">What it says</th>
+<th align="left">Why it matters</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>Determinism</strong> (Ex 18)</td>
+<td align="left">If <code>⟨S, σ⟩ ⇒ ⟨S&#39;, ρ⟩</code> and <code>⟨S, σ⟩ ⇒ ⟨S&#39;, τ⟩</code> then ρ = τ.</td>
+<td align="left">While is single-threaded — each (S, σ) has at most one next step.</td>
+</tr>
+<tr>
+<td align="left"><strong>State preservation</strong> (Ex 17)</td>
+<td align="left">If S doesn&#39;t mention x and <code>⟨S, σ⟩ ⇒ ⟨S&#39;, σ&#39;⟩</code>, then σ(x) = σ&#39;(x).</td>
+<td align="left">Variables you don&#39;t touch stay put.</td>
+</tr>
+<tr>
+<td align="left"><strong>Proposition 2</strong> (decomposition)</td>
+<td align="left"><code>⟨S; T, σ⟩ ⇒ⁿ ⟨U, τ⟩</code> decomposes as either &quot;still in S&quot; or &quot;done with S, working on T&quot;.</td>
+<td align="left">Sequential composition has a sharp boundary — S finishes <em>before</em> T starts.</td>
+</tr>
+<tr>
+<td align="left"><strong>Proposition 3</strong> (associativity of <code>;</code>)</td>
+<td align="left"><code>⟨(S; T); U, σ⟩ ⇒* ⟨skip, τ⟩</code> iff <code>⟨S; (T; U), σ⟩ ⇒* ⟨skip, τ⟩</code>.</td>
+<td align="left">The grammar&#39;s ambiguity for chained <code>;</code> is harmless.</td>
+</tr>
+</tbody></table>
+<p><strong><code>;</code> is associative but NOT commutative</strong> — <code>S; T</code> and <code>T; S</code> do different things. This is the difference between math <code>+</code> (both) and While <code>;</code> (associative only).</p>
+<hr>
+<h2>§6. Exam-style phrasing — how to say things on paper</h2>
+<p>When asked to &quot;compute the transitions&quot; or &quot;argue why...&quot;, these phrases come up:</p>
+<table>
+<thead>
+<tr>
+<th align="left">What you want to say</th>
+<th align="left">Use this phrasing</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">&quot;the assignment rule fires&quot;</td>
+<td align="left">&quot;by the := rule&quot;</td>
+</tr>
+<tr>
+<td align="left">&quot;the while-true case&quot;</td>
+<td align="left">&quot;by the while-tt rule&quot; / &quot;since <code>ℬ b σ = tt</code>, the while-tt rule applies&quot;</td>
+</tr>
+<tr>
+<td align="left">&quot;the program reaches a final state&quot;</td>
+<td align="left">&quot;the program terminates in state σ&#39;&quot; or &quot;<code>⟨S, σ⟩ ⇒* ⟨skip, σ&#39;⟩</code>&quot;</td>
+</tr>
+<tr>
+<td align="left">&quot;the program runs forever&quot;</td>
+<td align="left">&quot;the program does not terminate&quot; or &quot;no σ&#39; satisfies <code>⟨S, σ⟩ ⇒* ⟨skip, σ&#39;⟩</code>&quot;</td>
+</tr>
+<tr>
+<td align="left">&quot;I&#39;m folding multiple <code>:=</code> and <code>;</code> rules into one super-step&quot;</td>
+<td align="left">&quot;<code>⇒ⁿ</code>&quot; (with n counted) — chapter does this in Example 7</td>
+</tr>
+<tr>
+<td align="left">&quot;the body of the while loop&quot;</td>
+<td align="left">abbreviate as <code>B</code>, with &quot;where B is …&quot; stated once</td>
+</tr>
+<tr>
+<td align="left">&quot;the whole while statement&quot;</td>
+<td align="left">abbreviate as <code>L</code> or <code>L₁</code>, define on first appearance</td>
+</tr>
+<tr>
+<td align="left">starting a structural induction proof</td>
+<td align="left">&quot;By induction on the structure of S. We case-split on which rule applies.&quot;</td>
+</tr>
+<tr>
+<td align="left">ending a proof</td>
+<td align="left">&quot;∎&quot; or &quot;QED&quot;</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>§7. The three views of a trace, in one table</h2>
+<p>Our interpreter renders the same execution three ways. Here&#39;s when to use which:</p>
+<table>
+<thead>
+<tr>
+<th align="center">View</th>
+<th align="left">Looks like</th>
+<th align="left">When to use</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><code>view=&#39;formal&#39;</code></td>
+<td align="left"><code>⟨S, σ⟩ ⇒ ⟨S&#39;, σ&#39;⟩    [rule]</code> per line, with <code>L</code> abbreviations for repeated whiles</td>
+<td align="left">Studying the rules; matching what the chapter shows in Example 7</td>
+</tr>
+<tr>
+<td align="center"><code>view=&#39;table&#39;</code></td>
+<td align="left">One row per transition, columns = changing variables</td>
+<td align="left">When asked to &quot;track the execution&quot; — Example 8 / Example 11 style</td>
+</tr>
+<tr>
+<td align="center"><code>view=&#39;dict&#39;</code></td>
+<td align="left">Just the final state as a Python dict</td>
+<td align="left">When you only care about the answer, e.g. asserting correctness</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>§8. Quick decision tree — &quot;is this program correct?&quot;</h2>
+<p>If asked: <em>&quot;What does this program compute?&quot;</em> or <em>&quot;Will it terminate?&quot;</em></p>
+<ol>
+<li><strong>Identify the inputs and outputs.</strong> Which variables hold the input? Which hold the output? (The chapter says explicitly. If not, look at what&#39;s read first vs. assigned last.)</li>
+<li><strong>Walk the loop conditions.</strong> What invariant does each loop maintain? When does the condition first become false?</li>
+<li><strong>Check termination.</strong><ul>
+<li>No loops → always terminates.</li>
+<li>Bounded loops (e.g. counter increases towards a fixed bound) → terminates.</li>
+<li>Unbounded loop search (e.g. Example 2&#39;s quadratic search) → might not terminate; need to argue from the <em>arithmetic</em> whether the exit condition is ever satisfied.</li>
+</ul>
+</li>
+<li><strong>For divisibility / non-existence arguments</strong> (Exercise 14b(ii)): show all values reachable share a common factor that the target doesn&#39;t.</li>
+</ol>
+<hr>
+<h2>§9. Conventions that aren&#39;t formal but matter for readability</h2>
+<p>The chapter uses several conventions that aren&#39;t <em>required</em> by the formal rules but make traces easier to read:</p>
+<ul>
+<li><strong><code>⇒ⁿ</code> super-steps</strong> — collapse a run of <code>:=</code>, <code>;</code>, and <code>skip-;</code> rules into one labelled super-step.</li>
+<li><strong><code>B</code>, <code>L</code> abbreviations</strong> — give names to the body of a loop (<code>B</code>) or the whole loop (<code>L</code>) on first appearance.</li>
+<li><strong>Indentation instead of brackets</strong> — when writing programs over multiple lines, indentation replaces <code>( )</code> around if/while bodies.</li>
+<li><strong>State descriptions only show non-zero entries</strong> — <code>{x ↦ 1}</code> means &quot;x is 1, everything else is 0&quot;.</li>
+</ul>
+<p>You&#39;re allowed to use these in exam answers. Read Example 7 carefully — that&#39;s the gold standard for what the marker expects to see.</p>
+<hr>
+<h2>§10. Things that are NOT in While (so you don&#39;t waste time looking)</h2>
+<table>
+<thead>
+<tr>
+<th align="left">Thing</th>
+<th align="left">Workaround</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Division <code>/</code></td>
+<td align="left">Subtraction loop (see Example 1)</td>
+</tr>
+<tr>
+<td align="left">Modulo <code>%</code></td>
+<td align="left">Subtraction loop</td>
+</tr>
+<tr>
+<td align="left">Exponentiation <code>^</code></td>
+<td align="left">Multiplication loop (see Section 1.7)</td>
+</tr>
+<tr>
+<td align="left">Strict less-than <code>&lt;</code></td>
+<td align="left"><code>a &lt;= b &amp; !(a = b)</code></td>
+</tr>
+<tr>
+<td align="left">Greater-than <code>&gt;</code>, <code>≥</code></td>
+<td align="left">Swap operands of <code>&lt;=</code></td>
+</tr>
+<tr>
+<td align="left">OR <code>∨</code></td>
+<td align="left"><code>!((!a) &amp; (!b))</code></td>
+</tr>
+<tr>
+<td align="left">Implication <code>→</code></td>
+<td align="left"><code>!(a &amp; !b)</code></td>
+</tr>
+<tr>
+<td align="left">Boolean variables</td>
+<td align="left">All variables are integers; encode booleans as 0/1</td>
+</tr>
+<tr>
+<td align="left">Floating-point</td>
+<td align="left">Not in the language; integers only</td>
+</tr>
+<tr>
+<td align="left">Strings, lists, arrays</td>
+<td align="left">Not in the language; integers only</td>
+</tr>
+<tr>
+<td align="left">Function definitions</td>
+<td align="left">Not in the language; everything is inline</td>
+</tr>
+<tr>
+<td align="left">Recursion</td>
+<td align="left">No functions, but <code>while</code> can simulate any recursion</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>§11. The two bits to memorize cold</h2>
+<p>Everything in the chapter ultimately boils down to two memorized things. If you only have 30 seconds before the exam, learn these:</p>
+<h3>(a) The 6 inference rules</h3>
+<pre><code>⟨x := a, σ⟩          ⇒ ⟨skip, σ[x ↦ 𝒜 a σ]⟩
+
+⟨skip; T, σ⟩         ⇒ ⟨T, σ⟩
+
+⟨S, σ⟩ ⇒ ⟨S&#39;, σ&#39;⟩  implies  ⟨S; T, σ⟩ ⇒ ⟨S&#39;; T, σ&#39;⟩
+
+⟨if b then S else S&#39;, σ⟩  ⇒ ⟨S, σ⟩  if 𝓑 b σ = tt
+                          ⇒ ⟨S&#39;, σ⟩  otherwise
+
+⟨while b do S, σ⟩    ⇒ ⟨S; while b do S, σ⟩  if 𝓑 b σ = tt
+                     ⇒ ⟨skip, σ⟩  otherwise
+</code></pre>
+<h3>(b) The state update rule</h3>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0359em;">σ</span><span class="mopen">[</span><span class="mord mathnormal">x</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">↦</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">n</span><span class="mclose">])</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:3em;vertical-align:-1.25em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;"><span class="delimsizing size4">{</span></span><span class="mord"><span class="mtable"><span class="col-align-l"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.69em;"><span style="top:-3.69em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mord mathnormal">n</span></span></span><span style="top:-2.25em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">σ</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="mclose">)</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.19em;"><span></span></span></span></span></span><span class="arraycolsep" style="width:1em;"></span><span class="col-align-l"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.69em;"><span style="top:-3.69em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord mathnormal">x</span></span></span><span style="top:-2.25em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mord text"><span class="mord">otherwise</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.19em;"><span></span></span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></p>
+<p>In words: &quot;the new state is just like σ, except on x it gives n.&quot;</p>
+<p>Everything else is mechanics on top of these.</p>

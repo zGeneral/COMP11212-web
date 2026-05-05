@@ -36,6 +36,8 @@ COPY static/while_lang.py ./static/
 COPY static/lz-string.min.js ./static/
 COPY static/examples.json ./static/
 COPY static/wheels ./static/wheels
+COPY static/cheatsheets ./static/cheatsheets
+COPY cheatsheets.js ./
 
 # Drop the Pyodide bundle in.
 COPY --from=pyodide-fetch /pyodide-bundle ./static/pyodide

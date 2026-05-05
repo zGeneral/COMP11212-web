@@ -1,0 +1,337 @@
+<h1>COMP11212 Appendices — Math + Big-Step Cheat Sheet</h1>
+<p>Symbols, definitions for math vocabulary, and the 5 big-step rules. Companion to the chapter cheatsheets.</p>
+<hr>
+<h2>§1. Math symbols and pronunciation</h2>
+<h3>Set theory and functions</h3>
+<table>
+<thead>
+<tr>
+<th align="center">Symbol</th>
+<th align="left">Name</th>
+<th align="left">Say it like</th>
+<th align="left">Meaning</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><strong><code>f : S → T</code></strong></td>
+<td align="left">function arrow</td>
+<td align="left">&quot;f from S to T&quot;</td>
+<td align="left">Total function. Every input has exactly one output.</td>
+</tr>
+<tr>
+<td align="center"><strong><code>f : S ⇀ T</code></strong></td>
+<td align="left">partial-function arrow</td>
+<td align="left">&quot;f from S to T (partial)&quot; / &quot;half-arrow&quot;</td>
+<td align="left">Partial function. Some inputs may have no output.</td>
+</tr>
+<tr>
+<td align="center"><strong><code>f ∘ g</code></strong></td>
+<td align="left">composition</td>
+<td align="left">&quot;f after g&quot; / &quot;f compose g&quot;</td>
+<td align="left"><code>(f ∘ g)(s) = f(g(s))</code>.</td>
+</tr>
+<tr>
+<td align="center"><strong><code>id_S</code></strong></td>
+<td align="left">identity on S</td>
+<td align="left">&quot;id sub S&quot;</td>
+<td align="left">The function <code>s ↦ s</code>.</td>
+</tr>
+<tr>
+<td align="center"><strong><code>dom(f)</code></strong></td>
+<td align="left">domain of definition</td>
+<td align="left">&quot;domain of f&quot;</td>
+<td align="left">The inputs where f is defined.</td>
+</tr>
+<tr>
+<td align="center"><strong><code>Fun(S, T)</code></strong></td>
+<td align="left">function space</td>
+<td align="left">&quot;Fun S T&quot;</td>
+<td align="left">Set of all functions S → T.</td>
+</tr>
+<tr>
+<td align="center"><strong><code>PFun(S, T)</code></strong></td>
+<td align="left">partial function space</td>
+<td align="left">&quot;P Fun S T&quot;</td>
+<td align="left">Set of all partial functions S → T.</td>
+</tr>
+</tbody></table>
+<h3>Relations</h3>
+<table>
+<thead>
+<tr>
+<th align="center">Symbol</th>
+<th align="left">Say it like</th>
+<th align="left">Meaning</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><strong><code>R : S → T</code></strong></td>
+<td align="left">&quot;R from S to T&quot;</td>
+<td align="left">A relation: subset of S × T.</td>
+</tr>
+<tr>
+<td align="center"><strong><code>(s, s&#39;) ∈ R</code></strong></td>
+<td align="left">&quot;s, s prime in R&quot;</td>
+<td align="left">s and s&#39; are related.</td>
+</tr>
+<tr>
+<td align="center"><strong><code>R ; R&#39;</code></strong></td>
+<td align="left">&quot;R semicolon R prime&quot; / &quot;relational composition&quot;</td>
+<td align="left"><code>(s, s&#39;&#39;) ∈ R; R&#39;</code> iff <code>∃s&#39;, (s, s&#39;) ∈ R ∧ (s&#39;, s&#39;&#39;) ∈ R&#39;</code>.</td>
+</tr>
+<tr>
+<td align="center"><strong><code>R^n</code></strong></td>
+<td align="left">&quot;R to the n&quot;</td>
+<td align="left">n-fold composition. R^0 = id; R^{n+1} = R^n ; R.</td>
+</tr>
+<tr>
+<td align="center"><strong><code>⇒*</code></strong></td>
+<td align="left">&quot;yields star&quot; / &quot;reflexive-transitive closure&quot;</td>
+<td align="left"><code>⋃_{n ≥ 0} R^n</code>. The smallest reflexive + transitive relation containing R.</td>
+</tr>
+</tbody></table>
+<h3>Cardinality</h3>
+<table>
+<thead>
+<tr>
+<th align="center">Symbol</th>
+<th align="left">Say it like</th>
+<th align="left">Meaning</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><strong><code>|S|</code></strong></td>
+<td align="left">&quot;size of S&quot; / &quot;cardinality of S&quot;</td>
+<td align="left">Cardinality.</td>
+</tr>
+<tr>
+<td align="center"><strong><code>|S| ≤ |T|</code></strong></td>
+<td align="left">&quot;S has size at most T&quot;</td>
+<td align="left">There&#39;s an injection from S to T.</td>
+</tr>
+<tr>
+<td align="center"><strong><code>ℵ₀</code></strong></td>
+<td align="left">&quot;aleph null&quot; / &quot;aleph zero&quot;</td>
+<td align="left">Cardinality of countably-infinite sets.</td>
+</tr>
+<tr>
+<td align="center"><strong><code>2^ℵ₀</code></strong></td>
+<td align="left">&quot;two to the aleph null&quot;</td>
+<td align="left">Cardinality of P(ℕ) ≅ Fun(ℕ, 𝔹) ≅ ℝ.</td>
+</tr>
+</tbody></table>
+<h3>The big-step ⇓ symbol</h3>
+<table>
+<thead>
+<tr>
+<th align="center">Symbol</th>
+<th align="left">Name</th>
+<th align="left">Say it like</th>
+<th align="left">Meaning</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><strong><code>⟨S, σ⟩ ⇓ σ&#39;</code></strong></td>
+<td align="left">big-step judgment</td>
+<td align="left">&quot;S, σ falls to σ&#39;&quot; / &quot;S, σ terminates with σ&#39;&quot;</td>
+<td align="left">Executing S in σ terminates with state σ&#39;.</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>§2. Function properties</h2>
+<table>
+<thead>
+<tr>
+<th align="left">Property</th>
+<th align="left">Symbol/condition</th>
+<th align="left">Say it like</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>Injective</strong></td>
+<td align="left"><code>f(s) = f(s&#39;) ⟹ s = s&#39;</code></td>
+<td align="left">&quot;one-to-one&quot; / &quot;injective&quot;</td>
+</tr>
+<tr>
+<td align="left"><strong>Surjective</strong></td>
+<td align="left"><code>∀t ∈ T, ∃s ∈ S, f(s) = t</code></td>
+<td align="left">&quot;onto&quot; / &quot;surjective&quot;</td>
+</tr>
+<tr>
+<td align="left"><strong>Bijective</strong></td>
+<td align="left">both injective and surjective</td>
+<td align="left">&quot;bijective&quot; / &quot;one-to-one correspondence&quot;</td>
+</tr>
+<tr>
+<td align="left"><strong>Inverse function</strong></td>
+<td align="left"><code>g : T → S</code> with <code>g ∘ f = id_S</code> and <code>f ∘ g = id_T</code></td>
+<td align="left">&quot;g is the inverse of f&quot;</td>
+</tr>
+</tbody></table>
+<p><strong>Theorem 32:</strong> <code>f</code> has an inverse iff <code>f</code> is bijective.</p>
+<hr>
+<h2>§3. Relation properties</h2>
+<table>
+<thead>
+<tr>
+<th align="left">Property</th>
+<th align="left">Definition</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>Reflexive</strong></td>
+<td align="left"><code>∀s, (s, s) ∈ R</code></td>
+</tr>
+<tr>
+<td align="left"><strong>Symmetric</strong></td>
+<td align="left"><code>(s, s&#39;) ∈ R ⟹ (s&#39;, s) ∈ R</code></td>
+</tr>
+<tr>
+<td align="left"><strong>Antisymmetric</strong></td>
+<td align="left"><code>(s, s&#39;) ∈ R ∧ (s&#39;, s) ∈ R ⟹ s = s&#39;</code></td>
+</tr>
+<tr>
+<td align="left"><strong>Transitive</strong></td>
+<td align="left"><code>(s, s&#39;) ∈ R ∧ (s&#39;, s&#39;&#39;) ∈ R ⟹ (s, s&#39;&#39;) ∈ R</code></td>
+</tr>
+</tbody></table>
+<p><strong>Closures:</strong></p>
+<ul>
+<li><em>Reflexive closure</em>: <code>R ∪ id_S</code>.</li>
+<li><em>Transitive closure</em>: smallest transitive relation containing R = <code>⋃ R^n</code> for n ≥ 1.</li>
+<li><em>Reflexive-transitive closure</em>: <code>⋃ R^n</code> for n ≥ 0. This is the <code>⇒*</code> we use everywhere.</li>
+</ul>
+<hr>
+<h2>§4. Countability</h2>
+<p>A set S is:</p>
+<ul>
+<li><strong>Finite</strong> — has a finite number of elements. (Always countable.)</li>
+<li><strong>Countable</strong> — there&#39;s an injection S → ℕ.</li>
+<li><strong>Countably infinite</strong> — countable AND infinite. Cardinality ℵ₀.</li>
+<li><strong>Uncountable</strong> — no injection S → ℕ exists.</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th align="left">Countably infinite (size ℵ₀)</th>
+<th align="left">Uncountable (size 2^ℵ₀)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">ℕ, ℤ, ℚ</td>
+<td align="left">ℝ, ℂ</td>
+</tr>
+<tr>
+<td align="left">Finite subsets of ℕ</td>
+<td align="left">All subsets of ℕ (P(ℕ))</td>
+</tr>
+<tr>
+<td align="left">Strings over a finite alphabet</td>
+<td align="left">Functions ℕ → 𝔹</td>
+</tr>
+<tr>
+<td align="left">All programs in any reasonable language</td>
+<td align="left">Functions ℕ → ℕ</td>
+</tr>
+</tbody></table>
+<p><strong>Useful tool:</strong> Cantor&#39;s diagonal argument shows that <code>Fun(ℕ, X)</code> is uncountable whenever <code>|X| ≥ 2</code>.</p>
+<hr>
+<h2>§5. The 5 big-step rules</h2>
+<h3>Rule 1 — Skip</h3>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">⟨</span><span class="mord text"><span class="mord textbf">skip</span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">σ</span><span class="mclose">⟩</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⇓</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">σ</span></span></span></span></span></p>
+<h3>Rule 2 — Assignment</h3>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">⟨</span><span class="mord mathnormal">x</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">a</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">σ</span><span class="mclose">⟩</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⇓</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">σ</span><span class="mopen">[</span><span class="mord mathnormal">x</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">↦</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathcal">A</span><span class="mopen">(</span><span class="mord mathnormal">a</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">σ</span><span class="mclose">)]</span></span></span></span></span></p>
+<h3>Rule 3 — Composition</h3>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:2.3649em;vertical-align:-0.936em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.4289em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mopen">⟨</span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mpunct">;</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6779em;"><span style="top:-2.989em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">σ</span><span class="mclose">⟩</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⇓</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">σ</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6779em;"><span style="top:-2.989em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′′</span></span></span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mopen">⟨</span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">σ</span><span class="mclose">⟩</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⇓</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">σ</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7519em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:2em;"></span><span class="mopen">⟨</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7519em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">σ</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7519em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mclose">⟩</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⇓</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">σ</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7519em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′′</span></span></span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.936em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></p>
+<h3>Rule 4 — Conditional (two cases)</h3>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:2.3649em;vertical-align:-0.936em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.4289em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mopen">⟨</span><span class="mord text"><span class="mord textbf">if </span></span><span class="mord mathnormal">b</span><span class="mord text"><span class="mord textbf"> then </span></span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mord text"><span class="mord textbf"> else </span></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6779em;"><span style="top:-2.989em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">σ</span><span class="mclose">⟩</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⇓</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">σ</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6779em;"><span style="top:-2.989em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mopen">⟨</span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">σ</span><span class="mclose">⟩</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⇓</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">σ</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7519em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.936em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:1em;"></span><span class="mord mathcal" style="margin-right:0.0304em;">B</span><span class="mopen">(</span><span class="mord mathnormal">b</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">σ</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6349em;"></span><span class="mord"><span class="mord mathbf">tt</span></span></span></span></span></span></p>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:2.3649em;vertical-align:-0.936em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.4289em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mopen">⟨</span><span class="mord text"><span class="mord textbf">if </span></span><span class="mord mathnormal">b</span><span class="mord text"><span class="mord textbf"> then </span></span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mord text"><span class="mord textbf"> else </span></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6779em;"><span style="top:-2.989em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">σ</span><span class="mclose">⟩</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⇓</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">σ</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6779em;"><span style="top:-2.989em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′′</span></span></span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mopen">⟨</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7519em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">σ</span><span class="mclose">⟩</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⇓</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">σ</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7519em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′′</span></span></span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.936em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:1em;"></span><span class="mord mathcal" style="margin-right:0.0304em;">B</span><span class="mopen">(</span><span class="mord mathnormal">b</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">σ</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord"><span class="mord mathbf" style="margin-right:0.109em;">ff</span></span></span></span></span></span></p>
+<h3>Rule 5 — While (two cases)</h3>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:2.3649em;vertical-align:-0.936em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.4289em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mopen">⟨</span><span class="mord text"><span class="mord textbf">while </span></span><span class="mord mathnormal">b</span><span class="mord text"><span class="mord textbf"> do </span></span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">σ</span><span class="mclose">⟩</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⇓</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">σ</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6779em;"><span style="top:-2.989em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′′</span></span></span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mopen">⟨</span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">σ</span><span class="mclose">⟩</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⇓</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">σ</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7519em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:2em;"></span><span class="mopen">⟨</span><span class="mord text"><span class="mord textbf">while </span></span><span class="mord mathnormal">b</span><span class="mord text"><span class="mord textbf"> do </span></span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">σ</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7519em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mclose">⟩</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⇓</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">σ</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7519em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′′</span></span></span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.936em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:1em;"></span><span class="mord mathcal" style="margin-right:0.0304em;">B</span><span class="mopen">(</span><span class="mord mathnormal">b</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">σ</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6349em;"></span><span class="mord"><span class="mord mathbf">tt</span></span></span></span></span></span></p>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">⟨</span><span class="mord text"><span class="mord textbf">while </span></span><span class="mord mathnormal">b</span><span class="mord text"><span class="mord textbf"> do </span></span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">σ</span><span class="mclose">⟩</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⇓</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">σ</span><span class="mspace" style="margin-right:1em;"></span><span class="mord mathcal" style="margin-right:0.0304em;">B</span><span class="mopen">(</span><span class="mord mathnormal">b</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">σ</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord"><span class="mord mathbf" style="margin-right:0.109em;">ff</span></span></span></span></span></span></p>
+<hr>
+<h2>§6. Big-step vs small-step — at a glance</h2>
+<table>
+<thead>
+<tr>
+<th align="left">Aspect</th>
+<th align="left">Small-step (⇒, Ch 2)</th>
+<th align="left">Big-step (⇓, App B)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">What&#39;s tracked</td>
+<td align="left">Each individual transition</td>
+<td align="left">Just the final state</td>
+</tr>
+<tr>
+<td align="left">Reasoning style</td>
+<td align="left">Forward, step-by-step</td>
+<td align="left">Recursive (works &quot;backwards&quot; through loops)</td>
+</tr>
+<tr>
+<td align="left">While loops</td>
+<td align="left">Unfold rule (<code>while-tt</code>) → body; loop</td>
+<td align="left">Recurse on same loop from post-body state</td>
+</tr>
+<tr>
+<td align="left">Step counts</td>
+<td align="left">Available directly</td>
+<td align="left">Lost — only ⇓ gives final state</td>
+</tr>
+<tr>
+<td align="left">Termination</td>
+<td align="left">Trace ends at ⟨skip, σ⟩</td>
+<td align="left">No σ&#39; satisfies ⇓</td>
+</tr>
+<tr>
+<td align="left">Which is easier for proofs</td>
+<td align="left">Determinism, complexity</td>
+<td align="left">Final-state correctness, big invariants</td>
+</tr>
+<tr>
+<td align="left">Equivalence</td>
+<td align="left"><code>⟨S, σ⟩ ⇒* ⟨skip, σ&#39;⟩</code> ⟺ <code>⟨S, σ⟩ ⇓ σ&#39;</code> (Ex 67)</td>
+<td align="left"></td>
+</tr>
+</tbody></table>
+<hr>
+<h2>§7. Proof patterns</h2>
+<h3>Big-step termination via structural induction (Ex 58)</h3>
+<p>To show that all loop-free programs terminate (assignment, skip, if, ;):</p>
+<pre><code>Base cases:
+  - skip:  ⟨skip, σ⟩ ⇓ σ.    (Always works.)
+  - x:=a:  ⟨x:=a, σ⟩ ⇓ σ[x↦A(a,σ)].   (Always works.)
+
+Inductive cases:
+  - S₁; S₂:  By IH, both terminate. Apply ; rule.
+  - if b:   By IH, the chosen branch terminates. Apply if rule.
+  - while:  EXCLUDED by hypothesis.
+</code></pre>
+<h3>Big-step determinism (Ex 65)</h3>
+<p>By structural induction on S, each rule produces a unique σ&#39;.</p>
+<h3>Big-step ⟺ small-step (Ex 67)</h3>
+<p>Forward (⇓ → ⇒<em>): structural induction on big-step derivation.<br>Reverse (⇒</em> → ⇓): induction on length of small-step trace.</p>
+<p>Both work; both are tedious.</p>
+<hr>
+<h2>§8. Common pitfalls</h2>
+<ol>
+<li><p><strong>Confusing ⇓ with ⇒.</strong> ⇓ is BIG-STEP (one judgment per terminating execution). ⇒ is SMALL-STEP (one per transition). Distinct symbols, distinct judgments.</p>
+</li>
+<li><p><strong>Big-step claims about non-terminating programs.</strong> None — ⇓ has no derivation for non-terminating programs. There&#39;s no &quot;diverges&quot; judgment in big-step.</p>
+</li>
+<li><p><strong>The big-step <code>;</code> rule.</strong> Both premises must hold — neither program can run &quot;in parallel&quot; with the other. The post-state of the first IS the pre-state of the second.</p>
+</li>
+<li><p><strong>The big-step <code>while-tt</code> rule.</strong> Requires a derivation of the SAME loop from the post-body state. This is recursive — proofs can be long for high-iteration loops.</p>
+</li>
+<li><p><strong>Confusing dom(f) and the source/target sets.</strong> <code>dom(f) ⊆ S</code> for partial f; not all of S necessarily.</p>
+</li>
+<li><p><strong>Counting transitivity wrong for <code>⇒*</code>.</strong> The reflexive-transitive closure includes 0-step relations: <code>s ⇒* s</code> always. Don&#39;t forget the reflexive part.</p>
+</li>
+</ol>
+<hr>
+<h2>§9. The two-line elevator pitch</h2>
+<blockquote>
+<p><strong>Appendix A</strong> is the math vocabulary the chapters use — functions, partial functions, relations, countability — mostly recap from COMP11120.
+<strong>Appendix B</strong> is the <em>big-step</em> operational semantics: a different way to talk about program execution that goes straight from ⟨S, σ⟩ to the final ⟨σ&#39;⟩, skipping all the intermediate steps. Useful for proofs about <em>what programs compute</em>, complementing chapter 2&#39;s small-step view.</p>
+</blockquote>
