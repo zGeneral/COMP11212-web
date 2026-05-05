@@ -141,15 +141,18 @@ async function applyExample(value) {
   const preEl = document.getElementById('hoare-pre');
   const postEl = document.getElementById('hoare-post');
   const sampEl = document.getElementById('hoare-samples');
+  const editorMod = await import('./editor.js');
   if (preEl)  preEl.value  = entry.pre  || '';
   if (postEl) postEl.value = entry.post || '';
   if (sampEl) {
     sampEl.value =
       entry.samples && Object.keys(entry.samples).length
-        ? JSON.stringify(entry.samples, null, 2)
+        ? editorMod.formatJsonCompact(entry.samples)
         : '';
   }
-  // Trigger the auto-size listener on each programmatically-set textarea.
+  // Fire 'input' so any JS-fallback auto-size listener re-measures after
+  // we've programmatically set the values. Browsers with native
+  // `field-sizing: content` ignore this; both paths converge.
   [preEl, postEl, sampEl].forEach((el) => {
     if (el && el.tagName === 'TEXTAREA') el.dispatchEvent(new Event('input'));
   });

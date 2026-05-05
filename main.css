@@ -362,8 +362,11 @@ body.cheatsheets-page { background: var(--bg); }
   border: 1px solid var(--border);
   border-radius: 4px;
   background: var(--bg);
-  resize: none;
-  overflow: hidden;
+  /* Native auto-grow (Chrome 123+, FF 124+, Safari 17.4+);
+     manual drag-resize still available via the bottom-right handle. */
+  field-sizing: content;
+  resize: vertical;
+  overflow: auto;
 }
 
 .hoare-pane label {
@@ -386,8 +389,9 @@ body.cheatsheets-page { background: var(--bg); }
 }
 .hoare-pane textarea {
   min-height: 28px;
-  resize: none;
-  overflow: hidden;
+  field-sizing: content;
+  resize: vertical;
+  overflow: auto;
 }
 .hoare-pane .hint {
   margin: 8px 0 0;

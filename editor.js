@@ -59,23 +59,60 @@ export function onChange(handler) {
   if (typeof handler === 'function') _changeHandlers.push(handler);
 }
 
-// Auto-size a <textarea> so it grows to fit its content.
-function autoSize(el) {
-  if (!el) return;
-  el.style.height = 'auto';
-  el.style.height = (el.scrollHeight + 2) + 'px';
+// Compact JSON formatter for the state + samples textareas.
+// Produces single-line objects with arrays inline, e.g.
+//   {"m": [0, 50], "n": [1, 10]}
+// Default JSON.stringify(obj, null, 2) puts every array element on its own
+// line which is ugly for these short schemas.
+export function formatJsonCompact(obj) {
+  if (obj === null || obj === undefined) return 'null';
+  if (typeof obj === 'number' || typeof obj === 'boolean') return String(obj);
+  if (typeof obj === 'string') return JSON.stringify(obj);
+  if (Array.isArray(obj)) {
+    return '[' + obj.map(formatJsonCompact).join(', ') + ']';
+  }
+  if (typeof obj === 'object') {
+    const entries = Object.entries(obj)
+      .map(([k, v]) => `${JSON.stringify(k)}: ${formatJsonCompact(v)}`);
+    return '{' + entries.join(', ') + '}';
+  }
+  return JSON.stringify(obj);
 }
 
-// Wire the JSON textareas (#state-input + #hoare-samples) to auto-size on
-// every input event, and size them once at startup. Call from bootstrap.
+// Browsers since 2024 (Chrome 123+, Firefox 124+, Safari 17.4+) support
+// `field-sizing: content` natively — the browser auto-grows the textarea
+// to fit its content with zero JS. We rely on that as the primary mechanism.
+// `wireAutoSize` is now a JS fallback for any browser that doesn't.
+const SUPPORTS_FIELD_SIZING =
+  typeof CSS !== 'undefined' && CSS.supports && CSS.supports('field-sizing', 'content');
+
+function autoSizeFallback(el) {
+  if (!el) return;
+  // Defer to next paint so scrollHeight reflects the just-set value.
+  requestAnimationFrame(() => {
+    const prev = el.style.height;
+    el.style.height = 'auto';
+    const h = el.scrollHeight;
+    if (h > 0) el.style.height = h + 'px';
+    else el.style.height = prev; // hidden / not yet laid out — leave alone
+  });
+}
+
 export function wireAutoSize() {
-  if (typeof document === 'undefined') return;
-  for (const id of ['state-input', 'hoare-samples', 'hoare-pre', 'hoare-post']) {
+  if (typeof document === 'undefined' || SUPPORTS_FIELD_SIZING) return;
+  for (const id of ['state-input', 'hoare-samples']) {
     const el = document.getElementById(id);
     if (!el || el.tagName !== 'TEXTAREA') continue;
-    el.addEventListener('input', () => autoSize(el));
-    autoSize(el);
+    el.addEventListener('input', () => autoSizeFallback(el));
+    autoSizeFallback(el);
   }
+  // Also re-size when a collapsed <details> opens, since scrollHeight is 0
+  // while the textarea is display:none.
+  document.querySelectorAll('details').forEach((d) => {
+    d.addEventListener('toggle', () => {
+      if (d.open) d.querySelectorAll('textarea').forEach(autoSizeFallback);
+    });
+  });
 }
 
 // State input pane (plain <textarea id="state-input">).
@@ -83,8 +120,8 @@ export function setState(stateObj) {
   if (typeof document === 'undefined') return;
   const node = document.getElementById('state-input');
   if (!node) return;
-  node.value = JSON.stringify(stateObj || {}, null, 2);
-  autoSize(node);
+  node.value = formatJsonCompact(stateObj || {});
+  if (!SUPPORTS_FIELD_SIZING) autoSizeFallback(node);
 }
 
 export function getState() {
