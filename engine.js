@@ -130,8 +130,16 @@ export async function runTool({ tool, code, state, samples, pre, post }) {
     }
 
     if (tool === 'hoare') {
-      const schema =
-        samples && Object.keys(samples).length ? samples : { n: [0, 30] };
+      const schema = samples && Object.keys(samples).length ? samples : null;
+      if (!schema) {
+        return {
+          ok: false,
+          error: {
+            kind: 'assertion',
+            message: 'No sample-state schema provided. Add e.g. {"m": [0, 50], "n": [1, 10]}.',
+          },
+        };
+      }
       py.globals.set('_pre', pre || 'True');
       py.globals.set('_post', post || 'True');
       py.globals.set('_schema', schema);

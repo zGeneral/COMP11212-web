@@ -80,14 +80,22 @@ export function getState() {
 }
 
 export function getHoareInputs() {
-  if (typeof document === 'undefined') return { pre: '', post: '', samples: {} };
+  if (typeof document === 'undefined') return { pre: '', post: '', samples: {}, samplesRaw: '', samplesError: null };
   const pre = document.getElementById('hoare-pre')?.value || '';
   const post = document.getElementById('hoare-post')?.value || '';
+  const samplesRaw = document.getElementById('hoare-samples')?.value || '';
   let samples = {};
-  try {
-    samples = JSON.parse(document.getElementById('hoare-samples')?.value || '{}');
-  } catch {
-    /* empty */
+  let samplesError = null;
+  if (samplesRaw.trim()) {
+    try {
+      samples = JSON.parse(samplesRaw);
+      if (!samples || typeof samples !== 'object' || Array.isArray(samples)) {
+        samplesError = 'Schema must be a JSON object like {"m": [0, 50]}, not an array or scalar.';
+        samples = {};
+      }
+    } catch (e) {
+      samplesError = e.message;
+    }
   }
-  return { pre, post, samples };
+  return { pre, post, samples, samplesRaw, samplesError };
 }

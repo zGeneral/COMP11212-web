@@ -128,6 +128,42 @@ async function run() {
   live.state = getState();
   if (live.tool === 'hoare') {
     const h = getHoareInputs();
+
+    // Surface JSON parse errors instead of silently falling back. A
+    // student who types `{m: [0, 50]}` (missing key quotes) deserves to
+    // see "schema is invalid", not a default-schema verification result.
+    if (h.samplesError) {
+      renderResult('hoare', {
+        ok: false,
+        error: {
+          kind: 'assertion',
+          message:
+            'Sample-state schema is not valid JSON: ' + h.samplesError +
+            '. Expected: {"varname": [low, high], ...}\n' +
+            'Example: {"m": [0, 50], "n": [1, 10]}\n' +
+            'Note: keys must be in double quotes; values are [low, high] integer ranges.',
+        },
+      });
+      return;
+    }
+
+    if (!h.samples || !Object.keys(h.samples).length) {
+      // No sample schema at all. Refuse to run instead of silently
+      // using the (now-removed) default — the result would be
+      // misleading because the user couldn't see what got tested.
+      renderResult('hoare', {
+        ok: false,
+        error: {
+          kind: 'assertion',
+          message:
+            'Provide a sample-state schema first.\n' +
+            'Example: {"m": [0, 50], "n": [1, 10]}\n' +
+            'Each variable in your assertions that is part of the input state needs a [low, high] range here.',
+        },
+      });
+      return;
+    }
+
     live.pre = h.pre;
     live.post = h.post;
     live.samples = h.samples;
