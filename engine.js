@@ -9,8 +9,14 @@
 // during the bootstrap.
 
 const PYODIDE_INDEX = '/static/pyodide/';
-const LARK_WHEEL = '/static/wheels/lark-1.3.1-py3-none-any.whl';
 const ENGINE_SOURCE = '/static/while_lang.py';
+
+// micropip requires an absolute http(s) URL; relative paths get parsed as
+// file:// and rejected. Build at runtime from window.location.origin.
+function absoluteUrl(pathFromRoot) {
+  if (typeof location === 'undefined') return pathFromRoot;
+  return location.origin + pathFromRoot;
+}
 
 let _pyodideReady = null;
 
@@ -25,9 +31,10 @@ function ensurePyodide() {
     }
     const py = await loadPyodide({ indexURL: PYODIDE_INDEX });
     await py.loadPackage('micropip');
+    const larkUrl = absoluteUrl('/static/wheels/lark-1.3.1-py3-none-any.whl');
     await py.runPythonAsync(`
       import micropip
-      await micropip.install('${LARK_WHEEL}')
+      await micropip.install('${larkUrl}')
     `);
     const src = await fetch(ENGINE_SOURCE).then((r) => {
       if (!r.ok) throw new Error(`failed to fetch ${ENGINE_SOURCE}: ${r.status}`);
