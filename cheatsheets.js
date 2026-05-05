@@ -23,9 +23,10 @@ export async function renderCheatsheet(slug) {
   try {
     const html = await loadSheet(slug);
     body.innerHTML = html;
-    // scroll back to top of body so each sheet starts at the top
+    // Reset the body's own scroll position, but do NOT touch window scroll.
+    // The user clicked a tab — they expect the page to swap content in place,
+    // not to scroll under them.
     body.scrollTop = 0;
-    if (typeof window !== 'undefined') window.scrollTo({ top: body.offsetTop - 100, behavior: 'smooth' });
   } catch (e) {
     body.innerHTML =
       `<div class="error-block kind-load"><h3>Cheatsheet failed to load</h3><p>${String(e && e.message || e)}</p></div>`;

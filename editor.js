@@ -14,6 +14,8 @@
 
 let _view = null;
 let _currentTheme = 'two-tone';
+let _pendingTheme = null;
+let _appliedTheme = null;
 const _changeHandlers = [];
 
 function getMount() {
@@ -35,10 +37,35 @@ function ensureView(initial = '') {
   return _view;
 }
 
+function isPlaygroundVisible() {
+  if (typeof document === 'undefined') return false;
+  const view = document.getElementById('playground-view');
+  return !!(view && !view.hidden);
+}
+
 export function setEditorTheme(themeName) {
   _currentTheme = themeName;
+  if (!_view || !window.CMEditor || !window.CMEditor.setTheme) return;
+  // CodeMirror's reconfigure dispatch can trigger a layout pass that ends up
+  // scrolling the window when the editor is in a `display: none` subtree
+  // (e.g., the user is currently on the Cheatsheets tab). Defer until the
+  // playground is visible again.
+  if (!isPlaygroundVisible()) {
+    _pendingTheme = themeName;
+    return;
+  }
+  window.CMEditor.setTheme(_view, themeName);
+  _appliedTheme = themeName;
+  _pendingTheme = null;
+}
+
+export function flushPendingTheme() {
+  if (!_pendingTheme) return;
+  if (_pendingTheme === _appliedTheme) { _pendingTheme = null; return; }
   if (_view && window.CMEditor && window.CMEditor.setTheme) {
-    window.CMEditor.setTheme(_view, themeName);
+    window.CMEditor.setTheme(_view, _pendingTheme);
+    _appliedTheme = _pendingTheme;
+    _pendingTheme = null;
   }
 }
 

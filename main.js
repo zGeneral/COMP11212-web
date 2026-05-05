@@ -10,6 +10,7 @@ import {
   getState,
   getHoareInputs,
   setEditorTheme,
+  flushPendingTheme,
 } from './editor.js';
 import { renderResult, showLoading, showEngineLoading } from './trace_pane.js';
 import { setupToolbar } from './toolbar.js';
@@ -167,7 +168,7 @@ function shareCurrent() {
 
 let _currentTab = 'playground';
 
-function showTab(tab) {
+function showTab(tab, opts = {}) {
   _currentTab = tab;
   const playgroundView = document.getElementById('playground-view');
   const cheatsheetsView = document.getElementById('cheatsheets-view');
@@ -179,6 +180,15 @@ function showTab(tab) {
     b.setAttribute('aria-selected', isActive ? 'true' : 'false');
   });
   if (typeof document !== 'undefined') document.body.setAttribute('data-tab', tab);
+
+  // Switching tabs should land the user at the top of the new view, not
+  // dump them at whatever scroll position the previous view used.
+  if (opts.scroll !== false && typeof window !== 'undefined') {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+  }
+
+  // Apply any theme that was queued while the playground was hidden.
+  if (tab === 'playground') flushPendingTheme();
 }
 
 function updateUrlTab(tab, sheet) {
@@ -208,8 +218,10 @@ export function bootstrap() {
 
   const initial = parseUrl(typeof location !== 'undefined' ? location : { search: '', hash: '' });
 
-  // Tab routing.
-  showTab(initial.tab);
+  // Tab routing. Initial tab change (on bootstrap) does NOT scroll — we
+  // honour any deep-link the user arrived with. User-initiated tab clicks
+  // DO scroll back to the top of the new view.
+  showTab(initial.tab, { scroll: false });
   document.querySelectorAll('[data-tab]').forEach((btn) => {
     btn.addEventListener('click', () => {
       const tab = btn.getAttribute('data-tab');
