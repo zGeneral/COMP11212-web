@@ -1,8 +1,16 @@
 # while.hassiba.cc
 
-A formal-semantics playground for the **While** language from Manchester COMP11212 (Fundamentals of Computation, Part 2).
+A formal-semantics playground for the **While** language used in COMP11212 ("Fundamentals of Computation, Part 2") at the **University of Manchester**.
 
-> **Unofficial student companion.** Built by Kamal Hassiba, a first-year UoM CS student. Not affiliated with, endorsed by, or maintained by the University of Manchester or the COMP11212 course staff.
+> ⚠️ **Unofficial student companion. Not affiliated with the University of Manchester.**
+>
+> Built by **Kamal Hassiba**, an enrolled COMP11212 student, as a personal study aid made freely available to peers. **Not endorsed by, sponsored by, or maintained by** the University of Manchester, the School of Computer Science, the COMP11212 teaching staff, Andrea Schalk (current course author), Giles Reger, Gareth Henshall, or Dave Lester (prior contributors).
+>
+> The COMP11212 course material — chapter notes, exercise text, problem prompts, official solutions, slides, lectures — **is © The University of Manchester** and is **NOT redistributed here**. References like "Example 7" or "Exercise 14" appear in the playground only as **navigation labels** so students can find the matching playground entry quickly. The program bodies behind those labels are the author's own implementations of textbook CS classics (gcd, division, factorial, etc.); the algorithms themselves are not original to UoM. Students should refer to the official UoM course materials for the exercise prompts and explanatory prose.
+>
+> See [NOTICE](NOTICE) for the full attribution, scope, and contact information for UoM staff who wish to raise concerns.
+
+**Use:** free, MIT-licensed (see [LICENSE](LICENSE)). Open it, run it, copy it, fork it, host it yourself, change "while.hassiba.cc" to your own domain — fine.
 
 ## What it does
 
@@ -72,6 +80,13 @@ https://while.hassiba.cc/[?tool=trace|hoare|count][&state=...][&samples=...][&pr
 v1 in active development. Track v1.5+ work in [TODOS.md](TODOS.md).
 Design doc lives at `~/.gstack/projects/COMP11212/kamal-master-design-20260505-111355.md`.
 
-## License
+## License & attribution
 
-MIT. See [LICENSE](LICENSE).
+MIT. See [LICENSE](LICENSE) and [NOTICE](NOTICE).
+
+In short:
+- The webapp code, the trace renderer, the URL schema, the Docker config, the tests, and `static/while_lang.py` (vendored from the author's MIT-licensed companion notebooks repo): © 2026 Kamal Hassiba, MIT.
+- The reference labels ("Example 7", "Exercise 14", chapter groupings) point at material in the official UoM COMP11212 course, which is © The University of Manchester. None of that material is redistributed here. The playground only stores program bodies (the author's own implementations of textbook CS algorithms), navigation labels, and one-line blurbs.
+- Pyodide (MPL 2.0), lark (MIT), lz-string (MIT) — see NOTICE.
+
+UoM staff with concerns about the attribution language, the labels, or the project as a whole: please open an issue at https://github.com/zGeneral/COMP11212-web/issues or email me directly. I will respond promptly and am willing to revise wording, remove specific references, or take the project down on request.

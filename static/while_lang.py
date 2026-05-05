@@ -1,8 +1,17 @@
 """
-while_lang.py — an interpreter for the While language from COMP11212.
+while_lang.py — an interpreter for the While language used in COMP11212
+                ("Fundamentals of Computation, Part 2"), University of
+                Manchester.
 
-Copyright (c) 2026 Kamal Hassiba
+Copyright (c) 2026 Kamal Hassiba.
 Licensed under the MIT License. See LICENSE in the repository root.
+
+UNOFFICIAL student companion. Not affiliated with, endorsed by, or
+maintained by the University of Manchester or its course staff. The While
+language and the COMP11212 module are taught at UoM; the chapter notes,
+exercise text, and official solutions are © The University of Manchester
+and are NOT redistributed by this project. This file is the author's OWN
+implementation of the language's operational semantics.
 
 This module IS the executable definition of the operational semantics.
 The trace printer's output renders the formal small-step semantics

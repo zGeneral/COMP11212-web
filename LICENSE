@@ -24,3 +24,7 @@ SOFTWARE.
 
 This project vendors `static/while_lang.py` from
 https://github.com/zGeneral/COMP11212 (also MIT-licensed by the same author).
+
+See the `NOTICE` file for attribution to the source course material
+(University of Manchester COMP11212), the unofficial-companion disclaimer,
+and the licenses of bundled third-party software (Pyodide, lark, lz-string).

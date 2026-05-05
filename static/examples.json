@@ -1,4 +1,12 @@
 {
+  "attribution": {
+    "project": "while.hassiba.cc — unofficial student-built companion to UoM COMP11212",
+    "author": "Kamal Hassiba",
+    "license": "MIT (see LICENSE; see NOTICE for third-party attribution)",
+    "course_material": "Reference labels like 'Example 7' or 'Exercise 14' point at material in the University of Manchester COMP11212 course, which is © The University of Manchester. The course material itself is NOT redistributed here. Program bodies in this catalogue are the author's own implementations of textbook CS algorithms. See NOTICE for full attribution and contact details for UoM staff.",
+    "not_affiliated_with": "The University of Manchester, the School of Computer Science, the COMP11212 teaching staff, Andrea Schalk, Giles Reger, Gareth Henshall, or Dave Lester.",
+    "notice_url": "https://github.com/zGeneral/COMP11212-web/blob/master/NOTICE"
+  },
   "chapters": [
     {
       "label": "Chapter 1 — Syntax",

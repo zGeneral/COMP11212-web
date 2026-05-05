@@ -40,6 +40,13 @@ a:hover { color: var(--accent-hover); }
   border-bottom: 1px solid var(--border);
   background: var(--bg-card);
 }
+.page-header .header-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
 .page-header h1 {
   margin: 0;
   font-size: 22px;
@@ -47,6 +54,16 @@ a:hover { color: var(--accent-hover); }
   font-family: var(--code-font);
 }
 .page-header h1 a { color: var(--fg); text-decoration: none; }
+.page-header .header-disclaimer {
+  font-size: 12px;
+  color: var(--fg-faint);
+}
+.page-header .header-disclaimer abbr {
+  text-decoration: none;
+  border-bottom: 1px dotted var(--fg-faint);
+  cursor: help;
+}
+.page-header .header-disclaimer a { color: var(--accent); }
 .page-header .tagline {
   margin: 4px 0 0;
   color: var(--fg-muted);
@@ -322,10 +339,20 @@ table.hoare th {
 .page-footer {
   padding: 16px 24px;
   text-align: center;
-  font-size: 13px;
-  color: var(--fg-muted);
   border-top: 1px solid var(--border);
   background: var(--bg-card);
+}
+.page-footer .footer-line {
+  margin: 0 0 8px;
+  font-size: 13px;
+  color: var(--fg-muted);
+}
+.page-footer .footer-disclaimer {
+  margin: 0 auto;
+  max-width: 760px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--fg-faint);
 }
 .page-footer a { color: var(--accent); }
 
