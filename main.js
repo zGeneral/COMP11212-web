@@ -7,15 +7,12 @@ import { setEditor, getEditor, setState, getState, getHoareInputs } from './edit
 import { renderResult, showLoading, showEngineLoading } from './trace_pane.js';
 import { setupToolbar } from './toolbar.js';
 
-// Default starter program — sum 1..n. Loaded when the page is opened bare.
-const STARTER_CODE = `result := 0;
-i := 1;
-while i <= n do (
-  result := result + i;
-  i := i + 1
-)`;
+// Default starter program — tiny. The job of the first paint is "oh, that's
+// all?" not "whoa, complicated." Real programs live behind the Try-this buttons.
+const STARTER_CODE = `x := 5;
+y := x + 2`;
 
-const STARTER_STATE = { n: 10 };
+const STARTER_STATE = {};
 
 export function parseUrl(loc) {
   const params = new URLSearchParams(loc.search || '');
