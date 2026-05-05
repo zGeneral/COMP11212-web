@@ -12,6 +12,8 @@
   <script src="/static/pyodide/pyodide.js"></script>
   <!-- lz-string for shareable URLs (vendored as a static asset). -->
   <script src="/static/lz-string.min.js"></script>
+  <!-- CodeMirror 6 editor (bundled via esbuild). -->
+  <script src="/static/editor-bundle.js"></script>
 </head>
 <body>
 
@@ -38,7 +40,7 @@
           </select>
         </div>
       </div>
-      <textarea id="editor" spellcheck="false" autocomplete="off" autocapitalize="off"></textarea>
+      <div id="editor-mount" class="editor-mount" aria-label="While program editor"></div>
 
       <details class="state-pane" open>
         <summary>Initial state (JSON)</summary>

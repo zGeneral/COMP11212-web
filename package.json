@@ -11,10 +11,18 @@
     "test:e2e": "playwright test",
     "test:all": "npm test && npm run test:e2e",
     "sync-engine": "node scripts/sync-engine.mjs",
-    "fetch-pyodide-dev": "node scripts/fetch-pyodide-dev.mjs"
+    "fetch-pyodide-dev": "node scripts/fetch-pyodide-dev.mjs",
+    "build:editor": "node scripts/build-editor.mjs"
   },
   "devDependencies": {
+    "@codemirror/commands": "^6.10.3",
+    "@codemirror/language": "^6.12.3",
+    "@codemirror/search": "^6.7.0",
+    "@codemirror/state": "^6.6.0",
+    "@codemirror/view": "^6.41.1",
+    "@lezer/highlight": "^1.2.3",
     "@playwright/test": "^1.49.0",
+    "esbuild": "^0.28.0",
     "vitest": "^2.1.0"
   },
   "engines": {

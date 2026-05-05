@@ -21,7 +21,7 @@ describe('renderTraceText', () => {
   const { renderTraceText } = _internal;
   it('renders a short trace inline', () => {
     const out = renderTraceText('line1\nline2');
-    expect(out).toContain('<pre class="trace">line1\nline2</pre>');
+    expect(out).toMatch(/<pre class="trace">.*line1.*line2.*<\/pre>/s);
     expect(out).not.toContain('<details');
   });
 
@@ -35,8 +35,70 @@ describe('renderTraceText', () => {
 
   it('escapes HTML in the trace', () => {
     const out = renderTraceText('<script>x</script>');
-    expect(out).toContain('&lt;script&gt;');
-    expect(out).not.toContain('<script>x</script>');
+    // After tokenisation the literal angle brackets are escaped; the raw
+    // <script> tag never reaches the DOM. Tokens within may add their own spans.
+    expect(out).toContain('&lt;');
+    expect(out).toContain('&gt;');
+    expect(out).not.toMatch(/<script[^"]*>x<\/script>/);
+  });
+});
+
+describe('paintTokens', () => {
+  const { paintTokens } = _internal;
+  it('classifies keywords with tw-kw', () => {
+    const out = paintTokens('while i <= n do');
+    expect(out).toContain('<span class="tw-kw">while</span>');
+    expect(out).toContain('<span class="tw-kw">do</span>');
+  });
+  it('classifies := as tw-arrow', () => {
+    const out = paintTokens('x := 5');
+    expect(out).toContain('<span class="tw-arrow">:=</span>');
+  });
+  it('classifies numbers with tw-num', () => {
+    const out = paintTokens('x := 42');
+    expect(out).toContain('<span class="tw-num">42</span>');
+  });
+  it('classifies variables with tw-var', () => {
+    const out = paintTokens('result + i');
+    expect(out).toContain('<span class="tw-var">result</span>');
+    expect(out).toContain('<span class="tw-var">i</span>');
+  });
+  it('classifies ⟨ ⟩ as tw-bracket', () => {
+    const out = paintTokens('⟨skip, σ⟩');
+    expect(out).toContain('<span class="tw-bracket">⟨</span>');
+    expect(out).toContain('<span class="tw-bracket">⟩</span>');
+  });
+  it('escapes raw HTML inside tokens', () => {
+    const out = paintTokens('<x>');
+    // < is not a While token; falls through to escaped raw.
+    expect(out).toContain('&lt;');
+    expect(out).not.toContain('<x>');
+  });
+});
+
+describe('paintLine', () => {
+  const { paintLine } = _internal;
+  it('paints the rule label distinctly', () => {
+    const out = paintLine('  ⇒  ⟨skip, {x ↦ 1}⟩    [:=]');
+    expect(out).toContain('<span class="tw-rule-name">:=</span>');
+    expect(out).toContain('<span class="tw-arrow">⇒</span>');
+  });
+});
+
+describe('paintTrace', () => {
+  const { paintTrace } = _internal;
+  it('marks the legend header', () => {
+    const trace = `Where:\n  L1 := while i ≤ n do (skip)\n\n⟨L1, {}⟩`;
+    const out = paintTrace(trace);
+    expect(out).toContain('<span class="tw-legend-header">Where:</span>');
+    expect(out).toContain('class="tw-legend"');
+  });
+  it('paints normal trace lines', () => {
+    const trace = `⟨x := 1, {}⟩\n  ⇒  ⟨skip, {x ↦ 1}⟩    [:=]`;
+    const out = paintTrace(trace);
+    expect(out).toContain('<span class="tw-bracket">⟨</span>');
+    expect(out).toContain('<span class="tw-rule-name">:=</span>');
+    expect(out).toContain('<span class="tw-num">1</span>');
   });
 });
 

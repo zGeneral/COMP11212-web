@@ -16,6 +16,174 @@ function escapeHtml(s) {
     .replace(/'/g, '&#39;');
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Trace tokenizer — paints a formal trace line into syntax-highlighted spans.
+//
+// Trace shape (from while_lang.py's _render_formal):
+//
+//   Where:
+//     L1 := while i ≤ n do (...)
+//
+//   ⟨S, σ⟩
+//     ⇒  ⟨S', σ'⟩    [rule]
+//     ⇒  ⟨S'', σ''⟩    [rule]
+//
+// Strategy: per-line classifier (legend / config / transition / blank), then
+// inside any While-source or σ-state region, run a small token regex.
+
+const KEYWORDS = new Set([
+  'while', 'do', 'if', 'then', 'else', 'skip',
+]);
+const ATOMS = new Set(['tt', 'ff']);
+
+// Token regex: alternation of patterns. Order matters.
+//   1. unicode operators (≤ ¬ ∧ ↦ ×) and ASCII ops (:= = + − -)
+//   2. keywords / atoms
+//   3. numbers
+//   4. variable names
+//   5. punctuation
+//   6. anything else (fallback)
+const TOKEN_RE = new RegExp(
+  '(' +
+    [
+      ':=',
+      '↦',
+      '≤',
+      '¬',
+      '∧',
+      '⇒',
+      '×',
+      '−',
+      '[+\\-*/=]',
+      '\\b(?:while|do|if|then|else|skip|tt|ff)\\b',
+      '\\d+',
+      '[A-Za-z_][A-Za-z0-9_]*',
+      '[\\[\\]()\\{\\},;]',
+      '\\s+',
+      '.',
+    ].join('|') +
+  ')',
+  'g'
+);
+
+function classifyToken(tok) {
+  if (!tok) return null;
+  if (/^\s+$/.test(tok)) return null;                            // whitespace
+  if (KEYWORDS.has(tok)) return 'tw-kw';
+  if (ATOMS.has(tok)) return 'tw-atom';
+  if (/^\d+$/.test(tok)) return 'tw-num';
+  if (tok === ':=' || tok === '↦' || tok === '⇒') return 'tw-arrow';
+  if (tok === '≤' || tok === '¬' || tok === '∧' || tok === '×' ||
+      tok === '−' || /^[+\-*/=]$/.test(tok)) return 'tw-op';
+  if (tok === '⟨' || tok === '⟩') return 'tw-bracket';
+  if (tok === '{' || tok === '}') return 'tw-state-brace';
+  if (tok === '(' || tok === ')' || tok === '[' || tok === ']') return 'tw-paren';
+  if (tok === ',' || tok === ';') return 'tw-punct';
+  if (/^[A-Za-z_][A-Za-z0-9_]*$/.test(tok)) return 'tw-var';
+  return null;
+}
+
+// Highlight a generic snippet of While source / σ-state text.
+function paintTokens(text) {
+  if (!text) return '';
+  let out = '';
+  // Custom ⟨ ⟩ handling because they're outside the regex.
+  // We'll iterate char-by-char for ⟨ and ⟩ but otherwise let the regex run.
+  // Simpler: pre-replace ⟨ and ⟩ so they fall through to the fallback case.
+  // Actually we add them to the regex as a single-char alternative below.
+  text.replace(/⟨|⟩|./gsu, (chunk) => {
+    if (chunk === '⟨' || chunk === '⟩') {
+      out += `<span class="tw-bracket">${chunk}</span>`;
+      return '';
+    }
+    return '';
+  });
+  // The above doesn't actually do what we need. Let's run the proper regex:
+  out = '';
+  TOKEN_RE.lastIndex = 0;
+  let last = 0;
+  // Custom split: walk char by char to extract ⟨/⟩, then run regex on rest.
+  const parts = [];
+  let buf = '';
+  for (const ch of text) {
+    if (ch === '⟨' || ch === '⟩') {
+      if (buf) { parts.push({ kind: 'span', text: buf }); buf = ''; }
+      parts.push({ kind: 'bracket', text: ch });
+    } else {
+      buf += ch;
+    }
+  }
+  if (buf) parts.push({ kind: 'span', text: buf });
+
+  for (const p of parts) {
+    if (p.kind === 'bracket') {
+      out += `<span class="tw-bracket">${p.text}</span>`;
+      continue;
+    }
+    TOKEN_RE.lastIndex = 0;
+    let m;
+    let cursor = 0;
+    while ((m = TOKEN_RE.exec(p.text)) !== null) {
+      // emit gap (none expected since regex covers everything, but defensive)
+      if (m.index > cursor) {
+        out += escapeHtml(p.text.slice(cursor, m.index));
+      }
+      const tok = m[0];
+      const cls = classifyToken(tok);
+      if (cls) {
+        out += `<span class="${cls}">${escapeHtml(tok)}</span>`;
+      } else {
+        out += escapeHtml(tok);
+      }
+      cursor = m.index + tok.length;
+    }
+    if (cursor < p.text.length) {
+      out += escapeHtml(p.text.slice(cursor));
+    }
+  }
+  return out;
+}
+
+// Highlight a single trace line, distinguishing the rule-label suffix.
+function paintLine(line) {
+  // Match optional "  ⇒  " prefix and trailing "    [rule]"
+  // and paint rule labels distinctly.
+  const ruleMatch = line.match(/^(.*?)(\s+\[([^\]]+)\])\s*$/);
+  if (ruleMatch) {
+    const body = paintTokens(ruleMatch[1]);
+    const ruleName = escapeHtml(ruleMatch[3]);
+    return `${body}<span class="tw-rule">  [<span class="tw-rule-name">${ruleName}</span>]</span>`;
+  }
+  return paintTokens(line);
+}
+
+// Given the full multi-line trace string, classify each line and emit HTML.
+function paintTrace(text) {
+  const lines = String(text).split('\n');
+  const out = [];
+  let inLegend = false;
+  for (const line of lines) {
+    if (line === 'Where:') {
+      inLegend = true;
+      out.push(`<span class="tw-legend-header">${escapeHtml(line)}</span>`);
+      continue;
+    }
+    if (line.trim() === '' && inLegend) {
+      inLegend = false;
+      out.push('');
+      continue;
+    }
+    if (inLegend) {
+      // legend lines look like:  L1 := while i ≤ n do (...)
+      out.push(`<span class="tw-legend">${paintTokens(line)}</span>`);
+      continue;
+    }
+    if (line.trim() === '') { out.push(''); continue; }
+    out.push(paintLine(line));
+  }
+  return out.join('\n');
+}
+
 function getPane() {
   if (typeof document === 'undefined') return null;
   return document.getElementById('result-pane');
@@ -40,14 +208,14 @@ export function showEngineLoading() {
 function renderTraceText(text) {
   const lines = String(text).split('\n');
   if (lines.length <= DISPLAY_CAP) {
-    return `<pre class="trace">${escapeHtml(text)}</pre>`;
+    return `<pre class="trace">${paintTrace(text)}</pre>`;
   }
   const head = lines.slice(0, DISPLAY_CAP).join('\n');
   const total = lines.length;
   return (
-    `<pre class="trace">${escapeHtml(head)}</pre>` +
+    `<pre class="trace">${paintTrace(head)}</pre>` +
     `<details class="show-all"><summary>Show all ${total} lines</summary>` +
-    `<pre class="trace full">${escapeHtml(text)}</pre></details>`
+    `<pre class="trace full">${paintTrace(text)}</pre></details>`
   );
 }
 
@@ -153,4 +321,4 @@ export function renderResult(tool, envelope) {
 }
 
 // Exposed for unit testing
-export const _internal = { renderTraceText, renderCount, renderHoare, renderError, escapeHtml };
+export const _internal = { renderTraceText, renderCount, renderHoare, renderError, escapeHtml, paintTrace, paintTokens, paintLine };

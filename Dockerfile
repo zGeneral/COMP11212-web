@@ -16,7 +16,17 @@ RUN curl -fsSL -o pyodide.tar.bz2 \
  && rm pyodide.tar.bz2 \
  && mv pyodide /pyodide-bundle
 
-# ---- Stage 2: final image ----
+# ---- Stage 2: bundle the CodeMirror editor ----
+FROM node:20-alpine AS editor-build
+WORKDIR /build
+COPY package.json package-lock.json ./
+RUN npm ci --include=dev
+COPY scripts/editor-entry.js scripts/build-editor.mjs ./scripts/
+COPY static ./static
+RUN npm run build:editor
+# Result: /build/static/editor-bundle.js (rebuilt fresh).
+
+# ---- Stage 3: final image ----
 FROM nginx:alpine
 WORKDIR /usr/share/nginx/html
 
@@ -24,10 +34,14 @@ WORKDIR /usr/share/nginx/html
 COPY index.html main.js engine.js editor.js trace_pane.js toolbar.js main.css embed.css ./
 COPY static/while_lang.py ./static/
 COPY static/lz-string.min.js ./static/
+COPY static/examples.json ./static/
 COPY static/wheels ./static/wheels
 
 # Drop the Pyodide bundle in.
 COPY --from=pyodide-fetch /pyodide-bundle ./static/pyodide
+
+# Drop the freshly-built CodeMirror bundle in.
+COPY --from=editor-build /build/static/editor-bundle.js ./static/editor-bundle.js
 
 # Replace the default nginx config.
 COPY nginx.conf /etc/nginx/conf.d/default.conf

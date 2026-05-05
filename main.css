@@ -122,22 +122,21 @@ a:hover { color: var(--accent-hover); }
 #examples-select:hover { border-color: var(--border-strong); }
 #examples-select:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
 
-#editor {
+/* CodeMirror 6 mount: gives the editor a fixed visible area + scroll. */
+.editor-mount {
   flex: 1 1 240px;
-  width: 100%;
   min-height: 240px;
-  border: none;
-  resize: vertical;
-  font-family: var(--code-font);
-  font-size: 14px;
-  line-height: 1.5;
-  padding: 12px;
+  width: 100%;
   background: var(--bg-card);
-  color: var(--fg);
+  overflow: hidden;
+  border: none;
+  position: relative;
+}
+.editor-mount .cm-editor {
+  height: 100%;
+}
+.editor-mount .cm-editor.cm-focused {
   outline: none;
-  white-space: pre;
-  overflow-wrap: normal;
-  overflow-x: auto;
 }
 
 .state-pane,
@@ -255,6 +254,22 @@ body.tool-hoare .hoare-pane { display: block; }
   color: var(--fg);
   overflow-x: auto;
 }
+
+/* Syntax-highlight tokens inside the trace */
+.tw-bracket   { color: #888; }
+.tw-state-brace { color: #5e35b1; font-weight: 500; }
+.tw-paren     { color: #888; }
+.tw-punct     { color: #888; }
+.tw-kw        { color: #1565c0; font-weight: 600; }
+.tw-atom      { color: #5e35b1; font-weight: 600; }
+.tw-num       { color: #00838f; }
+.tw-var       { color: #1a1a1a; font-style: italic; }
+.tw-op        { color: #b85c00; }
+.tw-arrow     { color: #d32f2f; font-weight: 600; }
+.tw-rule      { color: #888; font-style: italic; font-size: 0.9em; }
+.tw-rule-name { color: #2e7d32; font-weight: 600; font-style: normal; }
+.tw-legend-header { color: var(--fg-muted); font-weight: 600; }
+.tw-legend    { color: var(--fg-muted); }
 
 .show-all { margin-top: 16px; }
 .show-all summary {

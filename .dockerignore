@@ -7,12 +7,12 @@ test-results
 *.log
 README.md
 TODOS.md
-package-lock.json
-package.json
 playwright.config.js
 vitest.config.js
-scripts
 .gitignore
 .dockerignore
 .env
 .env.local
+NOTICE
+LICENSE
+# package.json + scripts/ ARE needed by the editor-build stage; do NOT exclude.
