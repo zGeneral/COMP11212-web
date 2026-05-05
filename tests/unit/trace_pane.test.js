@@ -188,12 +188,20 @@ describe('parseTableText / renderTableHtml — table mode', () => {
     expect(p.rows[3].cells).toEqual(['3', ':=', '5', '7']);
   });
 
-  it('renders an HTML table with sticky header (table mode)', () => {
+  it('renders an HTML table with the No. + rule + vars + steps headers', () => {
     const html = renderTableHtml(sample, 'table', {});
     expect(html).toContain('<table class="trace-table">');
-    expect(html).toContain('<th>step</th>');
+    expect(html).toContain('<th>No.</th>');
     expect(html).toContain('<th>rule</th>');
     expect(html).toContain('<th>x</th>');
+    expect(html).toContain('<th class="tt-steps-th">steps</th>');
+    expect(html).not.toContain('<th>step</th>');
+  });
+
+  it('cumulates the steps column on counted rules and shows — for admin rules', () => {
+    const html = renderTableHtml(sample, 'table', {});
+    // sample has start, :=, skip-;, := → counted: 0, 1, 1, 2 → cells: —, 1, —, 2
+    expect(html).toMatch(/<td class="tt-steps">—<\/td>[\s\S]*<td class="tt-steps">1<\/td>[\s\S]*<td class="tt-steps">—<\/td>[\s\S]*<td class="tt-steps">2<\/td>/);
   });
 
   it('marks an increase as tt-up', () => {

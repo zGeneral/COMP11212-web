@@ -317,6 +317,10 @@ function filterLoopSnapshots(parsed) {
   return out;
 }
 
+// Rules that count toward the chapter's "step count" (§3.1.4):
+// assignments and boolean checks. Admin rules (skip-;) do not count.
+const COUNTED_RULES = new Set([':=', 'if-tt', 'if-ff', 'while-tt', 'while-ff']);
+
 // Mode-aware render: returns the inner HTML for the result pane.
 function renderTableHtml(text, mode = 'table', initialState = {}) {
   const parsed = parseTableText(text);
@@ -332,37 +336,50 @@ function renderTableHtml(text, mode = 'table', initialState = {}) {
     filtered = parsed.rows;
   }
 
-  // Decide which header columns to emit for THIS mode.
-  // mode='table': step + rule + columns (existing behaviour).
-  // mode='state-trace' / 'loops': No. + columns (drop rule).
+  // mode='table'        : No. + rule + vars + steps  (with the cumulative
+  //                        step count in the trailing column; matches the
+  //                        Count Steps tool's final number)
+  // mode='state-trace' /
+  // mode='loops'        : No. + vars   (no rule, no steps column)
   const showRule = mode === 'table';
-  const stepLabel = mode === 'table' ? 'step' : 'No.';
+  const showSteps = mode === 'table';
 
   let html = '<table class="trace-table"><thead><tr>';
-  html += `<th>${escapeHtml(stepLabel)}</th>`;
+  html += '<th>No.</th>';
   if (showRule) html += '<th>rule</th>';
   for (const col of columns) html += `<th>${escapeHtml(col)}</th>`;
+  if (showSteps) html += '<th class="tt-steps-th">steps</th>';
   html += '</tr></thead><tbody>';
 
   let prevValues = null;
   let displayIdx = 0;
+  let cumulativeSteps = 0;
+
   for (const row of filtered) {
     if (row.truncated) {
-      const span = 1 + (showRule ? 1 : 0) + columns.length;
+      const span = 1 + (showRule ? 1 : 0) + columns.length + (showSteps ? 1 : 0);
       html += `<tr class="truncated"><td colspan="${span}">${escapeHtml(row.truncated)}</td></tr>`;
       continue;
     }
-    const stepNum = mode === 'table'
-      ? row.cells[parsed.header.indexOf('step')]
-      : String(displayIdx);
     const rule = parsed.header.indexOf('rule') >= 0
       ? row.cells[parsed.header.indexOf('rule')]
       : '';
 
     const valueRow = columns.map((col) => valueForCol(parsed.header, row, col, initialState));
 
+    // Cumulative step count for the trailing column.
+    let stepsCell = '';
+    if (showSteps) {
+      if (COUNTED_RULES.has(rule)) {
+        cumulativeSteps += 1;
+        stepsCell = String(cumulativeSteps);
+      } else {
+        stepsCell = '—';
+      }
+    }
+
     html += '<tr>';
-    html += `<td class="tt-step">${escapeHtml(stepNum)}</td>`;
+    html += `<td class="tt-step">${escapeHtml(String(displayIdx))}</td>`;
     if (showRule) html += `<td class="tt-rule">${escapeHtml(rule)}</td>`;
     for (let i = 0; i < columns.length; i++) {
       const value = valueRow[i];
@@ -374,6 +391,7 @@ function renderTableHtml(text, mode = 'table', initialState = {}) {
       if (dir === 'na' && prev !== undefined && prev !== value) cls += ' tt-changed';
       html += `<td class="${cls}">${escapeHtml(value)}</td>`;
     }
+    if (showSteps) html += `<td class="tt-steps">${escapeHtml(stepsCell)}</td>`;
     html += '</tr>';
 
     prevValues = valueRow;

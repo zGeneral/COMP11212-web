@@ -498,9 +498,21 @@ table.trace-table tbody td {
   border-bottom: 1px solid var(--border);
   white-space: nowrap;
 }
-table.trace-table .tt-step { color: var(--fg-faint); text-align: right; }
-table.trace-table .tt-rule { color: var(--fg-muted); font-style: italic; }
-table.trace-table .tt-val  { font-variant-numeric: tabular-nums; }
+table.trace-table .tt-step  { color: var(--fg-faint); text-align: right; font-variant-numeric: tabular-nums; }
+table.trace-table .tt-rule  { color: var(--fg-muted); font-style: italic; }
+table.trace-table .tt-val   { font-variant-numeric: tabular-nums; }
+table.trace-table .tt-steps {
+  color: var(--fg-muted);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  border-left: 1px dashed var(--border);
+  padding-left: 14px;
+}
+table.trace-table .tt-steps-th {
+  border-left: 1px dashed var(--border);
+  padding-left: 14px;
+  text-align: right;
+}
 
 /* Direction-aware change highlighting:
    - tt-up    : value increased     (dark blue text on light blue bg)
