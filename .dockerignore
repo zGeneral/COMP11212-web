@@ -7,12 +7,14 @@ test-results
 *.log
 README.md
 TODOS.md
+DEPLOY.md
+Makefile
 playwright.config.js
 vitest.config.js
 .gitignore
 .dockerignore
 .env
 .env.local
-NOTICE
-LICENSE
+# Local-only Pyodide bundle (re-downloaded fresh in the pyodide-fetch stage).
+static/pyodide
 # package.json + scripts/ ARE needed by the editor-build stage; do NOT exclude.

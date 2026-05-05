@@ -22,8 +22,8 @@ WORKDIR /build
 COPY package.json package-lock.json ./
 RUN npm ci --include=dev
 COPY scripts/editor-entry.js scripts/build-editor.mjs ./scripts/
-COPY static ./static
-RUN npm run build:editor
+RUN mkdir -p static \
+ && node scripts/build-editor.mjs
 # Result: /build/static/editor-bundle.js (rebuilt fresh).
 
 # ---- Stage 3: final image ----

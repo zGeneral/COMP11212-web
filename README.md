@@ -51,16 +51,28 @@ npm run test:e2e
 npm run dev
 ```
 
-## Production deploy
+## Run with Docker
 
-Self-hosted on Kamal's VPS. Pure Docker + Traefik:
+The whole webapp ships as a single `nginx:alpine` container. The Dockerfile downloads the pinned Pyodide bundle and rebuilds the CodeMirror editor bundle at image-build time, so the user's browser fetches everything from your domain (no third-party CDN at runtime).
+
+**Local quick test** (no Traefik / DNS / TLS — just `:8080`):
 
 ```bash
-GIT_SHA=$(git rev-parse --short HEAD) docker compose build
-GIT_SHA=$(git rev-parse --short HEAD) docker compose up -d
+make local-up         # build + start at http://localhost:8080
+make local-verify     # smoke-check all the static endpoints
+make local-down
 ```
 
-The Dockerfile downloads the pinned Pyodide bundle at build time, so the user's browser fetches everything from `while.hassiba.cc` (no third-party CDN at runtime).
+**Production deploy** (Traefik + Let's Encrypt on your VPS):
+
+```bash
+make build            # tag image with the current git SHA
+make up               # replace the running container
+make verify           # smoke-check the running container
+make rollback         # list previous SHAs in case you need to revert
+```
+
+Full step-by-step deploy guide (DNS, hostname, troubleshooting, rollback, image-size budget): see [**DEPLOY.md**](DEPLOY.md).
 
 ## URL schema
 
