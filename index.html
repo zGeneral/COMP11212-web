@@ -7,7 +7,6 @@
   <meta name="description" content="A zero-install web playground for the While language. Trace a program's small-step semantics, count its steps, verify a Hoare triple. Built for first-year undergrads studying operational semantics.">
   <link rel="stylesheet" href="/main.css">
   <link rel="stylesheet" href="/embed.css">
-  <link rel="stylesheet" href="/static/cheatsheets/katex.min.css">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ctext y='14' font-size='14'%3E%E2%9F%A8%E2%9F%A9%3C/text%3E%3C/svg%3E">
   <!-- Pyodide: must load before main.js. Self-hosted in production; CDN in dev. -->
   <script src="/static/pyodide/pyodide.js"></script>
@@ -27,9 +26,9 @@
       </span>
     </div>
     <p class="tagline">A formal-semantics playground for the While language. Free, MIT-licensed, runs in your browser.</p>
-    <nav class="tabs" role="tablist" aria-label="Sections">
-      <button type="button" role="tab" data-tab="playground" class="tab active" aria-selected="true">▶ Playground</button>
-      <button type="button" role="tab" data-tab="cheatsheets" class="tab" aria-selected="false">📚 Cheatsheets</button>
+    <nav class="tabs" aria-label="Sections">
+      <span class="tab active" aria-current="page">▶ Playground</span>
+      <a class="tab tab-link" href="/cheatsheets.html" target="_blank" rel="noopener" title="Open the cheatsheets in a new window">📚 Cheatsheets ↗</a>
     </nav>
   </header>
 
@@ -97,25 +96,6 @@
     </section>
 
   </main>
-
-  <section class="cheatsheets-view" id="cheatsheets-view" hidden>
-    <nav class="cheatsheet-nav" role="tablist" aria-label="Cheatsheet sections">
-      <button type="button" data-sheet="semantics"     class="sheet-tab active">1–2 · Semantics</button>
-      <button type="button" data-sheet="complexity"    class="sheet-tab">3 · Complexity</button>
-      <button type="button" data-sheet="hoare"         class="sheet-tab">4 · Hoare logic</button>
-      <button type="button" data-sheet="computability" class="sheet-tab">5 · Computability</button>
-      <button type="button" data-sheet="encodings"     class="sheet-tab">6 · Encodings</button>
-      <button type="button" data-sheet="appendix"      class="sheet-tab">App · Math + big-step</button>
-    </nav>
-    <article id="cheatsheet-body" class="cheatsheet-body">
-      <p class="cheatsheet-loading">Loading…</p>
-    </article>
-    <p class="cheatsheet-note">
-      Cheatsheets are the author's own concise reference for COMP11212 study; they do not redistribute UoM course material. See
-      <a href="https://github.com/zGeneral/COMP11212-web/blob/master/NOTICE">NOTICE</a> for full attribution. Math rendered via
-      <a href="https://katex.org/">KaTeX</a>.
-    </p>
-  </section>
 
   <footer class="page-footer">
     <p class="footer-line">

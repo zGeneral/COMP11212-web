@@ -10,11 +10,21 @@ import {
   getState,
   getHoareInputs,
   setEditorTheme,
-  flushPendingTheme,
 } from './editor.js';
 import { renderResult, showLoading, showEngineLoading } from './trace_pane.js';
 import { setupToolbar } from './toolbar.js';
-import { renderCheatsheet, activateSheetTab, setupCheatsheetNav } from './cheatsheets.js';
+
+// Legacy URL redirect: /?tab=cheatsheets&sheet=hoare → /cheatsheets.html?sheet=hoare.
+// Old shareable links keep working after the cheatsheets moved out of the
+// playground tab into their own page.
+(function redirectLegacyCheatsheets() {
+  if (typeof location === 'undefined') return;
+  const params = new URLSearchParams(location.search || '');
+  if (params.get('tab') !== 'cheatsheets') return;
+  const sheet = params.get('sheet');
+  const target = '/cheatsheets.html' + (sheet ? '?sheet=' + encodeURIComponent(sheet) : '');
+  location.replace(target);
+})();
 
 const THEME_KEY = 'while-playground:theme';
 const THEME_VALUES = new Set(['plain', 'two-tone', 'ide']);
@@ -48,9 +58,6 @@ while i <= 1 do (
 
 const STARTER_STATE = {};
 
-const VALID_TABS = new Set(['playground', 'cheatsheets']);
-const VALID_SHEETS = new Set(['semantics', 'complexity', 'hoare', 'computability', 'encodings', 'appendix']);
-
 export function parseUrl(loc) {
   const params = new URLSearchParams(loc.search || '');
   const hash = new URLSearchParams((loc.hash || '').slice(1));
@@ -77,9 +84,6 @@ export function parseUrl(loc) {
     /* malformed ?samples= → empty */
   }
 
-  const tab = params.get('tab');
-  const sheet = params.get('sheet');
-
   return {
     code,
     tool: params.get('tool') || 'trace',
@@ -88,8 +92,6 @@ export function parseUrl(loc) {
     pre: params.get('pre') || '',
     post: params.get('post') || '',
     embed: params.get('embed') === '1',
-    tab: VALID_TABS.has(tab) ? tab : 'playground',
-    sheet: VALID_SHEETS.has(sheet) ? sheet : 'semantics',
   };
 }
 
@@ -121,8 +123,6 @@ const live = {
 };
 
 async function run() {
-  // No-op if the user is on the cheatsheets tab; don't load Pyodide for them.
-  if (_currentTab !== 'playground') return;
   const code = getEditor();
   // Always read the latest values from the inputs at run time.
   live.state = getState();
@@ -162,48 +162,6 @@ function shareCurrent() {
   return Promise.resolve({ ok: true, url, copied: false });
 }
 
-// ─────────────────────────────────────────────────────────────────────────
-// Tab routing — top-level Playground vs Cheatsheets
-// ─────────────────────────────────────────────────────────────────────────
-
-let _currentTab = 'playground';
-
-function showTab(tab, opts = {}) {
-  _currentTab = tab;
-  const playgroundView = document.getElementById('playground-view');
-  const cheatsheetsView = document.getElementById('cheatsheets-view');
-  if (playgroundView) playgroundView.hidden = tab !== 'playground';
-  if (cheatsheetsView) cheatsheetsView.hidden = tab !== 'cheatsheets';
-  document.querySelectorAll('[data-tab]').forEach((b) => {
-    const isActive = b.getAttribute('data-tab') === tab;
-    b.classList.toggle('active', isActive);
-    b.setAttribute('aria-selected', isActive ? 'true' : 'false');
-  });
-  if (typeof document !== 'undefined') document.body.setAttribute('data-tab', tab);
-
-  // Switching tabs should land the user at the top of the new view, not
-  // dump them at whatever scroll position the previous view used.
-  if (opts.scroll !== false && typeof window !== 'undefined') {
-    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-  }
-
-  // Apply any theme that was queued while the playground was hidden.
-  if (tab === 'playground') flushPendingTheme();
-}
-
-function updateUrlTab(tab, sheet) {
-  if (typeof history === 'undefined') return;
-  const url = new URL(location.href);
-  if (tab === 'playground') {
-    url.searchParams.delete('tab');
-    url.searchParams.delete('sheet');
-  } else {
-    url.searchParams.set('tab', tab);
-    if (sheet) url.searchParams.set('sheet', sheet);
-  }
-  history.replaceState(null, '', url.toString());
-}
-
 export function bootstrap() {
   if (typeof document === 'undefined') return; // skip in unit-test envs
 
@@ -217,33 +175,6 @@ export function bootstrap() {
   }
 
   const initial = parseUrl(typeof location !== 'undefined' ? location : { search: '', hash: '' });
-
-  // Tab routing. Initial tab change (on bootstrap) does NOT scroll — we
-  // honour any deep-link the user arrived with. User-initiated tab clicks
-  // DO scroll back to the top of the new view.
-  showTab(initial.tab, { scroll: false });
-  document.querySelectorAll('[data-tab]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const tab = btn.getAttribute('data-tab');
-      showTab(tab);
-      updateUrlTab(tab, _currentSheet);
-      if (tab === 'cheatsheets') {
-        renderCheatsheet(_currentSheet);
-      }
-    });
-  });
-
-  // Cheatsheet sub-tab routing.
-  let _currentSheet = initial.sheet;
-  activateSheetTab(_currentSheet);
-  setupCheatsheetNav((slug) => {
-    _currentSheet = slug;
-    updateUrlTab(_currentTab, slug);
-    renderCheatsheet(slug);
-  });
-  if (initial.tab === 'cheatsheets') {
-    renderCheatsheet(_currentSheet);
-  }
 
   // Apply embed mode immediately so first paint is correct.
   if (initial.embed) {

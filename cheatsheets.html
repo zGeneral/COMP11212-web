@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cheatsheets — while.hassiba.cc</title>
+  <meta name="description" content="Concise reference cheatsheets for COMP11212 (operational semantics, complexity, Hoare logic, computability, encodings, big-step). Companion to the playground at while.hassiba.cc.">
+  <link rel="stylesheet" href="/main.css">
+  <link rel="stylesheet" href="/static/cheatsheets/katex.min.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ctext y='14' font-size='14'%3E📚%3C/text%3E%3C/svg%3E">
+</head>
+<body class="cheatsheets-page">
+
+  <header class="page-header">
+    <div class="header-row">
+      <h1><a href="/cheatsheets.html">📚 Cheatsheets</a></h1>
+      <span class="header-disclaimer">
+        Author's own reference for <abbr title="University of Manchester">UoM</abbr> COMP11212 ·
+        <a href="https://github.com/zGeneral/COMP11212-web/blob/master/NOTICE">attribution</a>
+      </span>
+    </div>
+    <p class="tagline">
+      Concise reference for chapter material. Math typeset via KaTeX.
+      Companion to the <a href="/" target="_blank" rel="noopener">▶ playground ↗</a>.
+    </p>
+  </header>
+
+  <main class="cheatsheets-view">
+    <nav class="cheatsheet-nav" role="tablist" aria-label="Cheatsheet sections">
+      <button type="button" data-sheet="semantics"     class="sheet-tab active">1–2 · Semantics</button>
+      <button type="button" data-sheet="complexity"    class="sheet-tab">3 · Complexity</button>
+      <button type="button" data-sheet="hoare"         class="sheet-tab">4 · Hoare logic</button>
+      <button type="button" data-sheet="computability" class="sheet-tab">5 · Computability</button>
+      <button type="button" data-sheet="encodings"     class="sheet-tab">6 · Encodings</button>
+      <button type="button" data-sheet="appendix"      class="sheet-tab">App · Math + big-step</button>
+    </nav>
+    <article id="cheatsheet-body" class="cheatsheet-body">
+      <p class="cheatsheet-loading">Loading…</p>
+    </article>
+    <p class="cheatsheet-note">
+      Cheatsheets are the author's own concise reference for COMP11212 study; they do not redistribute UoM course material. See
+      <a href="https://github.com/zGeneral/COMP11212-web/blob/master/NOTICE">NOTICE</a> for full attribution. Math rendered via
+      <a href="https://katex.org/">KaTeX</a>.
+    </p>
+  </main>
+
+  <footer class="page-footer">
+    <p class="footer-line">
+      Built by <strong>Kamal Hassiba</strong> ·
+      <a href="https://github.com/zGeneral/COMP11212-web">source</a> ·
+      <a href="https://github.com/zGeneral/COMP11212">companion notebooks</a> ·
+      <a href="https://github.com/zGeneral/COMP11212-web/blob/master/NOTICE">attribution &amp; notice</a> ·
+      MIT licensed
+    </p>
+    <p class="footer-disclaimer">
+      <strong>Unofficial student companion to UoM COMP11212.</strong> Not affiliated with, endorsed by, or maintained by the
+      University of Manchester or its course staff.
+    </p>
+  </footer>
+
+  <script type="module">
+    // Self-contained loader for the cheatsheets page. Lazy-fetches one of
+    // the pre-rendered HTML chunks under /static/cheatsheets/.
+    const VALID = new Set(['semantics', 'complexity', 'hoare', 'computability', 'encodings', 'appendix']);
+    const cache = {};
+
+    function pickInitialSheet() {
+      const params = new URLSearchParams(location.search);
+      const sheet = params.get('sheet');
+      return VALID.has(sheet) ? sheet : 'semantics';
+    }
+
+    function activate(slug) {
+      document.querySelectorAll('[data-sheet]').forEach((b) => {
+        b.classList.toggle('active', b.getAttribute('data-sheet') === slug);
+      });
+    }
+
+    function updateUrl(slug) {
+      const url = new URL(location.href);
+      if (slug === 'semantics') url.searchParams.delete('sheet');
+      else url.searchParams.set('sheet', slug);
+      history.replaceState(null, '', url.toString());
+    }
+
+    async function load(slug) {
+      const body = document.getElementById('cheatsheet-body');
+      if (!body) return;
+      body.innerHTML = '<p class="cheatsheet-loading">Loading…</p>';
+      try {
+        if (!cache[slug]) {
+          const r = await fetch('/static/cheatsheets/' + encodeURIComponent(slug) + '.html');
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          cache[slug] = await r.text();
+        }
+        body.innerHTML = cache[slug];
+        body.scrollTop = 0;
+      } catch (e) {
+        body.innerHTML =
+          '<div class="error-block kind-load"><h3>Cheatsheet failed to load</h3><p>' +
+          String(e && e.message || e).replace(/[<>&]/g, (c) => ({'<': '&lt;', '>': '&gt;', '&': '&amp;'}[c])) +
+          '</p></div>';
+      }
+    }
+
+    document.querySelectorAll('[data-sheet]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const slug = btn.getAttribute('data-sheet');
+        activate(slug);
+        updateUrl(slug);
+        load(slug);
+      });
+    });
+
+    const initial = pickInitialSheet();
+    activate(initial);
+    load(initial);
+  </script>
+
+</body>
+</html>

@@ -96,6 +96,15 @@ a:hover { color: var(--accent-hover); }
   color: var(--fg);
   font-weight: 600;
 }
+.tab.tab-link {
+  text-decoration: none;
+  display: inline-block;
+}
+.tab.tab-link:hover { color: var(--accent); }
+
+/* Cheatsheets page sets its own body background so the page doesn't feel
+   like an extension of the playground card-grid. */
+body.cheatsheets-page { background: var(--bg); }
 
 /* ── Cheatsheets view ── */
 .cheatsheets-view {
