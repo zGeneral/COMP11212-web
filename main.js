@@ -3,9 +3,37 @@
 // the share button (not on every keystroke).
 
 import { runTool } from './engine.js';
-import { setEditor, getEditor, setState, getState, getHoareInputs } from './editor.js';
+import {
+  setEditor,
+  getEditor,
+  setState,
+  getState,
+  getHoareInputs,
+  setEditorTheme,
+} from './editor.js';
 import { renderResult, showLoading, showEngineLoading } from './trace_pane.js';
 import { setupToolbar } from './toolbar.js';
+
+const THEME_KEY = 'while-playground:theme';
+const THEME_VALUES = new Set(['plain', 'two-tone', 'ide']);
+
+function readTheme() {
+  if (typeof localStorage === 'undefined') return 'ide';
+  const v = localStorage.getItem(THEME_KEY);
+  return THEME_VALUES.has(v) ? v : 'ide';
+}
+
+function applyTheme(name) {
+  const safe = THEME_VALUES.has(name) ? name : 'ide';
+  if (typeof document !== 'undefined') {
+    document.body.classList.remove('theme-plain', 'theme-two', 'theme-ide');
+    document.body.classList.add(safe === 'two-tone' ? 'theme-two' : `theme-${safe}`);
+  }
+  setEditorTheme(safe);
+  if (typeof localStorage !== 'undefined') {
+    try { localStorage.setItem(THEME_KEY, safe); } catch { /* private mode */ }
+  }
+}
 
 // Default starter program — a tiny 2-iteration counter loop. Renders ~13
 // lines of trace; demonstrates :=, skip-;, while-tt firing twice, while-ff
@@ -124,6 +152,15 @@ function shareCurrent() {
 
 export function bootstrap() {
   if (typeof document === 'undefined') return; // skip in unit-test envs
+
+  // Apply saved theme BEFORE the editor mounts so the first paint is correct.
+  const savedTheme = readTheme();
+  applyTheme(savedTheme);
+  const themeSel = document.getElementById('theme-select');
+  if (themeSel) {
+    themeSel.value = savedTheme;
+    themeSel.addEventListener('change', (ev) => applyTheme(ev.target.value));
+  }
 
   const initial = parseUrl(typeof location !== 'undefined' ? location : { search: '', hash: '' });
 

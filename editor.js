@@ -13,6 +13,7 @@
 // Hoare inputs stay as plain <textarea>/<input> elements.
 
 let _view = null;
+let _currentTheme = 'ide';
 const _changeHandlers = [];
 
 function getMount() {
@@ -25,10 +26,20 @@ function ensureView(initial = '') {
   if (typeof window === 'undefined' || !window.CMEditor) return null;
   const mount = getMount();
   if (!mount) return null;
-  _view = window.CMEditor.create(mount, initial, (value) => {
-    _changeHandlers.forEach((h) => h(value));
-  });
+  _view = window.CMEditor.create(
+    mount,
+    initial,
+    (value) => _changeHandlers.forEach((h) => h(value)),
+    _currentTheme
+  );
   return _view;
+}
+
+export function setEditorTheme(themeName) {
+  _currentTheme = themeName;
+  if (_view && window.CMEditor && window.CMEditor.setTheme) {
+    window.CMEditor.setTheme(_view, themeName);
+  }
 }
 
 export function setEditor(code) {

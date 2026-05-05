@@ -3,7 +3,7 @@
 // Bundled by scripts/build-editor.mjs into static/editor-bundle.js. Exposes
 // a small API on window.CMEditor that editor.js consumes.
 
-import { EditorState } from '@codemirror/state';
+import { EditorState, Compartment } from '@codemirror/state';
 import {
   EditorView,
   lineNumbers,
@@ -44,11 +44,9 @@ const whileLanguage = StreamLanguage.define({
   token(stream) {
     if (stream.eatSpace()) return null;
 
-    // multi-char operators
     if (stream.match(':=')) return 'definitionOperator';
     if (stream.match('<=')) return 'compareOperator';
 
-    // single-char punctuation / operators
     const ch = stream.peek();
     if (ch === ';') { stream.next(); return 'punctuation'; }
     if (ch === '(' || ch === ')') { stream.next(); return 'paren'; }
@@ -57,10 +55,8 @@ const whileLanguage = StreamLanguage.define({
     if (ch === '=') { stream.next(); return 'compareOperator'; }
     if (ch === '!' || ch === '&' || ch === '|') { stream.next(); return 'logicOperator'; }
 
-    // numbers
     if (stream.match(/^\d+/)) return 'number';
 
-    // identifiers / keywords / atoms
     if (stream.match(/^[a-zA-Z_][a-zA-Z0-9_]*/)) {
       const word = stream.current();
       if (KEYWORDS.has(word)) return 'keyword';
@@ -86,11 +82,34 @@ const whileLanguage = StreamLanguage.define({
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// IDE-flavoured highlight theme — matches the trace pane palette so the
-// editor and the trace look like the same language.
+// Three named highlight themes
 // ─────────────────────────────────────────────────────────────────────────────
 
-const whileHighlight = HighlightStyle.define([
+// Plain — no syntax highlighting. Just the default text color.
+const themePlain = HighlightStyle.define([
+  // Empty list = no overrides; the editor falls back to the default color.
+  // We still register an empty style so swapping into "plain" overrides
+  // anything previously applied.
+  { tag: t.keyword },
+  { tag: t.atom },
+  { tag: t.number },
+  { tag: t.variableName },
+  { tag: t.definitionOperator },
+  { tag: t.compareOperator },
+  { tag: t.arithmeticOperator },
+  { tag: t.logicOperator },
+  { tag: t.paren },
+  { tag: t.punctuation },
+]);
+
+// Two-tone — keywords (while, do, if, then, else, skip) bold blue; rest black.
+const themeTwo = HighlightStyle.define([
+  { tag: t.keyword,            color: '#1565c0', fontWeight: '600' },
+  { tag: t.definitionOperator, fontWeight: '600' },
+]);
+
+// IDE — full multi-color palette. The original look.
+const themeIde = HighlightStyle.define([
   { tag: t.keyword,            color: '#1565c0', fontWeight: '600' },
   { tag: t.atom,               color: '#5e35b1', fontWeight: '600' },
   { tag: t.number,             color: '#00838f' },
@@ -102,6 +121,15 @@ const whileHighlight = HighlightStyle.define([
   { tag: t.paren,              color: '#888' },
   { tag: t.punctuation,        color: '#888' },
 ]);
+
+const THEMES = {
+  plain:    themePlain,
+  'two-tone': themeTwo,
+  ide:      themeIde,
+};
+
+// Compartment so we can swap the highlight extension on the fly.
+const themeCompartment = new Compartment();
 
 const editorTheme = EditorView.theme({
   '&': {
@@ -133,7 +161,12 @@ const editorTheme = EditorView.theme({
 // Public API: window.CMEditor
 // ─────────────────────────────────────────────────────────────────────────────
 
-function create(parent, initialDoc, onChange) {
+function pickTheme(name) {
+  return THEMES[name] || THEMES.ide;
+}
+
+function create(parent, initialDoc, onChange, themeName) {
+  const initial = pickTheme(themeName);
   const view = new EditorView({
     parent,
     state: EditorState.create({
@@ -149,7 +182,7 @@ function create(parent, initialDoc, onChange) {
         dropCursor(),
         keymap.of([...defaultKeymap, ...historyKeymap, indentWithTab]),
         whileLanguage,
-        syntaxHighlighting(whileHighlight),
+        themeCompartment.of(syntaxHighlighting(initial)),
         syntaxHighlighting(defaultHighlightStyle),
         editorTheme,
         EditorView.lineWrapping,
@@ -179,4 +212,11 @@ function focus(view) {
   if (view) view.focus();
 }
 
-window.CMEditor = { create, getValue, setValue, focus };
+function setTheme(view, name) {
+  if (!view) return;
+  view.dispatch({
+    effects: themeCompartment.reconfigure(syntaxHighlighting(pickTheme(name))),
+  });
+}
+
+window.CMEditor = { create, getValue, setValue, focus, setTheme };

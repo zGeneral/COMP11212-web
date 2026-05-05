@@ -229,6 +229,24 @@ body.tool-hoare .hoare-pane { display: block; }
 }
 .toolbar button.primary:hover { background: var(--accent-hover); }
 
+.theme-select-label {
+  font-size: 12px;
+  color: var(--fg-faint);
+  margin-right: 2px;
+}
+#theme-select {
+  font-size: 12px;
+  padding: 3px 8px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  color: var(--fg);
+}
+#theme-select:hover { border-color: var(--border-strong); }
+#theme-select:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+
 .result-pane {
   flex: 1;
   padding: 16px;
@@ -255,21 +273,51 @@ body.tool-hoare .hoare-pane { display: block; }
   overflow-x: auto;
 }
 
-/* Syntax-highlight tokens inside the trace */
-.tw-bracket   { color: #888; }
-.tw-state-brace { color: #5e35b1; font-weight: 500; }
-.tw-paren     { color: #888; }
-.tw-punct     { color: #888; }
-.tw-kw        { color: #1565c0; font-weight: 600; }
-.tw-atom      { color: #5e35b1; font-weight: 600; }
-.tw-num       { color: #00838f; }
-.tw-var       { color: #1a1a1a; font-style: italic; }
-.tw-op        { color: #b85c00; }
-.tw-arrow     { color: #d32f2f; font-weight: 600; }
-.tw-rule      { color: #888; font-style: italic; font-size: 0.9em; }
-.tw-rule-name { color: #2e7d32; font-weight: 600; font-style: normal; }
-.tw-legend-header { color: var(--fg-muted); font-weight: 600; }
-.tw-legend    { color: var(--fg-muted); }
+/* ─── Syntax-highlight tokens inside the trace ───
+   Default: plain (everything inherits the surrounding color).
+   Overrides for `body.theme-two` and `body.theme-ide` further down. */
+.tw-bracket,
+.tw-state-brace,
+.tw-paren,
+.tw-punct,
+.tw-kw,
+.tw-atom,
+.tw-num,
+.tw-var,
+.tw-op,
+.tw-arrow,
+.tw-rule,
+.tw-rule-name,
+.tw-legend-header,
+.tw-legend {
+  color: inherit;
+  font-weight: inherit;
+  font-style: inherit;
+}
+/* The rule label suffix is always slightly muted regardless of theme so it
+   reads as metadata, not as part of the configuration. */
+.tw-rule { font-size: 0.9em; opacity: 0.75; }
+
+/* ── theme-two: black + blue for keywords + bold := ── */
+body.theme-two .tw-kw       { color: #1565c0; font-weight: 600; }
+body.theme-two .tw-arrow    { font-weight: 600; }
+body.theme-two .tw-rule-name { font-weight: 500; }
+
+/* ── theme-ide: full palette (the original IDE look) ── */
+body.theme-ide .tw-bracket     { color: #888; }
+body.theme-ide .tw-state-brace { color: #5e35b1; font-weight: 500; }
+body.theme-ide .tw-paren       { color: #888; }
+body.theme-ide .tw-punct       { color: #888; }
+body.theme-ide .tw-kw          { color: #1565c0; font-weight: 600; }
+body.theme-ide .tw-atom        { color: #5e35b1; font-weight: 600; }
+body.theme-ide .tw-num         { color: #00838f; }
+body.theme-ide .tw-var         { color: #1a1a1a; font-style: italic; }
+body.theme-ide .tw-op          { color: #b85c00; }
+body.theme-ide .tw-arrow       { color: #d32f2f; font-weight: 600; }
+body.theme-ide .tw-rule        { color: #888; font-style: italic; }
+body.theme-ide .tw-rule-name   { color: #2e7d32; font-weight: 600; font-style: normal; }
+body.theme-ide .tw-legend-header { color: var(--fg-muted); font-weight: 600; }
+body.theme-ide .tw-legend      { color: var(--fg-muted); }
 
 .show-all { margin-top: 16px; }
 .show-all summary {
