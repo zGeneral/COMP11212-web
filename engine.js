@@ -137,15 +137,38 @@ export async function runTool({ tool, code, state, samples, pre, post }) {
       py.globals.set('_schema', schema);
 
       const result = py.runPython(`
-import random
+import random, ast
 random.seed(0)
 schema = dict(_schema.to_py())
 def _sample():
     return {k: random.randint(lo, hi) for k, (lo, hi) in schema.items()}
 samples = [_sample() for _ in range(10)]
 SAFE = {"__builtins__": {}}
-def _precond(s):  return bool(eval(_pre,  SAFE, dict(s)))
-def _postcond(s): return bool(eval(_post, SAFE, dict(s)))
+
+def _names_in(expr):
+    """Collect every Name referenced in the assertion expression."""
+    try:
+        tree = ast.parse(expr, mode='eval')
+    except SyntaxError:
+        return set()
+    return {n.id for n in ast.walk(tree) if isinstance(n, ast.Name)}
+
+_pre_names  = _names_in(_pre)
+_post_names = _names_in(_post)
+
+def _eval_with_zero_defaults(expr, names, state):
+    # In While, unset variables are implicitly 0. Mirror that semantic
+    # in the assertion eval: any name in the expression that's not in
+    # the state dict defaults to 0. Avoids spurious NameErrors when the
+    # final state happens to omit a zero-valued variable.
+    locs = dict(state)
+    for n in names:
+        locs.setdefault(n, 0)
+    return bool(eval(expr, SAFE, locs))
+
+def _precond(s):  return _eval_with_zero_defaults(_pre,  _pre_names,  s)
+def _postcond(s): return _eval_with_zero_defaults(_post, _post_names, s)
+
 verify_triple(precond=_precond, prog=_code, postcond=_postcond, sample_states=samples)
       `);
       return { ok: true, value: pyToJs(result) };
