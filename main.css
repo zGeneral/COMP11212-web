@@ -471,6 +471,52 @@ body.tool-hoare .hoare-pane { display: block; }
   overflow-x: auto;
 }
 
+/* ─── Table-view trace ───
+   Shown when tool=table. One row per small-step transition; columns are
+   step number, rule label, and one column per variable. Cells where a
+   value changed from the previous row get a subtle highlight. */
+.trace-table-wrap { overflow-x: auto; margin: 0; }
+table.trace-table {
+  border-collapse: collapse;
+  font-family: var(--code-font);
+  font-size: 13px;
+  line-height: 1.4;
+}
+table.trace-table thead th {
+  position: sticky;
+  top: 0;
+  background: var(--bg-soft);
+  border-bottom: 2px solid var(--border-strong);
+  padding: 6px 12px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--fg-muted);
+  white-space: nowrap;
+}
+table.trace-table tbody td {
+  padding: 4px 12px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+table.trace-table .tt-step { color: var(--fg-faint); text-align: right; }
+table.trace-table .tt-rule { color: var(--fg-muted); font-style: italic; }
+table.trace-table .tt-val  { font-variant-numeric: tabular-nums; }
+table.trace-table .tt-changed {
+  background: rgba(46, 125, 50, 0.10);
+  font-weight: 600;
+  color: var(--fg);
+}
+body.theme-ide table.trace-table .tt-changed { background: rgba(211, 47, 47, 0.10); color: #d32f2f; }
+body.theme-two table.trace-table .tt-changed { background: rgba(21, 101, 192, 0.10); color: #1565c0; }
+table.trace-table tr.truncated td {
+  text-align: center;
+  font-style: italic;
+  color: var(--fg-faint);
+  padding: 8px 12px;
+  background: var(--bg-soft);
+}
+table.trace-table tbody tr:hover { background: rgba(0, 0, 0, 0.02); }
+
 /* ─── Syntax-highlight tokens inside the trace ───
    Default: plain (everything inherits the surrounding color).
    Overrides for `body.theme-two` and `body.theme-ide` further down. */

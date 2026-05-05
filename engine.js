@@ -114,6 +114,11 @@ export async function runTool({ tool, code, state, samples, pre, post }) {
       return { ok: true, value: result };
     }
 
+    if (tool === 'table') {
+      const result = py.runPython(`trace(_code, dict(_state.to_py()), view='table')`);
+      return { ok: true, value: result };
+    }
+
     if (tool === 'count') {
       const result = py.runPython(`count_steps(_code, dict(_state.to_py()))`);
       return { ok: true, value: { steps: Number(result) } };

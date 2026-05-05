@@ -192,7 +192,7 @@ function getPane() {
 export function showLoading(tool) {
   const pane = getPane();
   if (!pane) return;
-  const labels = { trace: 'Tracing', count: 'Counting steps', hoare: 'Verifying' };
+  const labels = { trace: 'Tracing', table: 'Building table', count: 'Counting steps', hoare: 'Verifying' };
   pane.classList.remove('error');
   pane.innerHTML = `<div class="status">${labels[tool] || 'Running'}…</div>`;
 }
@@ -203,6 +203,80 @@ export function showEngineLoading() {
   pane.classList.remove('error');
   pane.innerHTML =
     '<div class="status">Engine loading… (5–15s on first visit; instant after)</div>';
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Table view — parse the engine's text output into a real HTML <table> and
+// highlight cells where the value changed from the previous row.
+//
+// Engine output shape (one trailing newline ignored):
+//   step | rule    | x  | y
+//   -----+---------+----+----
+//   0    | start   | 0  | 0
+//   1    | :=      | 5  | 0
+//   ...
+// ─────────────────────────────────────────────────────────────────────────────
+
+function parseTableText(text) {
+  const lines = String(text).split('\n').filter((l) => l.length > 0);
+  if (lines.length < 3) return null;
+  // First line is header; second line is separator; rest are data rows.
+  const splitRow = (line) => line.split('|').map((c) => c.trim());
+  const header = splitRow(lines[0]);
+  const rows = [];
+  for (let i = 2; i < lines.length; i++) {
+    const line = lines[i];
+    if (line.startsWith('...')) {
+      rows.push({ truncated: line });
+      continue;
+    }
+    if (line.includes('---')) continue;   // skip extra separators if any
+    const cells = splitRow(line);
+    if (cells.length === header.length) rows.push({ cells });
+  }
+  return { header, rows };
+}
+
+function renderTableHtml(text) {
+  const parsed = parseTableText(text);
+  if (!parsed) {
+    return `<pre class="trace">${escapeHtml(text)}</pre>`;
+  }
+  const { header, rows } = parsed;
+  let html = '<table class="trace-table"><thead><tr>';
+  for (const h of header) {
+    html += `<th>${escapeHtml(h)}</th>`;
+  }
+  html += '</tr></thead><tbody>';
+  let prev = null;
+  for (const row of rows) {
+    if (row.truncated) {
+      html += `<tr class="truncated"><td colspan="${header.length}">${escapeHtml(row.truncated)}</td></tr>`;
+      continue;
+    }
+    const cells = row.cells;
+    html += '<tr>';
+    for (let i = 0; i < cells.length; i++) {
+      const value = cells[i];
+      const colName = header[i];
+      // step + rule columns are metadata; never highlight as a value-change.
+      const isMeta = colName === 'step' || colName === 'rule';
+      const changed = !isMeta && prev && prev[i] !== undefined && prev[i] !== value;
+      const cls = isMeta
+        ? `tt-${escapeHtml(colName)}`
+        : 'tt-val' + (changed ? ' tt-changed' : '');
+      html += `<td class="${cls}">${escapeHtml(value)}</td>`;
+    }
+    html += '</tr>';
+    prev = cells;
+  }
+  html += '</tbody></table>';
+  return html;
+}
+
+function renderTrace(text) {
+  // Used by the table tool — wraps the table HTML in a scroll container.
+  return `<div class="trace-table-wrap">${renderTableHtml(text)}</div>`;
 }
 
 function renderTraceText(text) {
@@ -311,6 +385,8 @@ export function renderResult(tool, envelope) {
   pane.classList.remove('error');
   if (tool === 'trace') {
     pane.innerHTML = renderTraceText(envelope.value);
+  } else if (tool === 'table') {
+    pane.innerHTML = renderTrace(envelope.value);
   } else if (tool === 'count') {
     pane.innerHTML = renderCount(envelope.value);
   } else if (tool === 'hoare') {
@@ -321,4 +397,4 @@ export function renderResult(tool, envelope) {
 }
 
 // Exposed for unit testing
-export const _internal = { renderTraceText, renderCount, renderHoare, renderError, escapeHtml, paintTrace, paintTokens, paintLine };
+export const _internal = { renderTraceText, renderCount, renderHoare, renderError, escapeHtml, paintTrace, paintTokens, paintLine, parseTableText, renderTableHtml };

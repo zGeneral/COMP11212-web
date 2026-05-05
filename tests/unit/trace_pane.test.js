@@ -168,3 +168,58 @@ describe('renderCount', () => {
     expect(out).toContain('42');
   });
 });
+
+describe('parseTableText / renderTableHtml', () => {
+  const { parseTableText, renderTableHtml } = _internal;
+  const sample = [
+    'step | rule   | x | y',
+    '-----+--------+---+---',
+    '0    | start  | 0 | 0',
+    '1    | :=     | 5 | 0',
+    '2    | skip-; | 5 | 0',
+    '3    | :=     | 5 | 7',
+  ].join('\n');
+
+  it('parses header + rows', () => {
+    const p = parseTableText(sample);
+    expect(p.header).toEqual(['step', 'rule', 'x', 'y']);
+    expect(p.rows).toHaveLength(4);
+    expect(p.rows[0].cells).toEqual(['0', 'start', '0', '0']);
+    expect(p.rows[3].cells).toEqual(['3', ':=', '5', '7']);
+  });
+
+  it('renders an HTML table with sticky header', () => {
+    const html = renderTableHtml(sample);
+    expect(html).toContain('<table class="trace-table">');
+    expect(html).toContain('<thead>');
+    expect(html).toContain('<th>step</th>');
+    expect(html).toContain('<th>x</th>');
+    expect(html).toContain('<tbody>');
+  });
+
+  it('marks the cell where a value changed from the previous row', () => {
+    const html = renderTableHtml(sample);
+    // Row 1: x changed 0 → 5; should be tt-changed.
+    expect(html).toMatch(/<td class="tt-val tt-changed">5<\/td>.*?<td class="tt-val">0<\/td>/);
+    // Row 3: y changed 0 → 7; should be tt-changed.
+    expect(html).toMatch(/<td class="tt-val">5<\/td><td class="tt-val tt-changed">7<\/td>/);
+  });
+
+  it('does NOT mark the step or rule columns as changed (they always change)', () => {
+    const html = renderTableHtml(sample);
+    expect(html).not.toMatch(/<td class="tt-step tt-changed"/);
+    expect(html).not.toMatch(/<td class="tt-rule tt-changed"/);
+  });
+
+  it('handles a truncation row (... step budget exceeded ...)', () => {
+    const truncated = sample + '\n... step budget exceeded — likely non-terminating ...';
+    const html = renderTableHtml(truncated);
+    expect(html).toContain('class="truncated"');
+    expect(html).toContain('step budget exceeded');
+  });
+
+  it('falls back to a <pre> when the input is not a parseable table', () => {
+    const html = renderTableHtml('not a table');
+    expect(html).toContain('<pre');
+  });
+});
