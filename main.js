@@ -7,10 +7,14 @@ import { setEditor, getEditor, setState, getState, getHoareInputs } from './edit
 import { renderResult, showLoading, showEngineLoading } from './trace_pane.js';
 import { setupToolbar } from './toolbar.js';
 
-// Default starter program — tiny. The job of the first paint is "oh, that's
-// all?" not "whoa, complicated." Real programs live behind the Try-this buttons.
-const STARTER_CODE = `x := 5;
-y := x + 2`;
+// Default starter program — a tiny 2-iteration counter loop. Renders ~13
+// lines of trace; demonstrates :=, skip-;, while-tt firing twice, while-ff
+// terminating, and the L1 loop abbreviation. Substantive programs live one
+// click away (Try-this buttons).
+const STARTER_CODE = `i := 0;
+while i <= 1 do (
+  i := i + 1
+)`;
 
 const STARTER_STATE = {};
 
